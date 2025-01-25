@@ -1,3 +1,16 @@
+/* ### **3. `static/` Folder**
+This folder contains static files like CSS and JavaScript that are used by the frontend.
+
+#### **Files in `static/`:**
+
+1. **`css/style.css`**:
+   - **Purpose**: Defines the styling for the application.
+   - **Key Features**:
+     - General styles for the body, container, and headings.
+     - Styles for forms, tables, and buttons.
+     - Navigation bar styling. */
+
+
 /* General Styles */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;

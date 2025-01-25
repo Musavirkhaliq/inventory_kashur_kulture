@@ -1,3 +1,10 @@
+# 4. **`schemas.py`**:
+#    - **Purpose**: Defines Pydantic schemas for request/response validation.
+#    - **Key Schemas**:
+#      - `ProductCreate`: Schema for creating a product.
+#      - `Product`: Schema for returning a product.
+#      - Similar schemas for `sales`, `restocks`, and `invoices`.
+
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime

@@ -1,3 +1,11 @@
+// 2. **`js/main.js`**:
+//    - **Purpose**: Contains JavaScript for dynamic interactions (e.g., form submissions).
+//    - **Key Features**:
+//      - Handles form submissions for adding/updating products, sales, restocks, and invoices.
+//      - Makes API calls to the backend using `fetch`.
+
+
+
 // Function to handle form submissions
 async function submitForm(formId, endpoint, method = "POST") {
     const form = document.getElementById(formId);
