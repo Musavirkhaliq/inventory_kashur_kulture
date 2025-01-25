@@ -1,36 +1,36 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Sales Management</h1>
+    <h1>Restock Management</h1>
 
-    <h2>Record Sale</h2>
-    <form id="saleForm">
+    <h2>Record Restock</h2>
+    <form id="restockForm">
         <label for="product_id">Product ID:</label>
         <input type="number" id="product_id" name="product_id" required>
 
         <label for="quantity">Quantity:</label>
         <input type="number" id="quantity" name="quantity" required>
 
-        <button type="submit">Record Sale</button>
+        <button type="submit">Record Restock</button>
     </form>
 
-    <h2>Sales History</h2>
+    <h2>Restock History</h2>
     <table>
         <thead>
             <tr>
                 <th>ID</th>
                 <th>Product ID</th>
                 <th>Quantity</th>
-                <th>Sale Date</th>
+                <th>Restock Date</th>
             </tr>
         </thead>
         <tbody>
-            {% for sale in sales %}
+            {% for restock in restocks %}
             <tr>
-                <td>{{ sale.id }}</td>
-                <td>{{ sale.product_id }}</td>
-                <td>{{ sale.quantity }}</td>
-                <td>{{ sale.sale_date }}</td>
+                <td>{{ restock.id }}</td>
+                <td>{{ restock.product_id }}</td>
+                <td>{{ restock.quantity }}</td>
+                <td>{{ restock.restock_date }}</td>
             </tr>
             {% endfor %}
         </tbody>

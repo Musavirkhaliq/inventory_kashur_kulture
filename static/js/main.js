@@ -1,94 +1,71 @@
-/* static/js/main.js */
-async function addProduct() {
-    const form = document.getElementById('addProductForm');
-    const formData = new FormData(form);
-    
-    const product = {
-        sku: formData.get('sku'),
-        name: formData.get('name'),
-        quantity: parseInt(formData.get('quantity')),
-        price: parseFloat(formData.get('price'))
-    };
+// Function to handle form submissions
+async function submitForm(formId, endpoint, method = "POST") {
+    const form = document.getElementById(formId);
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
 
-    try {
-        const response = await fetch('/api/products', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(product)
-        });
+        try {
+            const response = await fetch(endpoint, {
+                method: method,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            });
 
-        if (response.ok) {
-            window.location.reload();
-        } else {
-            alert('Error adding product');
+            if (response.ok) {
+                alert("Operation successful!");
+                window.location.reload(); // Reload the page to reflect changes
+            } else {
+                alert("Something went wrong!");
+            }
+        } catch (error) {
+            console.error("Error:", error);
         }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Error adding product');
-    }
+    });
 }
 
+// Example: Handle product form submission
+document.addEventListener("DOMContentLoaded", () => {
+    submitForm("productForm", "/products/");
+    submitForm("saleForm", "/sales/");
+    submitForm("restockForm", "/restocks/");
+    submitForm("invoiceForm", "/invoices/");
+});
 
-// static/js/main.js
-async function addProduct() {
-    const form = document.getElementById('addProductForm');
-    const formData = new FormData(form);
 
-    const product = {
-        sku: formData.get('sku'),
-        name: formData.get('name'),
-        quantity: parseInt(formData.get('quantity')),
-        price: parseFloat(formData.get('price'))
-    };
+// Function to handle edit form submission
+async function submitEditForm(formId, endpoint, method = "PUT") {
+    const form = document.getElementById(formId);
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
 
-    try {
-        const response = await fetch('/api/products', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(product)
-        });
+        try {
+            const response = await fetch(endpoint, {
+                method: method,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            });
 
-        if (response.ok) {
-            window.location.reload();
-        } else {
-            alert('Error adding product');
+            if (response.ok) {
+                alert("Product updated successfully!");
+                window.location.href = "/products"; // Redirect to products page
+            } else {
+                alert("Something went wrong!");
+            }
+        } catch (error) {
+            console.error("Error:", error);
         }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Error adding product');
-    }
+    });
 }
 
-async function addSale() {
-    const form = document.getElementById('addSaleForm');
-    const formData = new FormData(form);
-
-    const sale = {
-        product_id: parseInt(formData.get('product_id')),
-        quantity: parseInt(formData.get('quantity')),
-        customer_name: formData.get('customer_name')
-    };
-
-    try {
-        const response = await fetch('/api/sales', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(sale)
-        });
-
-        if (response.ok) {
-            window.location.reload();
-        } else {
-            alert('Error adding sale');
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Error adding sale');
-    }
-}
+// Handle edit product form submission
+document.addEventListener("DOMContentLoaded", () => {
+    submitEditForm("editProductForm", `/products/${document.getElementById("id").value}`);
+});

@@ -1,29 +1,24 @@
-# schemas.py
 from pydantic import BaseModel
-from datetime import datetime
 from typing import Optional
-
+from datetime import datetime
 class ProductBase(BaseModel):
     name: str
-    sku: str
-    quantity: int
+    description: Optional[str] = None
     price: float
+    quantity: int
 
 class ProductCreate(ProductBase):
     pass
 
 class Product(ProductBase):
     id: int
-    created_at: datetime
-    updated_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class SaleBase(BaseModel):
     product_id: int
     quantity: int
-    total_amount: float
 
 class SaleCreate(SaleBase):
     pass
@@ -33,11 +28,24 @@ class Sale(SaleBase):
     sale_date: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
+
+class RestockBase(BaseModel):
+    product_id: int
+    quantity: int
+
+class RestockCreate(RestockBase):
+    pass
+
+class Restock(RestockBase):
+    id: int
+    restock_date: datetime
+
+    class Config:
+        from_attributes = True
 
 class InvoiceBase(BaseModel):
     sale_id: int
-    customer_name: str
 
 class InvoiceCreate(InvoiceBase):
     pass
@@ -47,10 +55,11 @@ class Invoice(InvoiceBase):
     invoice_date: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
-# schemas.py
-class SaleCreate(BaseModel):
-    product_id: int
-    quantity: int
-    customer_name: str
+
+class ProductUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    price: Optional[float] = None
+    quantity: Optional[int] = None

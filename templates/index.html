@@ -1,25 +1,14 @@
-<!-- templates/index.html -->
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container">
-    <div class="row mt-5">
-        <div class="col-md-12 text-center">
-            <h1>Welcome to Inventory Management System</h1>
-            <p class="lead">Manage your inventory efficiently</p>
-        </div>
-    </div>
-    
-    <div class="row mt-4">
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Products</h5>
-                    <p class="card-text">Manage your product inventory</p>
-                    <a href="/products" class="btn btn-primary">Go to Products</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+    <h1>Welcome to Inventory Management</h1>
+    <p>Manage your products, sales, restocks, and invoices efficiently.</p>
+
+    <h2>Quick Links</h2>
+    <ul>
+        <li><a href="/products">Manage Products</a></li>
+        <li><a href="/sales">Record Sales</a></li>
+        <li><a href="/restocks">Record Restocks</a></li>
+        <li><a href="/invoices">Generate Invoices</a></li>
+    </ul>
 {% endblock %}

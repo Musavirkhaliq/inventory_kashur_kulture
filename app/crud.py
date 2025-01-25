@@ -1,87 +1,61 @@
-# crud.py
 from sqlalchemy.orm import Session
 from . import models, schemas
-from datetime import datetime
 
 # Product CRUD
-def get_product(db: Session, product_id: int):
-    return db.query(models.Product).filter(models.Product.id == product_id).first()
-
-def get_product_by_sku(db: Session, sku: str):
-    return db.query(models.Product).filter(models.Product.sku == sku).first()
-
-def get_products(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.Product).offset(skip).limit(limit).all()
-
 def create_product(db: Session, product: schemas.ProductCreate):
-    db_product = models.Product(
-        name=product.name,
-        sku=product.sku,
-        quantity=product.quantity,
-        price=product.price,
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow()
-    )
+    db_product = models.Product(**product.dict())
     db.add(db_product)
     db.commit()
     db.refresh(db_product)
-    return db_product
+    print(db_product.__dict__)  # Log the created product
+    return db_product   
 
-def update_product(db: Session, product_id: int, product: schemas.ProductCreate):
-    db_product = get_product(db, product_id)
-    if db_product:
-        for var, value in vars(product).items():
-            setattr(db_product, var, value)
-        db_product.updated_at = datetime.utcnow()
-        db.commit()
-        db.refresh(db_product)
-    return db_product
+def get_product(db: Session, product_id: int):
+    return db.query(models.Product).filter(models.Product.id == product_id).first()
 
-def delete_product(db: Session, product_id: int):
-    db_product = get_product(db, product_id)
-    if db_product:
-        db.delete(db_product)
-        db.commit()
-        return True
-    return False
+def get_all_products(db: Session):
+    return db.query(models.Product).all()
 
 # Sale CRUD
 def create_sale(db: Session, sale: schemas.SaleCreate):
-    db_sale = models.Sale(
-        product_id=sale.product_id,
-        quantity=sale.quantity,
-        total_amount=sale.total_amount,
-        sale_date=datetime.utcnow()
-    )
+    db_sale = models.Sale(**sale.dict())
     db.add(db_sale)
     db.commit()
     db.refresh(db_sale)
     return db_sale
 
-def get_sales(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.Sale).offset(skip).limit(limit).all()
+def get_all_sales(db: Session):
+    return db.query(models.Sale).all()
+
+# Restock CRUD
+def create_restock(db: Session, restock: schemas.RestockCreate):
+    db_restock = models.Restock(**restock.dict())
+    db.add(db_restock)
+    db.commit()
+    db.refresh(db_restock)
+    print(db_restock.__dict__)  # Log the created restock
+    return db_restock
+
+def get_all_restocks(db: Session):
+    return db.query(models.Restock).all()
 
 # Invoice CRUD
 def create_invoice(db: Session, invoice: schemas.InvoiceCreate):
-    db_invoice = models.Invoice(
-        sale_id=invoice.sale_id,
-        customer_name=invoice.customer_name,
-        invoice_date=datetime.utcnow()
-    )
+    db_invoice = models.Invoice(**invoice.dict())
     db.add(db_invoice)
     db.commit()
     db.refresh(db_invoice)
     return db_invoice
 
-def get_invoices(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.Invoice).offset(skip).limit(limit).all()
+def get_all_invoices(db: Session):
+    return db.query(models.Invoice).all()
 
-# crud.py
-from sqlalchemy import func
 
-def get_sales_report(db: Session):
-    return db.query(
-        func.date(models.Sale.sale_date).label("sale_date"),
-        func.sum(models.Sale.quantity).label("total_sales"),
-        func.sum(models.Sale.total_amount).label("total_revenue")
-    ).group_by(func.date(models.Sale.sale_date)).all()
+def update_product(db: Session, product_id: int, product: schemas.ProductUpdate):
+    db_product = db.query(models.Product).filter(models.Product.id == product_id).first()
+    if db_product:
+        for key, value in product.dict(exclude_unset=True).items():
+            setattr(db_product, key, value)
+        db.commit()
+        db.refresh(db_product)
+    return db_product
