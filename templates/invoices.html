@@ -1,0 +1,35 @@
+<!-- templates/invoices.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2>Invoices</h2>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Invoice ID</th>
+                <th>Customer Name</th>
+                <th>Sale ID</th>
+                <th>Date</th>
+                <th>Total Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for invoice in invoices %}
+            <tr>
+                <td>{{ invoice.id }}</td>
+                <td>{{ invoice.customer_name }}</td>
+                <td>{{ invoice.sale_id }}</td>
+                <td>{{ invoice.invoice_date }}</td>
+                <td>${{ "%.2f"|format(invoice.sale.total_amount) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

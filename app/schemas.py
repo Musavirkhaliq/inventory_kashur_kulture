@@ -19,3 +19,38 @@ class Product(ProductBase):
 
     class Config:
         orm_mode = True
+
+class SaleBase(BaseModel):
+    product_id: int
+    quantity: int
+    total_amount: float
+
+class SaleCreate(SaleBase):
+    pass
+
+class Sale(SaleBase):
+    id: int
+    sale_date: datetime
+
+    class Config:
+        orm_mode = True
+
+class InvoiceBase(BaseModel):
+    sale_id: int
+    customer_name: str
+
+class InvoiceCreate(InvoiceBase):
+    pass
+
+class Invoice(InvoiceBase):
+    id: int
+    invoice_date: datetime
+
+    class Config:
+        orm_mode = True
+
+# schemas.py
+class SaleCreate(BaseModel):
+    product_id: int
+    quantity: int
+    customer_name: str

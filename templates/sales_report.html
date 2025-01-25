@@ -1,0 +1,31 @@
+<!-- templates/sales_report.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2>Sales Report</h2>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Total Sales</th>
+                <th>Total Revenue</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for report in sales_report %}
+            <tr>
+                <td>{{ report.sale_date }}</td>
+                <td>{{ report.total_sales }}</td>
+                <td>${{ "%.2f"|format(report.total_revenue) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,107 @@
+<!-- templates/sales.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2>Sales</h2>
+    </div>
+    <div class="col text-end">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSaleModal">
+            Add Sale
+        </button>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Total Amount</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sale in sales %}
+            <tr>
+                <td>{{ sale.product.name }}</td>
+                <td>{{ sale.quantity }}</td>
+                <td>${{ "%.2f"|format(sale.total_amount) }}</td>
+                <td>{{ sale.sale_date }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Add Sale Modal -->
+<div class="modal fade" id="addSaleModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Sale</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addSaleForm">
+                    <div class="mb-3">
+                        <label class="form-label">Product</label>
+                        <select class="form-control" name="product_id" required>
+                            {% for product in products %}
+                            <option value="{{ product.id }}">{{ product.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Quantity</label>
+                        <input type="number" class="form-control" name="quantity" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Customer Name</label>
+                        <input type="text" class="form-control" name="customer_name" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="addSale()">Save Sale</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+async function addSale() {
+    const form = document.getElementById('addSaleForm');
+    const formData = new FormData(form);
+
+    const sale = {
+        product_id: parseInt(formData.get('product_id')),
+        quantity: parseInt(formData.get('quantity')),
+        total_amount: 0, // Calculate this on the backend
+        customer_name: formData.get('customer_name')
+    };
+
+    try {
+        const response = await fetch('/api/sales', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(sale)
+        });
+
+        if (response.ok) {
+            window.location.reload();
+        } else {
+            alert('Error adding sale');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error adding sale');
+    }
+}
+</script>
+{% endblock %}
