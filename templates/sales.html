@@ -8,14 +8,8 @@
         <label for="product_id">Product ID:</label>
         <input type="number" id="product_id" name="product_id" required>
 
-        <label for="customer_id">Customer ID:</label>
-        <input type="number" id="customer_id" name="customer_id" required>
-
         <label for="quantity">Quantity:</label>
         <input type="number" id="quantity" name="quantity" required>
-
-        <label for="amount_paid">Amount Paid:</label>
-        <input type="number" id="amount_paid" name="amount_paid" step="0.01" required>
 
         <button type="submit">Record Sale</button>
     </form>
@@ -26,11 +20,7 @@
             <tr>
                 <th>ID</th>
                 <th>Product ID</th>
-                <th>Customer ID</th>
                 <th>Quantity</th>
-                <th>Total Amount</th>
-                <th>Amount Paid</th>
-                <th>Balance</th>
                 <th>Sale Date</th>
             </tr>
         </thead>
@@ -39,11 +29,7 @@
             <tr>
                 <td>{{ sale.id }}</td>
                 <td>{{ sale.product_id }}</td>
-                <td>{{ sale.customer_id }}</td>
                 <td>{{ sale.quantity }}</td>
-                <td>{{ sale.total_amount }}</td>
-                <td>{{ sale.amount_paid }}</td>
-                <td>{{ sale.balance }}</td>
                 <td>{{ sale.sale_date }}</td>
             </tr>
             {% endfor %}

@@ -1,9 +1,0 @@
-tree > output.txt
-echo >> output.txt
-for file in $(find . -type f); do
-  if [ -s "$file" ]; then
-    echo "## $file" >> output.txt
-    cat "$file" >> output.txt
-    echo >> output.txt
-  fi
-done

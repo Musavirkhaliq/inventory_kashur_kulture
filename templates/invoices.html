@@ -1,4 +1,3 @@
-<!-- In templates/invoices.html -->
 {% extends "base.html" %}
 
 {% block content %}
@@ -9,9 +8,6 @@
         <label for="sale_id">Sale ID:</label>
         <input type="number" id="sale_id" name="sale_id" required>
 
-        <label for="customer_name">Customer Name:</label>
-        <input type="text" id="customer_name" name="customer_name">
-
         <button type="submit">Generate Invoice</button>
     </form>
 
@@ -21,7 +17,6 @@
             <tr>
                 <th>ID</th>
                 <th>Sale ID</th>
-                <th>Customer Name</th>
                 <th>Invoice Date</th>
             </tr>
         </thead>
@@ -30,7 +25,6 @@
             <tr>
                 <td>{{ invoice.id }}</td>
                 <td>{{ invoice.sale_id }}</td>
-                <td>{{ invoice.customer_name }}</td>
                 <td>{{ invoice.invoice_date }}</td>
             </tr>
             {% endfor %}
