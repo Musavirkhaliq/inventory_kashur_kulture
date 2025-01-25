@@ -1,3 +1,13 @@
+# 1. **`crud.py`**:
+#    - **Purpose**: Contains functions to perform CRUD (Create, Read, Update, Delete) operations on the database.
+#    - **Key Functions**:
+#      - `create_product`: Adds a new product to the database.
+#      - `get_product`: Retrieves a product by its ID.
+#      - `get_all_products`: Retrieves all products from the database.
+#      - `update_product`: Updates an existing product.
+#      - Similar functions for `sales`, `restocks`, and `invoices`.
+
+
 from sqlalchemy.orm import Session
 from . import models, schemas
 

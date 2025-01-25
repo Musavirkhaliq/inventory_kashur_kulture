@@ -1,3 +1,11 @@
+# 5. **`main.py`**:
+#    - **Purpose**: Defines the FastAPI application and API routes.
+#    - **Key Routes**:
+#      - `/products/`: Handles product-related operations (e.g., create, read, update).
+#      - `/sales/`: Handles sale-related operations.
+#      - `/restocks/`: Handles restock-related operations.
+#      - `/invoices/`: Handles invoice-related operations.
+
 from fastapi import FastAPI, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates

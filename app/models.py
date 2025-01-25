@@ -1,3 +1,11 @@
+# 3. **`models.py`**:
+#    - **Purpose**: Defines the database models using SQLAlchemy.
+#    - **Key Models**:
+#      - `Product`: Represents a product in the inventory.
+#      - `Sale`: Represents a sale transaction.
+#      - `Restock`: Represents a restock transaction.
+#      - `Invoice`: Represents an invoice for a sale.
+
 from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey
 from sqlalchemy.sql import func
 from .database import Base
