@@ -118,3 +118,12 @@ function sendReminder(customerId) {
         });
     }
 }
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    // Existing form handlers
+    submitForm("customerForm", "/customers/");
+    // Add other form handlers...
+    submitForm(invoiceForm, "/invoices/");
+    // Add other form handlers...
+});

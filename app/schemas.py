@@ -74,21 +74,20 @@ from datetime import datetime
 # Add Customer schemas
 class CustomerBase(BaseModel):
     name: str
-    email: Optional[str] = None
+    email: str
     phone: Optional[str] = None
+    balance: Optional[float] = 0.0
 
 class CustomerCreate(CustomerBase):
     pass
 
 class Customer(CustomerBase):
     id: int
-    balance: float
-    created_at: datetime
-    last_reminder: Optional[datetime] = None
+    created_at: datetime  # Ensure created_at is included
+    last_reminder: Optional[datetime] = None  # Ensure last_reminder is included
 
     class Config:
         from_attributes = True
-
 # Update Sale schemas
 class SaleBase(BaseModel):
     product_id: int
@@ -106,3 +105,42 @@ class Sale(SaleBase):
 
     class Config:
         from_attributes = True
+
+
+class InvoiceBase(BaseModel):
+    sale_id: int
+    customer_name: Optional[str] = None
+
+class InvoiceCreate(InvoiceBase):
+    pass
+
+class Invoice(InvoiceBase):
+    id: int
+    invoice_date: datetime
+
+    class Config:
+        from_attributes = True
+
+
+# In app/schemas.py
+from pydantic import BaseModel
+from typing import Optional
+from datetime import datetime
+
+# class CustomerBase(BaseModel):
+#     name: str
+#     email: str
+#     phone: Optional[str] = None
+#     balance: Optional[float] = 0.0
+
+# class CustomerCreate(CustomerBase):
+#     pass
+
+# class Customer(CustomerBase):
+#     id: int
+#     created_at: datetime
+#     last_reminder: Optional[datetime] = None
+
+#     class Config:
+#         from_attributes = True
+

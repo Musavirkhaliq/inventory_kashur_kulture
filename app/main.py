@@ -132,3 +132,37 @@ def send_reminder(customer_id: int, db: Session = Depends(get_db)):
     print(f"Reminder sent to {customer.name} (Balance: {customer.balance})")
     crud.record_reminder(db, customer_id)
     return {"message": "Reminder sent successfully"}
+
+
+@app.post("/invoices/", response_model=schemas.Invoice)
+def create_invoice(invoice: schemas.InvoiceCreate, db: Session = Depends(get_db)):
+    return crud.create_invoice(db, invoice)
+
+
+# In app/main.py
+@app.post("/customers/", response_model=schemas.Customer)
+def create_customer(customer: schemas.CustomerCreate, db: Session = Depends(get_db)):
+    return crud.create_customer(db, customer)
+
+@app.get("/customers/{customer_id}", response_model=schemas.Customer)
+def read_customer(customer_id: int, db: Session = Depends(get_db)):
+    db_customer = crud.get_customer(db, customer_id)
+    if db_customer is None:
+        raise HTTPException(status_code=404, detail="Customer not found")
+    return db_customer
+
+@app.get("/customers/", response_model=list[schemas.Customer])
+def read_customers(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    customers = crud.get_all_customers(db)
+    return customers
+
+@app.put("/customers/{customer_id}", response_model=schemas.Customer)
+def update_customer(customer_id: int, customer: schemas.CustomerCreate, db: Session = Depends(get_db)):
+    db_customer = crud.update_customer(db, customer_id, customer)
+    if db_customer is None:
+        raise HTTPException(status_code=404, detail="Customer not found")
+    return db_customer
+
+@app.delete("/customers/{customer_id}")
+def delete_customer(customer_id: int, db: Session = Depends(get_db)):
+    return crud.delete_customer(db, customer_id)

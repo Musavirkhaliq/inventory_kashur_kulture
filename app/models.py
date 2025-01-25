@@ -27,12 +27,12 @@ class Restock(Base):
     quantity = Column(Integer)  # Quantity restocked
     restock_date = Column(DateTime, default=func.now())  # Restock date (auto-generated)
 
-# Invoice model
-class Invoice(Base):
-    __tablename__ = "invoices"  # Table name
-    id = Column(Integer, primary_key=True, index=True)  # Primary key
-    sale_id = Column(Integer, ForeignKey("sales.id"))  # Foreign key to sales
-    invoice_date = Column(DateTime, default=func.now())  # Invoice date (auto-generated)
+# # Invoice model
+# class Invoice(Base):
+#     __tablename__ = "invoices"  # Table name
+#     id = Column(Integer, primary_key=True, index=True)  # Primary key
+#     sale_id = Column(Integer, ForeignKey("sales.id"))  # Foreign key to sales
+#     invoice_date = Column(DateTime, default=func.now())  # Invoice date (auto-generated)
 
 
 
@@ -54,11 +54,11 @@ class Customer(Base):
     __tablename__ = "customers"
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
-    email = Column(String, nullable=True)
-    phone = Column(String, nullable=True)
+    email = Column(String, unique=True, index=True)
+    phone = Column(String)
     balance = Column(Float, default=0.0)
-    created_at = Column(DateTime, default=func.now())
-    last_reminder = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, default=func.now())  # Ensure created_at is included
+    last_reminder = Column(DateTime, nullable=True)  # Ensure last_reminder is included
 
 class Sale(Base):
     __tablename__ = "sales"
@@ -71,3 +71,13 @@ class Sale(Base):
     sale_date = Column(DateTime, default=func.now())
 
 # Restock and Invoice models remain the same
+
+
+class Invoice(Base):
+    __tablename__ = "invoices"
+    id = Column(Integer, primary_key=True, index=True)
+    sale_id = Column(Integer, ForeignKey("sales.id"))
+    invoice_date = Column(DateTime, default=func.now())
+    customer_name = Column(String, nullable=True)
+    invoice_amount = Column(Float)
+
