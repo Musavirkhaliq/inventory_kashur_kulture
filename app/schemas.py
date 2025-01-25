@@ -63,3 +63,46 @@ class ProductUpdate(BaseModel):
     description: Optional[str] = None
     price: Optional[float] = None
     quantity: Optional[int] = None
+
+
+
+# ./app/schemas.py
+from pydantic import BaseModel
+from typing import Optional
+from datetime import datetime
+
+# Add Customer schemas
+class CustomerBase(BaseModel):
+    name: str
+    email: Optional[str] = None
+    phone: Optional[str] = None
+
+class CustomerCreate(CustomerBase):
+    pass
+
+class Customer(CustomerBase):
+    id: int
+    balance: float
+    created_at: datetime
+    last_reminder: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+# Update Sale schemas
+class SaleBase(BaseModel):
+    product_id: int
+    customer_id: int
+    quantity: int
+    amount_paid: float
+
+class SaleCreate(SaleBase):
+    pass
+
+class Sale(SaleBase):
+    id: int
+    total_amount: float
+    sale_date: datetime
+
+    class Config:
+        from_attributes = True
