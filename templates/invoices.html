@@ -7,7 +7,6 @@
     <form id="invoiceForm">
         <label for="sale_id">Sale ID:</label>
         <input type="number" id="sale_id" name="sale_id" required>
-
         <button type="submit">Generate Invoice</button>
     </form>
 
@@ -18,6 +17,7 @@
                 <th>ID</th>
                 <th>Sale ID</th>
                 <th>Invoice Date</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -26,6 +26,13 @@
                 <td>{{ invoice.id }}</td>
                 <td>{{ invoice.sale_id }}</td>
                 <td>{{ invoice.invoice_date }}</td>
+                <td>
+                    <a href="/invoices/{{ invoice.id }}" target="_blank">View Invoice</a>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4">No invoices generated yet.</td>
             </tr>
             {% endfor %}
         </tbody>

@@ -1,6 +1,8 @@
 from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, JSON
 from sqlalchemy.sql import func
+from sqlalchemy.orm import relationship
 from .database import Base
+
 
 class Product(Base):
     __tablename__ = "products"
@@ -10,6 +12,10 @@ class Product(Base):
     price = Column(Float)
     quantity = Column(Integer)
 
+    # Relationships
+    sales = relationship("Sale", back_populates="product")
+
+
 class Customer(Base):
     __tablename__ = "customers"
     id = Column(Integer, primary_key=True, index=True)
@@ -17,8 +23,18 @@ class Customer(Base):
     email = Column(String, unique=True, index=True)
     phone_number = Column(String)
     address = Column(String)
-    balance_owe = Column(Float, default=0.0)  # Amount the customer owes
-    previous_transactions = Column(JSON, default=[])  # List of previous transactions
+    balance_owe = Column(Float, default=0.0)
+    previous_transactions = Column(JSON, default=[])
+
+    # Relationships
+    sales = relationship("Sale", back_populates="customer")
+    
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        # Ensure previous_transactions is always initialized properly
+        if self.previous_transactions is None:
+            self.previous_transactions = []
+
 
 class Sale(Base):
     __tablename__ = "sales"
@@ -26,18 +42,35 @@ class Sale(Base):
     product_id = Column(Integer, ForeignKey("products.id"))
     customer_id = Column(Integer, ForeignKey("customers.id"))
     quantity = Column(Integer)
-    selling_price = Column(Float)  # Selling price entered by the user
-    profit = Column(Float)  # Calculated profit
+    selling_price = Column(Float)
+    amount_received = Column(Float)
+    balance = Column(Float)
+    profit = Column(Float)
     sale_date = Column(DateTime, default=func.now())
+
+    # Relationships
+    product = relationship("Product", back_populates="sales")
+    customer = relationship("Customer", back_populates="sales")
+    invoice = relationship("Invoice", back_populates="sale", uselist=False)
+
+
 class Restock(Base):
     __tablename__ = "restocks"
+    
     id = Column(Integer, primary_key=True, index=True)
-    product_id = Column(Integer, ForeignKey("products.id"))
-    quantity = Column(Integer)
+    product_id = Column(Integer, ForeignKey("products.id"), nullable=False)
+    quantity = Column(Integer, nullable=False)
     restock_date = Column(DateTime, default=func.now())
+    
+    # Relationship to product
+    product = relationship("Product")
+
 
 class Invoice(Base):
     __tablename__ = "invoices"
     id = Column(Integer, primary_key=True, index=True)
     sale_id = Column(Integer, ForeignKey("sales.id"))
     invoice_date = Column(DateTime, default=func.now())
+
+    # Relationships
+    sale = relationship("Sale", back_populates="invoice")
