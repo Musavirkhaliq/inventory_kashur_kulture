@@ -11,8 +11,12 @@ class ProductBase(BaseModel):
 class ProductCreate(ProductBase):
     pass
 
-class Product(ProductBase):
+class Product(BaseModel):
     id: int
+    name: str
+    description: Optional[str] = None
+    price: float
+    quantity: int
 
     class Config:
         from_attributes = True

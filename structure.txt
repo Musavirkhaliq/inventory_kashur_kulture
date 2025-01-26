@@ -4,6 +4,7 @@
 │   ├── database.py
 │   ├── main.py
 │   ├── models.py
+│   ├── __pycache__
 │   └── schemas.py
 ├── __init__.py
 ├── inventory.db
@@ -19,6 +20,7 @@
 ├── structure.txt
 └── templates
     ├── base.html
+    ├── customers.html
     ├── edit_product.html
     ├── index.html
     ├── invoices.html
@@ -27,20 +29,21 @@
     ├── sales.html
     └── sales_report.html
 
-7 directories, 29 files
+7 directories, 30 files
 \n\n./__init__.py:\n
 from app.database import Base, engine
-from app.models import Product, Sale, Restock, Invoice
+from app.models import Product, Sale, Restock, Invoice, Customer
 
 # Drop all tables and recreate them
 Base.metadata.drop_all(bind=engine)
 Base.metadata.create_all(bind=engine)\n\n./print_contents.txt:\n
-tree
-find . -type f -exec echo "\n\n{}:\n" \; -exec cat {} \;\n\n./README.md:\n
+tree > structure.txt
+find . -type f -exec echo "\n\n{}:\n" \; -exec cat {} \; >> structure.txt\n\n./README.md:\n
 # inventory_kashur_kulture\n\n./app/schemas.py:\n
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
+
 class ProductBase(BaseModel):
     name: str
     description: Optional[str] = None
@@ -50,7 +53,32 @@ class ProductBase(BaseModel):
 class ProductCreate(ProductBase):
     pass
 
-class Product(ProductBase):
+class Product(BaseModel):
+    id: int
+    name: str
+    description: Optional[str] = None
+    price: float
+    quantity: int
+
+    class Config:
+        from_attributes = True
+
+from pydantic import BaseModel
+from typing import Optional, List
+from datetime import datetime
+
+class CustomerBase(BaseModel):
+    name: str
+    email: str
+    phone_number: Optional[str] = None
+    address: Optional[str] = None
+    balance_owe: Optional[float] = 0.0
+    previous_transactions: Optional[List[dict]] = []
+
+class CustomerCreate(CustomerBase):
+    pass
+
+class Customer(CustomerBase):
     id: int
 
     class Config:
@@ -58,10 +86,16 @@ class Product(ProductBase):
 
 class SaleBase(BaseModel):
     product_id: int
+    customer_id: int
     quantity: int
+    selling_price: float  # Selling price entered by the user
+    profit: float  # Calculated profit
 
-class SaleCreate(SaleBase):
-    pass
+class SaleCreate(BaseModel):
+    product_id: int
+    customer_id: int
+    quantity: int
+    selling_price: float
 
 class Sale(SaleBase):
     id: int
@@ -96,7 +130,6 @@ class Invoice(InvoiceBase):
 
     class Config:
         from_attributes = True
-
 
 class ProductUpdate(BaseModel):
     name: Optional[str] = None
@@ -141,15 +174,52 @@ def read_products(request: Request, db: Session = Depends(get_db)):
 def create_product(product: schemas.ProductCreate, db: Session = Depends(get_db)):
     return crud.create_product(db, product)
 
-@app.post("/products/", response_model=schemas.Product)
-def create_product(product: schemas.ProductCreate, db: Session = Depends(get_db)):
-    return crud.create_product(db, product)
+@app.get("/products/{product_id}/edit", response_class=HTMLResponse)
+def edit_product(request: Request, product_id: int, db: Session = Depends(get_db)):
+    product = crud.get_product(db, product_id)
+    if product is None:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return templates.TemplateResponse("edit_product.html", {"request": request, "product": product})
+
+@app.put("/products/{product_id}", response_model=schemas.Product)
+def update_product(product_id: int, product: schemas.ProductUpdate, db: Session = Depends(get_db)):
+    db_product = crud.update_product(db, product_id, product)
+    if db_product is None:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return db_product
+
+@app.delete("/products/{product_id}", response_model=schemas.Product)
+def delete_product(product_id: int, db: Session = Depends(get_db)):
+    db_product = crud.delete_product(db, product_id)
+    if db_product is None:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return db_product
+
+# Customer Endpoints
+@app.get("/customers", response_class=HTMLResponse)
+def read_customers(request: Request, db: Session = Depends(get_db)):
+    customers = crud.get_all_customers(db)
+    return templates.TemplateResponse("customers.html", {"request": request, "customers": customers})
+
+@app.post("/customers/", response_model=schemas.Customer)
+def create_customer(customer: schemas.CustomerCreate, db: Session = Depends(get_db)):
+    return crud.create_customer(db, customer)
 
 # Sale Endpoints
 @app.get("/sales", response_class=HTMLResponse)
 def read_sales(request: Request, db: Session = Depends(get_db)):
+    products = crud.get_all_products(db)
+    customers = crud.get_all_customers(db)
     sales = crud.get_all_sales(db)
-    return templates.TemplateResponse("sales.html", {"request": request, "sales": sales})
+    return templates.TemplateResponse(
+        "sales.html",
+        {
+            "request": request,
+            "products": products,
+            "customers": customers,
+            "sales": sales,
+        },
+    )
 
 @app.post("/sales/", response_model=schemas.Sale)
 def create_sale(sale: schemas.SaleCreate, db: Session = Depends(get_db)):
@@ -175,20 +245,7 @@ def read_invoices(request: Request, db: Session = Depends(get_db)):
 def create_invoice(invoice: schemas.InvoiceCreate, db: Session = Depends(get_db)):
     return crud.create_invoice(db, invoice)
 
-
-@app.get("/products/{product_id}/edit", response_class=HTMLResponse)
-def edit_product(request: Request, product_id: int, db: Session = Depends(get_db)):
-    product = crud.get_product(db, product_id)
-    if product is None:
-        raise HTTPException(status_code=404, detail="Product not found")
-    return templates.TemplateResponse("edit_product.html", {"request": request, "product": product})
-
-@app.put("/products/{product_id}", response_model=schemas.Product)
-def update_product(product_id: int, product: schemas.ProductUpdate, db: Session = Depends(get_db)):
-    db_product = crud.update_product(db, product_id, product)
-    if db_product is None:
-        raise HTTPException(status_code=404, detail="Product not found")
-    return db_product
+\n\n./app/database.py:\n
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -201,7 +258,7 @@ engine = create_engine(
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()\n\n./app/models.py:\n
-from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, JSON
 from sqlalchemy.sql import func
 from .database import Base
 
@@ -213,13 +270,25 @@ class Product(Base):
     price = Column(Float)
     quantity = Column(Integer)
 
+class Customer(Base):
+    __tablename__ = "customers"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, index=True)
+    email = Column(String, unique=True, index=True)
+    phone_number = Column(String)
+    address = Column(String)
+    balance_owe = Column(Float, default=0.0)  # Amount the customer owes
+    previous_transactions = Column(JSON, default=[])  # List of previous transactions
+
 class Sale(Base):
     __tablename__ = "sales"
     id = Column(Integer, primary_key=True, index=True)
     product_id = Column(Integer, ForeignKey("products.id"))
+    customer_id = Column(Integer, ForeignKey("customers.id"))
     quantity = Column(Integer)
+    selling_price = Column(Float)  # Selling price entered by the user
+    profit = Column(Float)  # Calculated profit
     sale_date = Column(DateTime, default=func.now())
-
 class Restock(Base):
     __tablename__ = "restocks"
     id = Column(Integer, primary_key=True, index=True)
@@ -234,6 +303,7 @@ class Invoice(Base):
     invoice_date = Column(DateTime, default=func.now())\n\n./app/crud.py:\n
 from sqlalchemy.orm import Session
 from . import models, schemas
+from datetime import datetime
 
 # Product CRUD
 def create_product(db: Session, product: schemas.ProductCreate):
@@ -241,8 +311,7 @@ def create_product(db: Session, product: schemas.ProductCreate):
     db.add(db_product)
     db.commit()
     db.refresh(db_product)
-    print(db_product.__dict__)  # Log the created product
-    return db_product   
+    return db_product
 
 def get_product(db: Session, product_id: int):
     return db.query(models.Product).filter(models.Product.id == product_id).first()
@@ -250,9 +319,52 @@ def get_product(db: Session, product_id: int):
 def get_all_products(db: Session):
     return db.query(models.Product).all()
 
+# Customer CRUD
+def create_customer(db: Session, customer: schemas.CustomerCreate):
+    db_customer = models.Customer(**customer.dict())
+    db.add(db_customer)
+    db.commit()
+    db.refresh(db_customer)
+    return db_customer
+
+def get_all_customers(db: Session):
+    return db.query(models.Customer).all()
+
+def get_customer(db: Session, customer_id: int):
+    return db.query(models.Customer).filter(models.Customer.id == customer_id).first()
+
 # Sale CRUD
 def create_sale(db: Session, sale: schemas.SaleCreate):
-    db_sale = models.Sale(**sale.dict())
+    # Fetch the product to get its cost price
+    product = db.query(models.Product).filter(models.Product.id == sale.product_id).first()
+    if not product:
+        raise ValueError("Product not found")
+
+    # Fetch the customer to update their balance and transactions
+    customer = db.query(models.Customer).filter(models.Customer.id == sale.customer_id).first()
+    if not customer:
+        raise ValueError("Customer not found")
+
+    # Calculate profit
+    cost_price = product.price * sale.quantity
+    profit = sale.selling_price - cost_price
+
+    # Update customer balance and transactions
+    customer.balance_owe += sale.selling_price
+    customer.previous_transactions.append({
+        "sale_id": sale.id,
+        "amount": sale.selling_price,
+        "date": datetime.now().isoformat(),
+    })
+
+    # Create the sale with the calculated profit
+    db_sale = models.Sale(
+        product_id=sale.product_id,
+        customer_id=sale.customer_id,
+        quantity=sale.quantity,
+        selling_price=sale.selling_price,
+        profit=profit,
+    )
     db.add(db_sale)
     db.commit()
     db.refresh(db_sale)
@@ -267,7 +379,6 @@ def create_restock(db: Session, restock: schemas.RestockCreate):
     db.add(db_restock)
     db.commit()
     db.refresh(db_restock)
-    print(db_restock.__dict__)  # Log the created restock
     return db_restock
 
 def get_all_restocks(db: Session):
@@ -282,17 +393,7 @@ def create_invoice(db: Session, invoice: schemas.InvoiceCreate):
     return db_invoice
 
 def get_all_invoices(db: Session):
-    return db.query(models.Invoice).all()
-
-
-def update_product(db: Session, product_id: int, product: schemas.ProductUpdate):
-    db_product = db.query(models.Product).filter(models.Product.id == product_id).first()
-    if db_product:
-        for key, value in product.dict(exclude_unset=True).items():
-            setattr(db_product, key, value)
-        db.commit()
-        db.refresh(db_product)
-    return db_product\n\n./static/css/style.css:\n
+    return db.query(models.Invoice).all()\n\n./static/css/style.css:\n
 /* General Styles */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -532,6 +633,78 @@ document.addEventListener("DOMContentLoaded", () => {
     submitForm("invoiceForm", "/invoices/");
 });
 
+// Function to handle edit form submission
+async function submitEditForm(formId, endpoint, method = "PUT") {
+    const form = document.getElementById(formId);
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+
+        try {
+            const response = await fetch(endpoint, {
+                method: method,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (response.ok) {
+                alert("Product updated successfully!");
+                window.location.href = "/products"; // Redirect to products page
+            } else {
+                alert("Something went wrong!");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    });
+}
+
+// Handle edit product form submission
+document.addEventListener("DOMContentLoaded", () => {
+    submitEditForm("editProductForm", `/products/${document.getElementById("id").value}`);
+});
+
+
+// Function to handle form submissions
+async function submitForm(formId, endpoint, method = "POST") {
+    const form = document.getElementById(formId);
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+
+        try {
+            const response = await fetch(endpoint, {
+                method: method,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (response.ok) {
+                alert("Operation successful!");
+                window.location.reload(); // Reload the page to reflect changes
+            } else {
+                alert("Something went wrong!");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    });
+}
+
+// Example: Handle product form submission
+document.addEventListener("DOMContentLoaded", () => {
+    submitForm("productForm", "/products/");
+    submitForm("customerForm", "/customers/");
+    submitForm("saleForm", "/sales/");
+    submitForm("restockForm", "/restocks/");
+    submitForm("invoiceForm", "/invoices/");
+});
 
 // Function to handle edit form submission
 async function submitEditForm(formId, endpoint, method = "PUT") {
@@ -567,6 +740,78 @@ document.addEventListener("DOMContentLoaded", () => {
     submitEditForm("editProductForm", `/products/${document.getElementById("id").value}`);
 });
 
+
+// Function to handle form submissions
+async function submitForm(formId, endpoint, method = "POST") {
+    const form = document.getElementById(formId);
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+
+        try {
+            const response = await fetch(endpoint, {
+                method: method,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (response.ok) {
+                alert("Sale recorded successfully!");
+                window.location.reload(); // Reload the page to reflect changes
+            } else {
+                alert("Something went wrong!");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    });
+}
+
+// Handle sale form submission
+document.addEventListener("DOMContentLoaded", () => {
+    submitForm("saleForm", "/sales/");
+});
+
+
+
+// Function to handle form submissions
+async function submitForm(formId, endpoint, method = "POST") {
+    const form = document.getElementById(formId);
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+
+        try {
+            const response = await fetch(endpoint, {
+                method: method,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (response.ok) {
+                alert("Customer added successfully!");
+                window.location.reload(); // Reload the page to reflect changes
+            } else {
+                alert("Something went wrong!");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    });
+}
+
+// Handle customer form submission
+document.addEventListener("DOMContentLoaded", () => {
+    submitForm("customerForm", "/customers/");
+});
+
+\n\n./templates/sales.html:\n
 {% extends "base.html" %}
 
 {% block content %}
@@ -574,11 +819,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
     <h2>Record Sale</h2>
     <form id="saleForm">
-        <label for="product_id">Product ID:</label>
-        <input type="number" id="product_id" name="product_id" required>
+        <label for="product_id">Product:</label>
+        <select id="product_id" name="product_id" required>
+            {% for product in products %}
+            <option value="{{ product.id }}">{{ product.name }} (Price: {{ product.price }})</option>
+            {% else %}
+            <option value="" disabled>No products available</option>
+            {% endfor %}
+        </select>
+        <a href="/products">Add New Product</a>
+
+        <label for="customer_id">Customer:</label>
+        <select id="customer_id" name="customer_id" required>
+            {% for customer in customers %}
+            <option value="{{ customer.id }}">{{ customer.name }}</option>
+            {% else %}
+            <option value="" disabled>No customers available</option>
+            {% endfor %}
+        </select>
+        <a href="/customers">Add New Customer</a>
 
         <label for="quantity">Quantity:</label>
         <input type="number" id="quantity" name="quantity" required>
+
+        <label for="selling_price">Selling Price:</label>
+        <input type="number" id="selling_price" name="selling_price" step="0.01" required>
 
         <button type="submit">Record Sale</button>
     </form>
@@ -588,8 +853,11 @@ document.addEventListener("DOMContentLoaded", () => {
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Product ID</th>
+                <th>Product</th>
+                <th>Customer</th>
                 <th>Quantity</th>
+                <th>Selling Price</th>
+                <th>Profit</th>
                 <th>Sale Date</th>
             </tr>
         </thead>
@@ -598,8 +866,15 @@ document.addEventListener("DOMContentLoaded", () => {
             <tr>
                 <td>{{ sale.id }}</td>
                 <td>{{ sale.product_id }}</td>
+                <td>{{ sale.customer_id }}</td>
                 <td>{{ sale.quantity }}</td>
+                <td>{{ sale.selling_price }}</td>
+                <td>{{ sale.profit }}</td>
                 <td>{{ sale.sale_date }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="7">No sales recorded yet.</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -609,11 +884,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
 {% block content %}
     <h1>Welcome to Inventory Management</h1>
-    <p>Manage your products, sales, restocks, and invoices efficiently.</p>
+    <p>Manage your products, customers, sales, restocks, and invoices efficiently.</p>
 
     <h2>Quick Links</h2>
     <ul>
         <li><a href="/products">Manage Products</a></li>
+        <li><a href="/customers">Manage Customers</a></li>
         <li><a href="/sales">Record Sales</a></li>
         <li><a href="/restocks">Record Restocks</a></li>
         <li><a href="/invoices">Generate Invoices</a></li>
@@ -656,6 +932,62 @@ document.addEventListener("DOMContentLoaded", () => {
             {% endfor %}
         </tbody>
     </table>
+{% endblock %}\n\n./templates/customers.html:\n
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Customer Management</h1>
+
+    <h2>Add Customer</h2>
+    <form id="customerForm">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="phone_number">Phone Number:</label>
+        <input type="text" id="phone_number" name="phone_number">
+
+        <label for="address">Address:</label>
+        <input type="text" id="address" name="address">
+
+        <button type="submit">Add Customer</button>
+    </form>
+
+    <h2>Customer List</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone Number</th>
+                <th>Address</th>
+                <th>Balance Owe</th>
+                <th>Previous Transactions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for customer in customers %}
+            <tr>
+                <td>{{ customer.id }}</td>
+                <td>{{ customer.name }}</td>
+                <td>{{ customer.email }}</td>
+                <td>{{ customer.phone_number }}</td>
+                <td>{{ customer.address }}</td>
+                <td>{{ customer.balance_owe }}</td>
+                <td>
+                    <ul>
+                        {% for transaction in customer.previous_transactions %}
+                        <li>{{ transaction }}</li>
+                        {% endfor %}
+                    </ul>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}\n\n./templates/invoices.html:\n
 {% extends "base.html" %}
 
@@ -690,7 +1022,6 @@ document.addEventListener("DOMContentLoaded", () => {
         </tbody>
     </table>
 {% endblock %}\n\n./templates/sales_report.html:\n
-<!-- templates/sales_report.html -->
 {% extends "base.html" %}
 
 {% block content %}
@@ -807,6 +1138,7 @@ document.addEventListener("DOMContentLoaded", () => {
     <div class="navbar">
         <a href="/">Home</a>
         <a href="/products">Products</a>
+        <a href="/customers">Customers</a>
         <a href="/sales">Sales</a>
         <a href="/restocks">Restocks</a>
         <a href="/invoices">Invoices</a>
