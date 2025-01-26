@@ -36,15 +36,52 @@ def read_products(request: Request, db: Session = Depends(get_db)):
 def create_product(product: schemas.ProductCreate, db: Session = Depends(get_db)):
     return crud.create_product(db, product)
 
-@app.post("/products/", response_model=schemas.Product)
-def create_product(product: schemas.ProductCreate, db: Session = Depends(get_db)):
-    return crud.create_product(db, product)
+@app.get("/products/{product_id}/edit", response_class=HTMLResponse)
+def edit_product(request: Request, product_id: int, db: Session = Depends(get_db)):
+    product = crud.get_product(db, product_id)
+    if product is None:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return templates.TemplateResponse("edit_product.html", {"request": request, "product": product})
+
+@app.put("/products/{product_id}", response_model=schemas.Product)
+def update_product(product_id: int, product: schemas.ProductUpdate, db: Session = Depends(get_db)):
+    db_product = crud.update_product(db, product_id, product)
+    if db_product is None:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return db_product
+
+@app.delete("/products/{product_id}", response_model=schemas.Product)
+def delete_product(product_id: int, db: Session = Depends(get_db)):
+    db_product = crud.delete_product(db, product_id)
+    if db_product is None:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return db_product
+
+# Customer Endpoints
+@app.get("/customers", response_class=HTMLResponse)
+def read_customers(request: Request, db: Session = Depends(get_db)):
+    customers = crud.get_all_customers(db)
+    return templates.TemplateResponse("customers.html", {"request": request, "customers": customers})
+
+@app.post("/customers/", response_model=schemas.Customer)
+def create_customer(customer: schemas.CustomerCreate, db: Session = Depends(get_db)):
+    return crud.create_customer(db, customer)
 
 # Sale Endpoints
 @app.get("/sales", response_class=HTMLResponse)
 def read_sales(request: Request, db: Session = Depends(get_db)):
+    products = crud.get_all_products(db)
+    customers = crud.get_all_customers(db)
     sales = crud.get_all_sales(db)
-    return templates.TemplateResponse("sales.html", {"request": request, "sales": sales})
+    return templates.TemplateResponse(
+        "sales.html",
+        {
+            "request": request,
+            "products": products,
+            "customers": customers,
+            "sales": sales,
+        },
+    )
 
 @app.post("/sales/", response_model=schemas.Sale)
 def create_sale(sale: schemas.SaleCreate, db: Session = Depends(get_db)):
@@ -69,18 +106,3 @@ def read_invoices(request: Request, db: Session = Depends(get_db)):
 @app.post("/invoices/", response_model=schemas.Invoice)
 def create_invoice(invoice: schemas.InvoiceCreate, db: Session = Depends(get_db)):
     return crud.create_invoice(db, invoice)
-
-
-@app.get("/products/{product_id}/edit", response_class=HTMLResponse)
-def edit_product(request: Request, product_id: int, db: Session = Depends(get_db)):
-    product = crud.get_product(db, product_id)
-    if product is None:
-        raise HTTPException(status_code=404, detail="Product not found")
-    return templates.TemplateResponse("edit_product.html", {"request": request, "product": product})
-
-@app.put("/products/{product_id}", response_model=schemas.Product)
-def update_product(product_id: int, product: schemas.ProductUpdate, db: Session = Depends(get_db)):
-    db_product = crud.update_product(db, product_id, product)
-    if db_product is None:
-        raise HTTPException(status_code=404, detail="Product not found")
-    return db_product

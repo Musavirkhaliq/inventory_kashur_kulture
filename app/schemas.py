@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
+
 class ProductBase(BaseModel):
     name: str
     description: Optional[str] = None
@@ -16,12 +17,39 @@ class Product(ProductBase):
     class Config:
         from_attributes = True
 
+from pydantic import BaseModel
+from typing import Optional, List
+from datetime import datetime
+
+class CustomerBase(BaseModel):
+    name: str
+    email: str
+    phone_number: Optional[str] = None
+    address: Optional[str] = None
+    balance_owe: Optional[float] = 0.0
+    previous_transactions: Optional[List[dict]] = []
+
+class CustomerCreate(CustomerBase):
+    pass
+
+class Customer(CustomerBase):
+    id: int
+
+    class Config:
+        from_attributes = True
+
 class SaleBase(BaseModel):
     product_id: int
+    customer_id: int
     quantity: int
+    selling_price: float  # Selling price entered by the user
+    profit: float  # Calculated profit
 
-class SaleCreate(SaleBase):
-    pass
+class SaleCreate(BaseModel):
+    product_id: int
+    customer_id: int
+    quantity: int
+    selling_price: float
 
 class Sale(SaleBase):
     id: int
@@ -56,7 +84,6 @@ class Invoice(InvoiceBase):
 
     class Config:
         from_attributes = True
-
 
 class ProductUpdate(BaseModel):
     name: Optional[str] = None
