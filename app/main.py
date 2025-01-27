@@ -4,7 +4,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session,joinedload
 from . import crud, schemas, models, database
-
+from datetime import datetime, timedelta
 app = FastAPI()
 
 # Mount static files
@@ -138,3 +138,45 @@ def generate_invoice(invoice_id: int, request: Request, db: Session = Depends(ge
         "invoice_template.html",
         {"request": request, "invoice": invoice}
     )
+
+
+@app.get("/customers/{customer_id}/transactions", response_class=HTMLResponse)
+def view_customer_transactions(request: Request, customer_id: int, db: Session = Depends(get_db)):
+    customer = crud.get_customer_by_id(db, customer_id)
+    if not customer:
+        raise HTTPException(status_code=404, detail="Customer not found")
+    
+    transactions = db.query(models.Sale).filter(models.Sale.customer_id == customer_id).all()
+    return render_template("customer_transactions.html", request, {"customer": customer, "transactions": transactions})
+
+
+@app.get("/sales/report", response_class=HTMLResponse)
+def sales_report(request: Request, db: Session = Depends(get_db)):
+    daily_sales = db.query(models.Sale).filter(models.Sale.sale_date >= datetime.today().date()).all()
+    weekly_sales = db.query(models.Sale).filter(models.Sale.sale_date >= datetime.today().date() - timedelta(days=7)).all()
+    monthly_sales = db.query(models.Sale).filter(models.Sale.sale_date >= datetime.today().date() - timedelta(days=30)).all()
+
+    daily_total = sum(sale.selling_price * sale.quantity for sale in daily_sales)
+    weekly_total = sum(sale.selling_price * sale.quantity for sale in weekly_sales)
+    monthly_total = sum(sale.selling_price * sale.quantity for sale in monthly_sales)
+
+    return render_template("sales_report.html", request, {
+        "daily_sales": daily_sales,
+        "weekly_sales": weekly_sales,
+        "monthly_sales": monthly_sales,
+        "daily_total": daily_total,
+        "weekly_total": weekly_total,
+        "monthly_total": monthly_total,
+    })
+
+@app.get("/customers/balances", response_class=HTMLResponse)
+def customer_balances(request: Request, db: Session = Depends(get_db)):
+    customers = db.query(models.Customer).all()
+    return render_template("customer_balances.html", request, {"customers": customers})
+
+
+@app.get("/inventory/value", response_class=HTMLResponse)
+def inventory_value(request: Request, db: Session = Depends(get_db)):
+    products = db.query(models.Product).all()
+    total_value = sum(product.price * product.quantity for product in products)
+    return render_template("inventory_value.html", request, {"total_value": total_value})

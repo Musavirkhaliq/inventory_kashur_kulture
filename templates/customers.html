@@ -30,7 +30,7 @@
                 <th>Phone Number</th>
                 <th>Address</th>
                 <th>Balance Owe</th>
-                <th>Previous Transactions</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -43,14 +43,16 @@
                 <td>{{ customer.address }}</td>
                 <td>{{ customer.balance_owe }}</td>
                 <td>
-                    <ul>
-                        {% for transaction in customer.previous_transactions %}
-                        <li>{{ transaction }}</li>
-                        {% endfor %}
-                    </ul>
+                    <button onclick="viewTransactions({{ customer.id }})">View Transactions</button>
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+
+    <script>
+        function viewTransactions(customerId) {
+            window.location.href = `/customers/${customerId}/transactions`;
+        }
+    </script>
 {% endblock %}

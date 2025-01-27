@@ -1,30 +1,116 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row mb-4">
-    <div class="col">
-        <h2>Sales Report</h2>
-    </div>
-</div>
+    <h1>Sales Report</h1>
 
-<div class="table-responsive">
-    <table class="table table-striped">
+    <h2>Daily Sales</h2>
+    <p>Total: {{ daily_total }}</p>
+    <table>
         <thead>
             <tr>
-                <th>Date</th>
-                <th>Total Sales</th>
-                <th>Total Revenue</th>
+                <th>ID</th>
+                <th>Product</th>
+                <th>Customer</th>
+                <th>Quantity</th>
+                <th>Selling Price</th>
+                <th>Amount Received</th>
+                <th>Balance</th>
+                <th>Profit</th>
+                <th>Sale Date</th>
             </tr>
         </thead>
         <tbody>
-            {% for report in sales_report %}
+            {% for sale in daily_sales %}
             <tr>
-                <td>{{ report.sale_date }}</td>
-                <td>{{ report.total_sales }}</td>
-                <td>${{ "%.2f"|format(report.total_revenue) }}</td>
+                <td>{{ sale.id }}</td>
+                <td>{{ sale.product.name if sale.product else 'N/A' }}</td>
+                <td>{{ sale.customer.name if sale.customer else 'N/A' }}</td>
+                <td>{{ sale.quantity }}</td>
+                <td>{{ sale.selling_price }}</td>
+                <td>{{ sale.amount_received }}</td>
+                <td>{{ sale.balance }}</td>
+                <td>{{ sale.profit }}</td>
+                <td>{{ sale.sale_date }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="9">No sales recorded today.</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
-</div>
+
+    <h2>Weekly Sales</h2>
+    <p>Total: {{ weekly_total }}</p>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Product</th>
+                <th>Customer</th>
+                <th>Quantity</th>
+                <th>Selling Price</th>
+                <th>Amount Received</th>
+                <th>Balance</th>
+                <th>Profit</th>
+                <th>Sale Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sale in weekly_sales %}
+            <tr>
+                <td>{{ sale.id }}</td>
+                <td>{{ sale.product.name if sale.product else 'N/A' }}</td>
+                <td>{{ sale.customer.name if sale.customer else 'N/A' }}</td>
+                <td>{{ sale.quantity }}</td>
+                <td>{{ sale.selling_price }}</td>
+                <td>{{ sale.amount_received }}</td>
+                <td>{{ sale.balance }}</td>
+                <td>{{ sale.profit }}</td>
+                <td>{{ sale.sale_date }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="9">No sales recorded this week.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Monthly Sales</h2>
+    <p>Total: {{ monthly_total }}</p>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Product</th>
+                <th>Customer</th>
+                <th>Quantity</th>
+                <th>Selling Price</th>
+                <th>Amount Received</th>
+                <th>Balance</th>
+                <th>Profit</th>
+                <th>Sale Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sale in monthly_sales %}
+            <tr>
+                <td>{{ sale.id }}</td>
+                <td>{{ sale.product.name if sale.product else 'N/A' }}</td>
+                <td>{{ sale.customer.name if sale.customer else 'N/A' }}</td>
+                <td>{{ sale.quantity }}</td>
+                <td>{{ sale.selling_price }}</td>
+                <td>{{ sale.amount_received }}</td>
+                <td>{{ sale.balance }}</td>
+                <td>{{ sale.profit }}</td>
+                <td>{{ sale.sale_date }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="9">No sales recorded this month.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}
