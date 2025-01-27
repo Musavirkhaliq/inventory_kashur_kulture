@@ -1,2 +1,2 @@
 tree > structure.txt
-find . -type f -exec echo "\n\n{}:\n" \; -exec cat {} \; >> structure.txt
+find . -type f \( -name "*.py" -o -name "*.html" -o -name "*.css" -o -name "*.js" \) -exec echo "\n\n{}:\n" \; -exec cat {} \; >> structure.txt
