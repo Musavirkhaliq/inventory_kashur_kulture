@@ -1,26 +1,21 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, validator
 from typing import Optional, List
 from datetime import datetime
 
-
-# Product Schemas
 class ProductBase(BaseModel):
     name: str
     description: Optional[str] = None
-    price: float
-    quantity: int
-
+    price: float = Field(gt=0)
+    quantity: int = Field(ge=0)
 
 class ProductCreate(ProductBase):
     pass
 
-
 class ProductUpdate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
-    price: Optional[float] = None
-    quantity: Optional[int] = None
-
+    price: Optional[float] = Field(gt=0)
+    quantity: Optional[int] = Field(ge=0)
 
 class Product(ProductBase):
     id: int
@@ -28,20 +23,15 @@ class Product(ProductBase):
     class Config:
         from_attributes = True
 
-
-# Customer Schemas
 class CustomerBase(BaseModel):
     name: str
     email: str
     phone_number: Optional[str] = None
     address: Optional[str] = None
-    balance_owe: float = 0.0  # Default is always zero for simplicity
-    previous_transactions: List[dict] = []
-
+    balance_owe: float = Field(default=0.0, ge=0)
 
 class CustomerCreate(CustomerBase):
     pass
-
 
 class Customer(CustomerBase):
     id: int
@@ -49,60 +39,43 @@ class Customer(CustomerBase):
     class Config:
         from_attributes = True
 
-
-# Sale Schemas
 class SaleBase(BaseModel):
     product_id: int
     customer_id: int
-    quantity: int
-    selling_price: float  # Price at which the product was sold
-    profit: float  # Profit from the sale
+    quantity: int = Field(gt=0)
+    selling_price: float = Field(gt=0)
+    amount_received: float = Field(ge=0)
 
-
-class SaleCreate(BaseModel):
-    product_id: int
-    customer_id: int
-    quantity: int
-    selling_price: float
-    amount_received: float  # New field
-
+class SaleCreate(SaleBase):
+    pass
 
 class Sale(SaleBase):
     id: int
     sale_date: datetime
-    product: Optional[Product] = None
-    customer: Optional[Customer] = None
 
     class Config:
         from_attributes = True
 
-
-# Restock Schemas
 class RestockBase(BaseModel):
     product_id: int
     quantity: int
 
-
 class RestockCreate(RestockBase):
     pass
-
 
 class Restock(RestockBase):
     id: int
     restock_date: datetime
+    product_name: str  # Add product name
 
     class Config:
         from_attributes = True
 
-
-# Invoice Schemas
 class InvoiceBase(BaseModel):
     sale_id: int
 
-
 class InvoiceCreate(InvoiceBase):
     pass
-
 
 class Invoice(InvoiceBase):
     id: int

@@ -2,8 +2,8 @@ from fastapi import FastAPI, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
-from sqlalchemy.orm import Session, joinedload  # Add joinedload here
-from . import crud, schemas, models, database
+from sqlalchemy.orm import Session,joinedload
+from . import crud, schemas, models, database, auth
 
 app = FastAPI()
 
@@ -95,7 +95,12 @@ def create_sale(sale: schemas.SaleCreate, db: Session = Depends(get_db)):
 @app.get("/restocks", response_class=HTMLResponse)
 def read_restocks(request: Request, db: Session = Depends(get_db)):
     restocks = crud.get_all_restocks(db)
-    return render_template("restocks.html", request, {"restocks": restocks})
+    products = crud.get_all_products(db)  # Fetch all products
+    return templates.TemplateResponse(
+        "restocks.html",
+        {"request": request, "restocks": restocks, "products": products},
+    )
+
 
 @app.post("/restocks/", response_model=schemas.Restock)
 def create_restock(restock: schemas.RestockCreate, db: Session = Depends(get_db)):
@@ -116,12 +121,9 @@ def create_invoice(invoice: schemas.InvoiceCreate, db: Session = Depends(get_db)
         return crud.create_invoice(db, invoice)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
-    
-
 
 @app.get("/invoices/{invoice_id}", response_class=HTMLResponse)
 def generate_invoice(invoice_id: int, request: Request, db: Session = Depends(get_db)):
-    # Fetch the invoice with related sale, product, and customer data
     invoice = db.query(models.Invoice).options(
         joinedload(models.Invoice.sale)
         .joinedload(models.Sale.product),

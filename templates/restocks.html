@@ -5,12 +5,18 @@
 
     <h2>Record Restock</h2>
     <form id="restockForm">
-        <label for="product_id">Product ID:</label>
-        <input type="number" id="product_id" name="product_id" required>
-
+        <label for="product_id">Product:</label>
+        <select id="product_id" name="product_id" required>
+            {% for product in products %}
+            <option value="{{ product.id }}">{{ product.name }}</option>
+            {% else %}
+            <option value="" disabled>No products available</option>
+            {% endfor %}
+        </select>
+    
         <label for="quantity">Quantity:</label>
         <input type="number" id="quantity" name="quantity" required>
-
+    
         <button type="submit">Record Restock</button>
     </form>
 
@@ -19,7 +25,7 @@
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Product ID</th>
+                <th>Product Name</th>
                 <th>Quantity</th>
                 <th>Restock Date</th>
             </tr>
@@ -28,9 +34,13 @@
             {% for restock in restocks %}
             <tr>
                 <td>{{ restock.id }}</td>
-                <td>{{ restock.product_id }}</td>
+                <td>{{ restock.product_name }}</td>  <!-- Display product name -->
                 <td>{{ restock.quantity }}</td>
                 <td>{{ restock.restock_date }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4">No restocks recorded yet.</td>
             </tr>
             {% endfor %}
         </tbody>

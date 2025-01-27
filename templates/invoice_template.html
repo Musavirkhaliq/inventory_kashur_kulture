@@ -118,17 +118,18 @@
                 <tr>
                     <td>{{ invoice.sale.product.name }}</td>
                     <td>{{ invoice.sale.quantity }}</td>
-                    <td>{{ invoice.sale.product.price }}</td>
-                    <td>{{ invoice.sale.selling_price }}</td>
+                    <td>₹{{ invoice.sale.selling_price }}</td>
+                    <!-- Multiply quantity by selling price -->
+                    <td>₹{{ invoice.sale.quantity * invoice.sale.selling_price }}</td>
                 </tr>
             </tbody>
         </table>
 
         <!-- Invoice Total -->
         <div class="invoice-total">
-            <p><strong>Total Amount:</strong> ₹{{ invoice.sale.selling_price }}</p>
+            <p><strong>Total Amount:</strong> ₹{{ invoice.sale.quantity * invoice.sale.selling_price }}</p>
             <p><strong>Amount Received:</strong> ₹{{ invoice.sale.amount_received }}</p>
-            <p><strong>Balance Due:</strong> ₹{{ invoice.sale.balance }}</p>
+            <p><strong>Balance Due:</strong> ₹{{ (invoice.sale.quantity * invoice.sale.selling_price) - invoice.sale.amount_received }}</p>
         </div>
 
         <!-- Invoice Footer -->
