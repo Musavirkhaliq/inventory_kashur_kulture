@@ -95,10 +95,23 @@
         .invoice-footer a:hover {
             text-decoration: underline;
         }
+        .action-buttons {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        .action-buttons button {
+            margin-left: 10px;
+        }
     </style>
 </head>
 <body>
-    <div class="invoice-container">
+    <div class="invoice-container" id="invoice">
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button class="btn btn-primary" onclick="generatePDF()">Download PDF</button>
+            <button class="btn btn-success" onclick="shareInvoice()">Share</button>
+        </div>
+
         <!-- Invoice Header -->
         <div class="invoice-header">
             <h1>KashurKulture</h1>
@@ -156,5 +169,31 @@
             <p>Visit us again at <a href="https://kashurkulture.com">kashurkulture.com</a></p>
         </div>
     </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+    <script>
+            // Hide the button before downloading
+            document.getElementById('shareButton').style.display = 'none';
+            document.getElementById('downloadButton').style.display = 'none';
+        // Generate PDF
+        function generatePDF() {
+
+            const element = document.getElementById('invoice');
+
+            const options = {
+                margin: 10,
+                filename: 'invoice_12345.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().from(element).set(options).save();
+        }
+
+        // Placeholder for Share functionality
+        function shareInvoice() {
+            alert('Share functionality is under development.');
+        }
+    </script>
 </body>
 </html>
