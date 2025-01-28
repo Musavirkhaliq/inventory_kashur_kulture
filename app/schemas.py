@@ -4,6 +4,7 @@ from datetime import datetime
 
 class ProductBase(BaseModel):
     name: str
+    unique_id: str
     description: Optional[str] = None
     price: float = Field(gt=0)
     quantity: int = Field(ge=0)
@@ -13,6 +14,7 @@ class ProductCreate(ProductBase):
 
 class ProductUpdate(BaseModel):
     name: Optional[str] = None
+    unique_id: str
     description: Optional[str] = None
     price: Optional[float] = Field(gt=0)
     quantity: Optional[int] = Field(ge=0)
@@ -46,8 +48,15 @@ class SaleBase(BaseModel):
     selling_price: float = Field(gt=0)
     amount_received: float = Field(ge=0)
 
-class SaleCreate(SaleBase):
-    pass
+class SaleItemCreate(BaseModel):
+    product_id: int
+    quantity: int
+    selling_price: float
+
+class SaleCreate(BaseModel):
+    customer_id: int
+    items: List[SaleItemCreate]
+    amount_received: float
 
 class Sale(SaleBase):
     id: int

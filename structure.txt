@@ -144,7 +144,10 @@ class Invoice(InvoiceBase):
     invoice_date: datetime
 
     class Config:
-        from_attributes = True\n\n./app/main.py:\n
+        from_attributes = True
+
+
+\n\n./app/main.py:\n
 from fastapi import FastAPI, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
@@ -387,6 +390,9 @@ class Sale(Base):
     product = relationship("Product", back_populates="sales")
     customer = relationship("Customer", back_populates="sales")
     invoice = relationship("Invoice", back_populates="sale", uselist=False)
+
+
+
 
 class Restock(Base):
     __tablename__ = "restocks"
@@ -832,678 +838,107 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // document.addEventListener("DOMContentLoaded", () => {
 //     submitForm("restockForm", "/restocks/");
-    // });\n\n./templates/sales.html:\n
-    {% extends "base.html" %}
+// });
 
-    {% block content %}
-        <h1>Sales Management</h1>
+sales.html:
 
-        <h2>Record Sale</h2>
-        <form id="saleForm">
-            <label for="product_id">Product:</label>
-            <select id="product_id" name="product_id" required>
-                {% for product in products %}
-                <option value="{{ product.id }}">{{ product.name }} (Price: {{ product.price }})</option>
-                {% else %}
-                <option value="" disabled>No products available</option>
-                {% endfor %}
-            </select>
-            <a href="/products">Add New Product</a>
+{% extends "base.html" %}
 
-            <label for="customer_id">Customer:</label>
-            <select id="customer_id" name="customer_id" required>
-                {% for customer in customers %}
-                <option value="{{ customer.id }}">{{ customer.name }}</option>
-                {% else %}
-                <option value="" disabled>No customers available</option>
-                {% endfor %}
-            </select>
-            <a href="/customers">Add New Customer</a>
+{% block content %}
+    <div class="container">
+        <h1 class="text-center mb-4">Sales Management</h1>
 
-            <label for="quantity">Quantity:</label>
-            <input type="number" id="quantity" name="quantity" required>
-
-            <label for="selling_price">Selling Price:</label>
-            <input type="number" id="selling_price" name="selling_price" step="0.01" required>
-
-            <label for="amount_received">Amount Received:</label>
-            <input type="number" id="amount_received" name="amount_received" step="0.01" required>
-
-            <button type="submit">Record Sale</button>
-        </form>
-
-        <h2>Sales History</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Product</th>
-                    <th>Customer</th>
-                    <th>Quantity</th>
-                    <th>Selling Price</th>
-                    <th>Amount Received</th>
-                    <th>Balance</th>
-                    <th>Profit</th>
-                    <th>Sale Date</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for sale in sales %}
-                <tr>
-                    <td>{{ sale.id }}</td>
-                    <td>{{ sale.product.name if sale.product else 'N/A' }}</td>
-                    <td>{{ sale.customer.name if sale.customer else 'N/A' }}</td>
-                    <td>{{ sale.quantity }}</td>
-                    <td>{{ sale.selling_price }}</td>
-                    <td>{{ sale.amount_received }}</td>
-                    <td>{{ sale.balance }}</td>
-                    <td>{{ sale.profit }}</td>
-                    <td>{{ sale.sale_date }}</td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="9">No sales recorded yet.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endblock %}\n\n./templates/index.html:\n
-    {% extends "base.html" %}
-
-    {% block content %}
-        <h1>Welcome to Inventory Management</h1>
-        <p>Manage your products, customers, sales, restocks, and invoices efficiently.</p>
-
-        <h2>Quick Links</h2>
-        <ul>
-            <li><a href="/products">Manage Products</a></li>
-            <li><a href="/customers">Manage Customers</a></li>
-            <li><a href="/sales">Record Sales</a></li>
-            <li><a href="/restocks">Record Restocks</a></li>
-            <li><a href="/invoices">Generate Invoices</a></li>
-        </ul>
-    {% endblock %}\n\n./templates/restocks.html:\n
-    {% extends "base.html" %}
-
-    {% block content %}
-        <h1>Restock Management</h1>
-
-        <h2>Record Restock</h2>
-        <form id="restockForm">
-            <label for="product_id">Product:</label>
-            <select id="product_id" name="product_id" required>
-                {% for product in products %}
-                <option value="{{ product.id }}">{{ product.name }}</option>
-                {% else %}
-                <option value="" disabled>No products available</option>
-                {% endfor %}
-            </select>
-        
-            <label for="quantity">Quantity:</label>
-            <input type="number" id="quantity" name="quantity" required>
-        
-            <button type="submit">Record Restock</button>
-        </form>
-
-        <h2>Restock History</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Product Name</th>
-                    <th>Quantity</th>
-                    <th>Restock Date</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for restock in restocks %}
-                <tr>
-                    <td>{{ restock.id }}</td>
-                    <td>{{ restock.product_name }}</td>  <!-- Display product name -->
-                    <td>{{ restock.quantity }}</td>
-                    <td>{{ restock.restock_date }}</td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="4">No restocks recorded yet.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endblock %}\n\n./templates/inventory_value.html:\n
-    {% extends "base.html" %}
-
-    {% block content %}
-        <h1>Inventory Value</h1>
-
-        <p>The total value of all items in the store is: {{ total_value }}</p>
-    {% endblock %}\n\n./templates/customers.html:\n
-    {% extends "base.html" %}
-
-    {% block content %}
-        <h1>Customer Management</h1>
-
-        <h2>Add Customer</h2>
-        <form id="customerForm">
-            <label for="name">Name:</label>
-            <input type="text" id="name" name="name" required>
-
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
-
-            <label for="phone_number">Phone Number:</label>
-            <input type="text" id="phone_number" name="phone_number">
-
-            <label for="address">Address:</label>
-            <input type="text" id="address" name="address">
-
-            <button type="submit">Add Customer</button>
-        </form>
-
-        <h2>Customer List</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Phone Number</th>
-                    <th>Address</th>
-                    <th>Balance Owe</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for customer in customers %}
-                <tr>
-                    <td>{{ customer.id }}</td>
-                    <td>{{ customer.name }}</td>
-                    <td>{{ customer.email }}</td>
-                    <td>{{ customer.phone_number }}</td>
-                    <td>{{ customer.address }}</td>
-                    <td>{{ customer.balance_owe }}</td>
-                    <td>
-                        <button onclick="viewTransactions({{ customer.id }})">View Transactions</button>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
-        <script>
-            function viewTransactions(customerId) {
-                window.location.href = `/customers/${customerId}/transactions`;
-            }
-        </script>
-    {% endblock %}\n\n./templates/customer_balances.html:\n
-    {% extends "base.html" %}
-
-    {% block content %}
-        <h1>Customer Balances</h1>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Phone Number</th>
-                    <th>Address</th>
-                    <th>Balance Owe</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for customer in customers %}
-                <tr>
-                    <td>{{ customer.id }}</td>
-                    <td>{{ customer.name }}</td>
-                    <td>{{ customer.email }}</td>
-                    <td>{{ customer.phone_number }}</td>
-                    <td>{{ customer.address }}</td>
-                    <td>{{ customer.balance_owe }}</td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="6">No customers found.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endblock %}\n\n./templates/invoices.html:\n
-    {% extends "base.html" %}
-
-    {% block content %}
-        <h1>Invoice Management</h1>
-
-        <h2>Generate Invoice</h2>
-        <form id="invoiceForm">
-            <label for="sale_id">Sale ID:</label>
-            <input type="number" id="sale_id" name="sale_id" required>
-            <button type="submit">Generate Invoice</button>
-        </form>
-
-        <h2>Invoice History</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Sale ID</th>
-                    <th>Invoice Date</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for invoice in invoices %}
-                <tr>
-                    <td>{{ invoice.id }}</td>
-                    <td>{{ invoice.sale_id }}</td>
-                    <td>{{ invoice.invoice_date }}</td>
-                    <td>
-                        <a href="/invoices/{{ invoice.id }}" target="_blank">View Invoice</a>
-                    </td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="4">No invoices generated yet.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endblock %}\n\n./templates/sales_report.html:\n
-    {% extends "base.html" %}
-
-    {% block content %}
-        <h1>Sales Report</h1>
-
-        <h2>Daily Sales</h2>
-        <p>Total: {{ daily_total }}</p>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Product</th>
-                    <th>Customer</th>
-                    <th>Quantity</th>
-                    <th>Selling Price</th>
-                    <th>Amount Received</th>
-                    <th>Balance</th>
-                    <th>Profit</th>
-                    <th>Sale Date</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for sale in daily_sales %}
-                <tr>
-                    <td>{{ sale.id }}</td>
-                    <td>{{ sale.product.name if sale.product else 'N/A' }}</td>
-                    <td>{{ sale.customer.name if sale.customer else 'N/A' }}</td>
-                    <td>{{ sale.quantity }}</td>
-                    <td>{{ sale.selling_price }}</td>
-                    <td>{{ sale.amount_received }}</td>
-                    <td>{{ sale.balance }}</td>
-                    <td>{{ sale.profit }}</td>
-                    <td>{{ sale.sale_date }}</td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="9">No sales recorded today.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
-        <h2>Weekly Sales</h2>
-        <p>Total: {{ weekly_total }}</p>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Product</th>
-                    <th>Customer</th>
-                    <th>Quantity</th>
-                    <th>Selling Price</th>
-                    <th>Amount Received</th>
-                    <th>Balance</th>
-                    <th>Profit</th>
-                    <th>Sale Date</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for sale in weekly_sales %}
-                <tr>
-                    <td>{{ sale.id }}</td>
-                    <td>{{ sale.product.name if sale.product else 'N/A' }}</td>
-                    <td>{{ sale.customer.name if sale.customer else 'N/A' }}</td>
-                    <td>{{ sale.quantity }}</td>
-                    <td>{{ sale.selling_price }}</td>
-                    <td>{{ sale.amount_received }}</td>
-                    <td>{{ sale.balance }}</td>
-                    <td>{{ sale.profit }}</td>
-                    <td>{{ sale.sale_date }}</td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="9">No sales recorded this week.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
-        <h2>Monthly Sales</h2>
-        <p>Total: {{ monthly_total }}</p>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Product</th>
-                    <th>Customer</th>
-                    <th>Quantity</th>
-                    <th>Selling Price</th>
-                    <th>Amount Received</th>
-                    <th>Balance</th>
-                    <th>Profit</th>
-                    <th>Sale Date</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for sale in monthly_sales %}
-                <tr>
-                    <td>{{ sale.id }}</td>
-                    <td>{{ sale.product.name if sale.product else 'N/A' }}</td>
-                    <td>{{ sale.customer.name if sale.customer else 'N/A' }}</td>
-                    <td>{{ sale.quantity }}</td>
-                    <td>{{ sale.selling_price }}</td>
-                    <td>{{ sale.amount_received }}</td>
-                    <td>{{ sale.balance }}</td>
-                    <td>{{ sale.profit }}</td>
-                    <td>{{ sale.sale_date }}</td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="9">No sales recorded this month.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endblock %}\n\n./templates/customer_transactions.html:\n
-    {% extends "base.html" %}
-
-    {% block content %}
-        <h1>Transactions for {{ customer.name }}</h1>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Product</th>
-                    <th>Quantity</th>
-                    <th>Selling Price</th>
-                    <th>Amount Received</th>
-                    <th>Balance</th>
-                    <th>Sale Date</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for transaction in transactions %}
-                <tr>
-                    <td>{{ transaction.id }}</td>
-                    <td>{{ transaction.product.name if transaction.product else 'N/A' }}</td>
-                    <td>{{ transaction.quantity }}</td>
-                    <td>{{ transaction.selling_price }}</td>
-                    <td>{{ transaction.amount_received }}</td>
-                    <td>{{ transaction.balance }}</td>
-                    <td>{{ transaction.sale_date }}</td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="7">No transactions found.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endblock %}\n\n./templates/invoice_template.html:\n
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Invoice - Kashur Kulture</title>
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                margin: 0;
-                padding: 20px;
-                background-color: #f9f9f9;
-            }
-            .invoice-container {
-                max-width: 800px;
-                margin: 0 auto;
-                background: #fff;
-                padding: 20px;
-                border: 1px solid #ddd;
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            }
-            .invoice-header {
-                text-align: center;
-                margin-bottom: 20px;
-            }
-            .invoice-header h1 {
-                font-size: 24px;
-                color: #333;
-                margin: 0;
-            }
-            .invoice-header p {
-                font-size: 14px;
-                color: #777;
-                margin: 5px 0;
-            }
-            .invoice-details {
-                display: flex;
-                justify-content: space-between;
-                margin-bottom: 20px;
-            }
-            .invoice-details .left, .invoice-details .right {
-                width: 48%;
-            }
-            .invoice-details h2 {
-                font-size: 18px;
-                color: #333;
-                margin-bottom: 10px;
-            }
-            .invoice-details p {
-                margin: 5px 0;
-                color: #555;
-            }
-            .invoice-table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-bottom: 20px;
-            }
-            .invoice-table th, .invoice-table td {
-                border: 1px solid #ddd;
-                padding: 10px;
-                text-align: left;
-            }
-            .invoice-table th {
-                background-color: #f5f5f5;
-                font-weight: bold;
-            }
-            .invoice-total {
-                text-align: right;
-                font-size: 18px;
-                font-weight: bold;
-                color: #333;
-            }
-            .invoice-footer {
-                text-align: center;
-                margin-top: 20px;
-                font-size: 14px;
-                color: #777;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="invoice-container">
-            <!-- Invoice Header -->
-            <div class="invoice-header">
-                <h1>Kashur Kulture</h1>
-                <p>Your Fashion, Your Style</p>
-                <p>Contact: +91 1234567890 | Email: info@kashurkulture.com</p>
+        <!-- Record Sale Form -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h2 class="card-title">Record Sale</h2>
             </div>
-
-            <!-- Invoice Details -->
-            <div class="invoice-details">
-                <div class="left">
-                    <h2>Bill To:</h2>
-                    <p>{{ invoice.sale.customer.name }}</p>
-                    <p>{{ invoice.sale.customer.email }}</p>
-                    <p>{{ invoice.sale.customer.phone_number }}</p>
-                    <p>{{ invoice.sale.customer.address }}</p>
-                </div>
-                <div class="right">
-                    <h2>Invoice Details:</h2>
-                    <p><strong>Invoice ID:</strong> {{ invoice.id }}</p>
-                    <p><strong>Date:</strong> {{ invoice.invoice_date }}</p>
-                    <p><strong>Sale ID:</strong> {{ invoice.sale.id }}</p>
-                </div>
-            </div>
-
-            <!-- Invoice Table -->
-            <table class="invoice-table">
-                <thead>
-                    <tr>
-                        <th>Product</th>
-                        <th>Quantity</th>
-                        <th>Unit Price</th>
-                        <th>Total Price</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>{{ invoice.sale.product.name }}</td>
-                        <td>{{ invoice.sale.quantity }}</td>
-                        <td>₹{{ invoice.sale.selling_price }}</td>
-                        <!-- Multiply quantity by selling price -->
-                        <td>₹{{ invoice.sale.quantity * invoice.sale.selling_price }}</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <!-- Invoice Total -->
-            <div class="invoice-total">
-                <p><strong>Total Amount:</strong> ₹{{ invoice.sale.quantity * invoice.sale.selling_price }}</p>
-                <p><strong>Amount Received:</strong> ₹{{ invoice.sale.amount_received }}</p>
-                <p><strong>Balance Due:</strong> ₹{{ (invoice.sale.quantity * invoice.sale.selling_price) - invoice.sale.amount_received }}</p>
-            </div>
-
-            <!-- Invoice Footer -->
-            <div class="invoice-footer">
-                <p>Thank you for shopping with Kashur Kulture!</p>
-                <p>Visit us again at <a href="https://kashurkulture.com">kashurkulture.com</a></p>
+            <div class="card-body">
+                <form id="saleForm" class="row g-3">
+                    <div class="col-md-6">
+                        <label for="product_id" class="form-label">Product</label>
+                        <select id="product_id" name="product_id" class="form-select" required>
+                            {% for product in products %}
+                                <option value="{{ product.id }}">{{ product.name }} (Price: {{ product.price }})</option>
+                            {% else %}
+                                <option value="" disabled>No products available</option>
+                            {% endfor %}
+                        </select>
+                        <a href="/products" class="btn btn-link mt-2">Add New Product</a>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="customer_id" class="form-label">Customer</label>
+                        <select id="customer_id" name="customer_id" class="form-select" required>
+                            {% for customer in customers %}
+                                <option value="{{ customer.id }}">{{ customer.name }}</option>
+                            {% else %}
+                                <option value="" disabled>No customers available</option>
+                            {% endfor %}
+                        </select>
+                        <a href="/customers" class="btn btn-link mt-2">Add New Customer</a>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="quantity" class="form-label">Quantity</label>
+                        <input type="number" id="quantity" name="quantity" class="form-control" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="selling_price" class="form-label">Selling Price</label>
+                        <input type="number" id="selling_price" name="selling_price" class="form-control" step="0.01" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="amount_received" class="form-label">Amount Received</label>
+                        <input type="number" id="amount_received" name="amount_received" class="form-control" step="0.01" required>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-success">Record Sale</button>
+                    </div>
+                </form>
             </div>
         </div>
-    </body>
-    </html>
-    \n\n./templates/products.html:\n
-    {% extends "base.html" %}
 
-    {% block content %}
-        <h1>Product Management</h1>
-
-        <h2>Add Product</h2>
-        <form id="productForm">
-            <label for="name">Name:</label>
-            <input type="text" id="name" name="name" required>
-
-            <label for="description">Description:</label>
-            <input type="text" id="description" name="description">
-
-            <label for="price">Price:</label>
-            <input type="number" id="price" name="price" step="0.01" required>
-
-            <label for="quantity">Quantity:</label>
-            <input type="number" id="quantity" name="quantity" required>
-
-            <button type="submit">Add Product</button>
-        </form>
-
-        <h2>Product List</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Description</th>
-                    <th>Price</th>
-                    <th>Quantity</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for product in products %}
-                <tr>
-                    <td>{{ product.id }}</td>
-                    <td>{{ product.name }}</td>
-                    <td>{{ product.description }}</td>
-                    <td>{{ product.price }}</td>
-                    <td>{{ product.quantity }}</td>
-                    <td>
-                        <a href="/products/{{ product.id }}/edit">Edit</a>
-                        <a href="/products/{{ product.id }}/delete">Delete</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endblock %}\n\n./templates/edit_product.html:\n
-    {% extends "base.html" %}
-
-    {% block content %}
-        <h1>Edit Product</h1>
-
-        <form id="editProductForm">
-            <input type="hidden" id="id" name="id" value="{{ product.id }}">
-
-            <label for="name">Name:</label>
-            <input type="text" id="name" name="name" value="{{ product.name }}" required>
-
-            <label for="description">Description:</label>
-            <input type="text" id="description" name="description" value="{{ product.description }}">
-
-            <label for="price">Price:</label>
-            <input type="number" id="price" name="price" value="{{ product.price }}" step="0.01" required>
-
-            <label for="quantity">Quantity:</label>
-            <input type="number" id="quantity" name="quantity" value="{{ product.quantity }}" required>
-
-            <button type="submit">Update Product</button>
-        </form>
-    {% endblock %}\n\n./templates/base.html:\n
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Inventory Management</title>
-        <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
-    </head>
-    <body>
-        <div class="navbar">
-            <a href="/">Home</a>
-            <a href="/products">Products</a>
-            <a href="/customers">Customers</a>
-            <a href="/sales">Sales</a>
-            <a href="/restocks">Restocks</a>
-            <a href="/invoices">Invoices</a>
-            <a href="/sales/report">Sales Report</a>
-            <a href="/customers/balances">Customer Balances</a>
-            <a href="/inventory/value">Inventory Value</a>
+        <!-- Sales History Table -->
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h2 class="card-title">Sales History</h2>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Product</th>
+                            <th>Customer</th>
+                            <th>Quantity</th>
+                            <th>Selling Price</th>
+                            <th>Amount Received</th>
+                            <th>Balance</th>
+                            <th>Profit</th>
+                            <th>Sale Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sale in sales %}
+                            <tr>
+                                <td>{{ sale.id }}</td>
+                                <td>{{ sale.product.name if sale.product else 'N/A' }}</td>
+                                <td>{{ sale.customer.name if sale.customer else 'N/A' }}</td>
+                                <td>{{ sale.quantity }}</td>
+                                <td>{{ sale.selling_price }}</td>
+                                <td>{{ sale.amount_received }}</td>
+                                <td>{{ sale.balance }}</td>
+                                <td>{{ sale.profit }}</td>
+                                <td>{{ sale.sale_date }}</td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="9" class="text-center">No sales recorded yet.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
+    </div>
+{% endblock %}
 
-        <div class="container">
-            {% block content %}{% endblock %}
-        </div>
-
-        <script src="{{ url_for('static', path='js/main.js') }}"></script>
-    </body>
-    </html>
+other front end files html

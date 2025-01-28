@@ -39,6 +39,7 @@ def read_products(request: Request, db: Session = Depends(get_db)):
 
 @app.post("/products/", response_model=schemas.Product)
 def create_product(product: schemas.ProductCreate, db: Session = Depends(get_db)):
+    print("hello")
     return crud.create_product(db, product)
 
 @app.get("/products/{product_id}/edit", response_class=HTMLResponse)
@@ -180,3 +181,16 @@ def inventory_value(request: Request, db: Session = Depends(get_db)):
     products = db.query(models.Product).all()
     total_value = sum(product.price * product.quantity for product in products)
     return render_template("inventory_value.html", request, {"total_value": total_value})
+
+
+@app.get("/api/search/customers")
+def search_customers_api(query: str, db: Session = Depends(get_db)):
+    return crud.search_customers(db, query)
+
+@app.get("/api/search/products")
+def search_products_api(query: str, db: Session = Depends(get_db)):
+    return crud.search_products(db, query)
+
+@app.get("/api/customer/{customer_id}/transactions")
+def get_customer_transactions_api(customer_id: int, db: Session = Depends(get_db)):
+    return crud.get_customer_transactions(db, customer_id)

@@ -43,33 +43,41 @@ def get_all_customers(db: Session) -> List[models.Customer]:
 
 # Sale CRUD
 def create_sale(db: Session, sale: schemas.SaleCreate):
-    product = get_product_by_id(db, sale.product_id)
-    if not product:
-        raise ValueError("Product not found")
-    if product.quantity < sale.quantity:
-        raise ValueError("Not enough stock available")
-
-    customer = get_customer_by_id(db, sale.customer_id)
-    if not customer:
-        raise ValueError("Customer not found")
-
-    profit = (sale.selling_price*sale.quantity) - (product.price * sale.quantity)
-    balance = (sale.selling_price*sale.quantity) - sale.amount_received
-
-    product.quantity -= sale.quantity
-    customer.balance_owe += balance
-
+    # Calculate total amount
+    total_amount = 0
+    sale_items = []
+    
+    for item in sale.items:
+        product = get_product_by_id(db, item.product_id)
+        if not product:
+            raise ValueError(f"Product {item.product_id} not found")
+        if product.quantity < item.quantity:
+            raise ValueError(f"Not enough stock for product {product.name}")
+            
+        total_amount += item.selling_price * item.quantity
+        
+    # Create sale record
     db_sale = models.Sale(
-        product_id=sale.product_id,
         customer_id=sale.customer_id,
-        quantity=sale.quantity,
-        selling_price=sale.selling_price,
+        total_amount=total_amount,
         amount_received=sale.amount_received,
-        balance=balance,
-        profit=profit,
+        balance=total_amount - sale.amount_received
     )
-
     db.add(db_sale)
+    db.flush()
+    
+    # Create sale items
+    for item in sale.items:
+        product = get_product_by_id(db, item.product_id)
+        db_sale_item = models.SaleItem(
+            sale_id=db_sale.id,
+            product_id=item.product_id,
+            quantity=item.quantity,
+            selling_price=item.selling_price
+        )
+        product.quantity -= item.quantity
+        db.add(db_sale_item)
+    
     db.commit()
     db.refresh(db_sale)
     return db_sale
@@ -130,4 +138,20 @@ def update_product(db: Session, product_id: int, product_update: schemas.Product
 #         db.commit()
 #         db.refresh(db_product)
 #     return db_product
+
+def search_customers(db: Session, query: str):
+    return db.query(models.Customer).filter(
+        models.Customer.name.ilike(f"%{query}%")
+    ).all()
+
+def search_products(db: Session, query: str):
+    return db.query(models.Product).filter(
+        models.Product.name.ilike(f"%{query}%")
+    ).all()
+
+def get_customer_transactions(db: Session, customer_id: int):
+    return db.query(models.Sale).filter(
+        models.Sale.customer_id == customer_id
+    ).all()
+
 

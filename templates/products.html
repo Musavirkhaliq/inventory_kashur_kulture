@@ -16,6 +16,10 @@
                         <input type="text" id="name" name="name" class="form-control" required>
                     </div>
                     <div class="col-md-6">
+                        <label for="unique_id" class="form-label">Unique ID</label>
+                        <input type="text" id="unique_id" name="unique_id" class="form-control">
+                    </div>
+                    <div class="col-md-6">
                         <label for="description" class="form-label">Description</label>
                         <input type="text" id="description" name="description" class="form-control">
                     </div>
@@ -45,6 +49,7 @@
                         <tr>
                             <th>ID</th>
                             <th>Name</th>
+                            <th>UniqueID</th>
                             <th>Description</th>
                             <th>Price</th>
                             <th>Quantity</th>
@@ -56,6 +61,7 @@
                             <tr>
                                 <td>{{ product.id }}</td>
                                 <td>{{ product.name }}</td>
+                                <td>{{ product.unique_id }}</td>
                                 <td>{{ product.description }}</td>
                                 <td>{{ product.price }}</td>
                                 <td>{{ product.quantity }}</td>
