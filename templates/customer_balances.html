@@ -1,34 +1,43 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Customer Balances</h1>
+    <div class="container">
+        <h1 class="text-center mb-4">Customer Balances</h1>
 
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone Number</th>
-                <th>Address</th>
-                <th>Balance Owe</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for customer in customers %}
-            <tr>
-                <td>{{ customer.id }}</td>
-                <td>{{ customer.name }}</td>
-                <td>{{ customer.email }}</td>
-                <td>{{ customer.phone_number }}</td>
-                <td>{{ customer.address }}</td>
-                <td>{{ customer.balance_owe }}</td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="6">No customers found.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h2 class="card-title">Customer Balances</h2>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone Number</th>
+                            <th>Address</th>
+                            <th>Balance Owe</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for customer in customers %}
+                            <tr>
+                                <td>{{ customer.id }}</td>
+                                <td>{{ customer.name }}</td>
+                                <td>{{ customer.email }}</td>
+                                <td>{{ customer.phone_number }}</td>
+                                <td>{{ customer.address }}</td>
+                                <td>{{ customer.balance_owe }}</td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center">No customers found.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 {% endblock %}

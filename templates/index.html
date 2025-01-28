@@ -1,15 +1,62 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Welcome to Inventory Management</h1>
-    <p>Manage your products, customers, sales, restocks, and invoices efficiently.</p>
+    <!-- Hero Banner -->
+    <div class="py-5 text-center bg-light">
+        <h1 class="display-4 fw-bold text-primary">Welcome to KashurKulture</h1>
+        <p class="lead">Streamlining Inventory Management with Elegance and Simplicity</p>
+        <a href="/products" class="btn btn-primary btn-lg">Explore Now</a>
+    </div>
 
-    <h2>Quick Links</h2>
-    <ul>
-        <li><a href="/products">Manage Products</a></li>
-        <li><a href="/customers">Manage Customers</a></li>
-        <li><a href="/sales">Record Sales</a></li>
-        <li><a href="/restocks">Record Restocks</a></li>
-        <li><a href="/invoices">Generate Invoices</a></li>
-    </ul>
+    <!-- Quick Links Section -->
+    <div class="container mt-5">
+        <h2 class="text-center mb-4">Quick Links</h2>
+        <div class="row gy-4">
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Manage Products</h5>
+                        <p class="card-text">Add, edit, or delete products in your inventory.</p>
+                        <a href="/products" class="btn btn-primary">Go</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Manage Customers</h5>
+                        <p class="card-text">View and manage customer details seamlessly.</p>
+                        <a href="/customers" class="btn btn-primary">Go</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Record Sales</h5>
+                        <p class="card-text">Keep track of sales transactions efficiently.</p>
+                        <a href="/sales" class="btn btn-primary">Go</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Record Restocks</h5>
+                        <p class="card-text">Manage and track restock operations easily.</p>
+                        <a href="/restocks" class="btn btn-primary">Go</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Generate Invoices</h5>
+                        <p class="card-text">Create and manage invoices with ease.</p>
+                        <a href="/invoices" class="btn btn-primary">Go</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

@@ -3,26 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventory Management</title>
+    <title>Inventory Management - KashurKulture</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .navbar {
+            background: linear-gradient(45deg, #6a11cb, #2575fc);
+        }
+        .navbar-brand {
+            font-weight: bold;
+            color: #fff !important;
+        }
+        .navbar-nav .nav-link {
+            color: #f8f9fa !important;
+            transition: color 0.3s ease-in-out;
+        }
+        .navbar-nav .nav-link:hover {
+            color: #d4d4d4 !important;
+        }
+        footer {
+            background-color: #343a40;
+            color: #fff;
+            text-align: center;
+            padding: 1rem 0;
+        }
+    </style>
 </head>
 <body>
-    <div class="navbar">
-        <a href="/">Home</a>
-        <a href="/products">Products</a>
-        <a href="/customers">Customers</a>
-        <a href="/sales">Sales</a>
-        <a href="/restocks">Restocks</a>
-        <a href="/invoices">Invoices</a>
-        <a href="/sales/report">Sales Report</a>
-        <a href="/customers/balances">Customer Balances</a>
-        <a href="/inventory/value">Inventory Value</a>
-    </div>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">KashurKulture</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/products">Products</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/customers">Customers</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/sales">Sales</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/restocks">Restocks</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/invoices">Invoices</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/sales/report">Sales Report</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/customers/balances">Customer Balances</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/inventory/value">Inventory Value</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-    <div class="container">
+    <!-- Main Content -->
+    <div class="container mt-4">
         {% block content %}{% endblock %}
     </div>
 
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 KashurKulture. All Rights Reserved.</p>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ url_for('static', path='js/main.js') }}"></script>
 </body>
 </html>

@@ -1,116 +1,139 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Sales Report</h1>
+    <div class="container">
+        <h1 class="text-center mb-4">Sales Report</h1>
 
-    <h2>Daily Sales</h2>
-    <p>Total: {{ daily_total }}</p>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Product</th>
-                <th>Customer</th>
-                <th>Quantity</th>
-                <th>Selling Price</th>
-                <th>Amount Received</th>
-                <th>Balance</th>
-                <th>Profit</th>
-                <th>Sale Date</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for sale in daily_sales %}
-            <tr>
-                <td>{{ sale.id }}</td>
-                <td>{{ sale.product.name if sale.product else 'N/A' }}</td>
-                <td>{{ sale.customer.name if sale.customer else 'N/A' }}</td>
-                <td>{{ sale.quantity }}</td>
-                <td>{{ sale.selling_price }}</td>
-                <td>{{ sale.amount_received }}</td>
-                <td>{{ sale.balance }}</td>
-                <td>{{ sale.profit }}</td>
-                <td>{{ sale.sale_date }}</td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="9">No sales recorded today.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+        <!-- Daily Sales -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h2 class="card-title">Daily Sales</h2>
+            </div>
+            <div class="card-body">
+                <p class="lead">Total: <strong>{{ daily_total }}</strong></p>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Product</th>
+                            <th>Customer</th>
+                            <th>Quantity</th>
+                            <th>Selling Price</th>
+                            <th>Amount Received</th>
+                            <th>Balance</th>
+                            <th>Profit</th>
+                            <th>Sale Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sale in daily_sales %}
+                            <tr>
+                                <td>{{ sale.id }}</td>
+                                <td>{{ sale.product.name if sale.product else 'N/A' }}</td>
+                                <td>{{ sale.customer.name if sale.customer else 'N/A' }}</td>
+                                <td>{{ sale.quantity }}</td>
+                                <td>{{ sale.selling_price }}</td>
+                                <td>{{ sale.amount_received }}</td>
+                                <td>{{ sale.balance }}</td>
+                                <td>{{ sale.profit }}</td>
+                                <td>{{ sale.sale_date }}</td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="9" class="text-center">No sales recorded today.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-    <h2>Weekly Sales</h2>
-    <p>Total: {{ weekly_total }}</p>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Product</th>
-                <th>Customer</th>
-                <th>Quantity</th>
-                <th>Selling Price</th>
-                <th>Amount Received</th>
-                <th>Balance</th>
-                <th>Profit</th>
-                <th>Sale Date</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for sale in weekly_sales %}
-            <tr>
-                <td>{{ sale.id }}</td>
-                <td>{{ sale.product.name if sale.product else 'N/A' }}</td>
-                <td>{{ sale.customer.name if sale.customer else 'N/A' }}</td>
-                <td>{{ sale.quantity }}</td>
-                <td>{{ sale.selling_price }}</td>
-                <td>{{ sale.amount_received }}</td>
-                <td>{{ sale.balance }}</td>
-                <td>{{ sale.profit }}</td>
-                <td>{{ sale.sale_date }}</td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="9">No sales recorded this week.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+        <!-- Weekly Sales -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h2 class="card-title">Weekly Sales</h2>
+            </div>
+            <div class="card-body">
+                <p class="lead">Total: <strong>{{ weekly_total }}</strong></p>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Product</th>
+                            <th>Customer</th>
+                            <th>Quantity</th>
+                            <th>Selling Price</th>
+                            <th>Amount Received</th>
+                            <th>Balance</th>
+                            <th>Profit</th>
+                            <th>Sale Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sale in weekly_sales %}
+                            <tr>
+                                <td>{{ sale.id }}</td>
+                                <td>{{ sale.product.name if sale.product else 'N/A' }}</td>
+                                <td>{{ sale.customer.name if sale.customer else 'N/A' }}</td>
+                                <td>{{ sale.quantity }}</td>
+                                <td>{{ sale.selling_price }}</td>
+                                <td>{{ sale.amount_received }}</td>
+                                <td>{{ sale.balance }}</td>
+                                <td>{{ sale.profit }}</td>
+                                <td>{{ sale.sale_date }}</td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="9" class="text-center">No sales recorded this week.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-    <h2>Monthly Sales</h2>
-    <p>Total: {{ monthly_total }}</p>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Product</th>
-                <th>Customer</th>
-                <th>Quantity</th>
-                <th>Selling Price</th>
-                <th>Amount Received</th>
-                <th>Balance</th>
-                <th>Profit</th>
-                <th>Sale Date</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for sale in monthly_sales %}
-            <tr>
-                <td>{{ sale.id }}</td>
-                <td>{{ sale.product.name if sale.product else 'N/A' }}</td>
-                <td>{{ sale.customer.name if sale.customer else 'N/A' }}</td>
-                <td>{{ sale.quantity }}</td>
-                <td>{{ sale.selling_price }}</td>
-                <td>{{ sale.amount_received }}</td>
-                <td>{{ sale.balance }}</td>
-                <td>{{ sale.profit }}</td>
-                <td>{{ sale.sale_date }}</td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="9">No sales recorded this month.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+        <!-- Monthly Sales -->
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h2 class="card-title">Monthly Sales</h2>
+            </div>
+            <div class="card-body">
+                <p class="lead">Total: <strong>{{ monthly_total }}</strong></p>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Product</th>
+                            <th>Customer</th>
+                            <th>Quantity</th>
+                            <th>Selling Price</th>
+                            <th>Amount Received</th>
+                            <th>Balance</th>
+                            <th>Profit</th>
+                            <th>Sale Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sale in monthly_sales %}
+                            <tr>
+                                <td>{{ sale.id }}</td>
+                                <td>{{ sale.product.name if sale.product else 'N/A' }}</td>
+                                <td>{{ sale.customer.name if sale.customer else 'N/A' }}</td>
+                                <td>{{ sale.quantity }}</td>
+                                <td>{{ sale.selling_price }}</td>
+                                <td>{{ sale.amount_received }}</td>
+                                <td>{{ sale.balance }}</td>
+                                <td>{{ sale.profit }}</td>
+                                <td>{{ sale.sale_date }}</td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="9" class="text-center">No sales recorded this month.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 {% endblock %}

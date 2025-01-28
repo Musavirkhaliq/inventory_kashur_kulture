@@ -1,40 +1,60 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Invoice Management</h1>
+    <div class="container">
+        <h1 class="text-center mb-4">Invoice Management</h1>
 
-    <h2>Generate Invoice</h2>
-    <form id="invoiceForm">
-        <label for="sale_id">Sale ID:</label>
-        <input type="number" id="sale_id" name="sale_id" required>
-        <button type="submit">Generate Invoice</button>
-    </form>
+        <!-- Generate Invoice Form -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h2 class="card-title">Generate Invoice</h2>
+            </div>
+            <div class="card-body">
+                <form id="invoiceForm" class="row g-3">
+                    <div class="col-md-6">
+                        <label for="sale_id" class="form-label">Sale ID</label>
+                        <input type="number" id="sale_id" name="sale_id" class="form-control" required>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-success">Generate Invoice</button>
+                    </div>
+                </form>
+            </div>
+        </div>
 
-    <h2>Invoice History</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Sale ID</th>
-                <th>Invoice Date</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for invoice in invoices %}
-            <tr>
-                <td>{{ invoice.id }}</td>
-                <td>{{ invoice.sale_id }}</td>
-                <td>{{ invoice.invoice_date }}</td>
-                <td>
-                    <a href="/invoices/{{ invoice.id }}" target="_blank">View Invoice</a>
-                </td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="4">No invoices generated yet.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+        <!-- Invoice History Table -->
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h2 class="card-title">Invoice History</h2>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Sale ID</th>
+                            <th>Invoice Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for invoice in invoices %}
+                            <tr>
+                                <td>{{ invoice.id }}</td>
+                                <td>{{ invoice.sale_id }}</td>
+                                <td>{{ invoice.invoice_date }}</td>
+                                <td>
+                                    <a href="/invoices/{{ invoice.id }}" class="btn btn-sm btn-primary" target="_blank">View Invoice</a>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center">No invoices generated yet.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 {% endblock %}

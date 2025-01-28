@@ -41,6 +41,9 @@ class Sale(Base):
     customer = relationship("Customer", back_populates="sales")
     invoice = relationship("Invoice", back_populates="sale", uselist=False)
 
+
+
+
 class Restock(Base):
     __tablename__ = "restocks"
     id = Column(Integer, primary_key=True, index=True)

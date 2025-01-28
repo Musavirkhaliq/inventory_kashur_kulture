@@ -1,54 +1,76 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Customer Management</h1>
+    <div class="container">
+        <h1 class="text-center mb-4">Customer Management</h1>
 
-    <h2>Add Customer</h2>
-    <form id="customerForm">
-        <label for="name">Name:</label>
-        <input type="text" id="name" name="name" required>
+        <!-- Add Customer Form -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h2 class="card-title">Add Customer</h2>
+            </div>
+            <div class="card-body">
+                <form id="customerForm" class="row g-3">
+                    <div class="col-md-6">
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" id="name" name="name" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" id="email" name="email" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="phone_number" class="form-label">Phone Number</label>
+                        <input type="text" id="phone_number" name="phone_number" class="form-control">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="address" class="form-label">Address</label>
+                        <input type="text" id="address" name="address" class="form-control">
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-success">Add Customer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
 
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required>
-
-        <label for="phone_number">Phone Number:</label>
-        <input type="text" id="phone_number" name="phone_number">
-
-        <label for="address">Address:</label>
-        <input type="text" id="address" name="address">
-
-        <button type="submit">Add Customer</button>
-    </form>
-
-    <h2>Customer List</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone Number</th>
-                <th>Address</th>
-                <th>Balance Owe</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for customer in customers %}
-            <tr>
-                <td>{{ customer.id }}</td>
-                <td>{{ customer.name }}</td>
-                <td>{{ customer.email }}</td>
-                <td>{{ customer.phone_number }}</td>
-                <td>{{ customer.address }}</td>
-                <td>{{ customer.balance_owe }}</td>
-                <td>
-                    <button onclick="viewTransactions({{ customer.id }})">View Transactions</button>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+        <!-- Customer List Table -->
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h2 class="card-title">Customer List</h2>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone Number</th>
+                            <th>Address</th>
+                            <th>Balance Owe</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for customer in customers %}
+                            <tr>
+                                <td>{{ customer.id }}</td>
+                                <td>{{ customer.name }}</td>
+                                <td>{{ customer.email }}</td>
+                                <td>{{ customer.phone_number }}</td>
+                                <td>{{ customer.address }}</td>
+                                <td>{{ customer.balance_owe }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary" onclick="viewTransactions({{ customer.id }})">View Transactions</button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
     <script>
         function viewTransactions(customerId) {
