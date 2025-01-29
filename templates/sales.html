@@ -1,98 +1,195 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <div class="container">
-        <h1 class="text-center mb-4">Sales Management</h1>
+<div class="container">
+    <h1 class="text-center mb-4">Sales Management</h1>
 
-        <!-- Record Sale Form -->
-        <div class="card mb-4">
-            <div class="card-header bg-primary text-white">
-                <h2 class="card-title">Record Sale</h2>
-            </div>
-            <div class="card-body">
-                <form id="saleForm" class="row g-3">
-                    <div class="col-md-6">
-                        <label for="product_id" class="form-label">Product</label>
-                        <select id="product_id" name="product_id" class="form-select" required>
-                            {% for product in products %}
-                                <option value="{{ product.id }}">{{ product.name }} (Price: {{ product.price }})</option>
-                            {% else %}
-                                <option value="" disabled>No products available</option>
-                            {% endfor %}
-                        </select>
-                        <a href="/products" class="btn btn-link mt-2">Add New Product</a>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="customer_id" class="form-label">Customer</label>
-                        <select id="customer_id" name="customer_id" class="form-select" required>
-                            {% for customer in customers %}
-                                <option value="{{ customer.id }}">{{ customer.name }}</option>
-                            {% else %}
-                                <option value="" disabled>No customers available</option>
-                            {% endfor %}
-                        </select>
-                        <a href="/customers" class="btn btn-link mt-2">Add New Customer</a>
-                    </div>
-                    <div class="col-md-4">
-                        <label for="quantity" class="form-label">Quantity</label>
-                        <input type="number" id="quantity" name="quantity" class="form-control" required>
-                    </div>
-                    <div class="col-md-4">
-                        <label for="selling_price" class="form-label">Selling Price</label>
-                        <input type="number" id="selling_price" name="selling_price" class="form-control" step="0.01" required>
-                    </div>
-                    <div class="col-md-4">
-                        <label for="amount_received" class="form-label">Amount Received</label>
-                        <input type="number" id="amount_received" name="amount_received" class="form-control" step="0.01" required>
-                    </div>
-                    <div class="col-12">
-                        <button type="submit" class="btn btn-success">Record Sale</button>
-                    </div>
-                </form>
-            </div>
+    <!-- Record Sale Form -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h2 class="card-title">Record Sale</h2>
         </div>
-
-        <!-- Sales History Table -->
-        <div class="card">
-            <div class="card-header bg-info text-white">
-                <h2 class="card-title">Sales History</h2>
-            </div>
-            <div class="card-body">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Product</th>
-                            <th>Customer</th>
-                            <th>Quantity</th>
-                            <th>Selling Price</th>
-                            <th>Amount Received</th>
-                            <th>Balance</th>
-                            <th>Profit</th>
-                            <th>Sale Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for sale in sales %}
-                            <tr>
-                                <td>{{ sale.id }}</td>
-                                <td>{{ sale.product.name if sale.product else 'N/A' }}</td>
-                                <td>{{ sale.customer.name if sale.customer else 'N/A' }}</td>
-                                <td>{{ sale.quantity }}</td>
-                                <td>{{ sale.selling_price }}</td>
-                                <td>{{ sale.amount_received }}</td>
-                                <td>{{ sale.balance }}</td>
-                                <td>{{ sale.profit }}</td>
-                                <td>{{ sale.sale_date }}</td>
-                            </tr>
+        <div class="card-body">
+            <form id="saleForm" class="row g-3">
+                <!-- Customer Selection -->
+                <div class="col-md-12 mb-3">
+                    <label for="customer_id" class="form-label">Customer</label>
+                    <select id="customer_id" name="customer_id" class="form-select" required>
+                        {% for customer in customers %}
+                            <option value="{{ customer.id }}">{{ customer.name }}</option>
                         {% else %}
-                            <tr>
-                                <td colspan="9" class="text-center">No sales recorded yet.</td>
-                            </tr>
+                            <option value="" disabled>No customers available</option>
                         {% endfor %}
-                    </tbody>
-                </table>
+                    </select>
+                    <a href="/customers" class="btn btn-link mt-2">Add New Customer</a>
+                </div>
+
+                <!-- Product Addition Section -->
+                <div class="col-12 mb-4">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <h4>Add Products</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label for="product_id" class="form-label">Product</label>
+                                    <select id="product_id" class="form-select">
+                                        {% for product in products %}
+                                            <option value="{{ product.id }}" 
+                                                    data-price="{{ product.price }}"
+                                                    data-stock="{{ product.quantity }}">
+                                                {{ product.name }} (Stock: {{ product.quantity }})
+                                            </option>
+                                        {% else %}
+                                            <option value="" disabled>No products available</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="quantity" class="form-label">Quantity</label>
+                                    <input type="number" id="quantity" class="form-control" min="1">
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="selling_price" class="form-label">Price</label>
+                                    <input type="number" id="selling_price" class="form-control" step="0.01">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">&nbsp;</label>
+                                    <button type="button" id="add-item" class="btn btn-primary form-control">
+                                        Add Item
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Selected Products Table -->
+                <div class="col-12 mb-4">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <h4>Selected Products</h4>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Quantity</th>
+                                        <th>Price</th>
+                                        <th>Subtotal</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="sale-items-tbody">
+                                    <!-- Sale items will be added here dynamically -->
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="3" class="text-end"><strong>Total Amount:</strong></td>
+                                        <td colspan="2"><span id="total-amount">0.00</span></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Section -->
+                <div class="col-md-6">
+                    <label for="amount_received" class="form-label">Amount Received</label>
+                    <input type="number" id="amount_received" name="amount_received" 
+                           class="form-control" step="0.01" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Balance</label>
+                    <div class="form-control bg-light" id="balance-amount">0.00</div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="col-12">
+                    <button type="submit" class="btn btn-success" id="submit-sale">
+                        Complete Sale
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Sales History Table -->
+    <div class="card">
+        <div class="card-header bg-info text-white">
+            <h2 class="card-title">Sales History</h2>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Customer</th>
+                        <th>Total Amount</th>
+                        <th>Amount Received</th>
+                        <th>Balance</th>
+                        <th>Status</th>
+                        <th>Sale Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sale in sales %}
+                        <tr>
+                            <td>{{ sale.id }}</td>
+                            <td>{{ sale.customer.name if sale.customer else 'N/A' }}</td>
+                            <td>{{ sale.total_amount }}</td>
+                            <td>{{ sale.amount_received }}</td>
+                            <td>{{ sale.balance }}</td>
+                            <td>{{ sale.status }}</td>
+                            <td>{{ sale.sale_date }}</td>
+                            <td>
+                                <button class="btn btn-sm btn-info view-details" 
+                                        data-sale-id="{{ sale.id }}">
+                                    View Details
+                                </button>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="8" class="text-center">No sales recorded yet.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Sale Details Modal -->
+    <div class="modal fade" id="saleDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Sale Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="saleDetailsContent">
+                    <!-- Sale details will be loaded here -->
+                </div>
             </div>
         </div>
     </div>
+</div>
+
+<!-- Add this to the bottom of your template, just before the closing body tag -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize product price when selecting a product
+        document.getElementById('product_id').addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            document.getElementById('selling_price').value = selectedOption.dataset.price;
+        });
+
+        // Trigger change event to set initial price
+        document.getElementById('product_id').dispatchEvent(new Event('change'));
+    });
+</script>
 {% endblock %}

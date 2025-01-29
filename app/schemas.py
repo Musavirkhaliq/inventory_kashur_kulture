@@ -46,15 +46,15 @@ class SaleBase(BaseModel):
     selling_price: float = Field(gt=0)
     amount_received: float = Field(ge=0)
 
-class SaleCreate(SaleBase):
-    pass
+# class SaleCreate(SaleBase):
+#     pass
 
-class Sale(SaleBase):
-    id: int
-    sale_date: datetime
+# class Sale(SaleBase):
+#     id: int
+#     sale_date: datetime
 
-    class Config:
-        from_attributes = True
+#     class Config:
+#         from_attributes = True
 
 class RestockBase(BaseModel):
     product_id: int
@@ -85,3 +85,41 @@ class Invoice(InvoiceBase):
         from_attributes = True
 
 
+
+# schemas.py changes
+from pydantic import BaseModel, Field
+from typing import List, Optional
+from datetime import datetime
+
+class SaleItemBase(BaseModel):
+    product_id: int
+    quantity: int
+    price: float
+
+class SaleItemCreate(SaleItemBase):
+    pass
+
+class SaleItem(SaleItemBase):
+    id: int
+    sale_id: int
+
+    class Config:
+        from_attributes = True
+
+class SaleCreate(BaseModel):
+    customer_id: int
+    items: List[SaleItemCreate]
+    amount_received: float
+
+class Sale(BaseModel):
+    id: int
+    customer_id: int
+    total_amount: float
+    amount_received: float
+    balance: float
+    sale_date: datetime
+    status: str
+    items: List[SaleItem]
+
+    class Config:
+        from_attributes = True

@@ -124,12 +124,18 @@ def create_invoice(invoice: schemas.InvoiceCreate, db: Session = Depends(get_db)
 
 @app.get("/invoices/{invoice_id}", response_class=HTMLResponse)
 def generate_invoice(invoice_id: int, request: Request, db: Session = Depends(get_db)):
-    invoice = db.query(models.Invoice).options(
-        joinedload(models.Invoice.sale)
-        .joinedload(models.Sale.product),
-        joinedload(models.Invoice.sale)
-        .joinedload(models.Sale.customer)
-    ).filter(models.Invoice.id == invoice_id).first()
+    invoice = (
+        db.query(models.Invoice)
+        .options(
+            joinedload(models.Invoice.sale)
+            .joinedload(models.Sale.items)  # Load sale items
+            .joinedload(models.SaleItem.product),  # Load products through SaleItem
+            joinedload(models.Invoice.sale)
+            .joinedload(models.Sale.customer)  # Load customer details
+        )
+        .filter(models.Invoice.id == invoice_id)
+        .first()
+    )
 
     if not invoice:
         raise HTTPException(status_code=404, detail="Invoice not found")
@@ -156,9 +162,9 @@ def sales_report(request: Request, db: Session = Depends(get_db)):
     weekly_sales = db.query(models.Sale).filter(models.Sale.sale_date >= datetime.today().date() - timedelta(days=7)).all()
     monthly_sales = db.query(models.Sale).filter(models.Sale.sale_date >= datetime.today().date() - timedelta(days=30)).all()
 
-    daily_total = sum(sale.selling_price * sale.quantity for sale in daily_sales)
-    weekly_total = sum(sale.selling_price * sale.quantity for sale in weekly_sales)
-    monthly_total = sum(sale.selling_price * sale.quantity for sale in monthly_sales)
+    daily_total = sum(sale.total_amount  for sale in daily_sales)
+    weekly_total = sum(sale.total_amount  for sale in weekly_sales)
+    monthly_total = sum(sale.total_amount  for sale in monthly_sales)
 
     return render_template("sales_report.html", request, {
         "daily_sales": daily_sales,
@@ -180,3 +186,20 @@ def inventory_value(request: Request, db: Session = Depends(get_db)):
     products = db.query(models.Product).all()
     total_value = sum(product.price * product.quantity for product in products)
     return render_template("inventory_value.html", request, {"total_value": total_value})
+
+@app.get("/sales/{sale_id}/details")
+def get_sale_details(sale_id: int, db: Session = Depends(get_db)):
+    sale = db.query(models.Sale).filter(models.Sale.id == sale_id).first()
+    if not sale:
+        raise HTTPException(status_code=404, detail="Sale not found")
+    
+    return {
+        "id": sale.id,
+        "customer_name": sale.customer.name,
+        "total_amount": sale.total_amount,
+        "items": [{
+            "product_name": item.product.name,
+            "quantity": item.quantity,
+            "price": item.price,
+        } for item in sale.items]
+    }

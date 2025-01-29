@@ -138,29 +138,41 @@
 
         <!-- Invoice Table -->
         <table class="invoice-table">
-            <thead>
-                <tr>
-                    <th>Product</th>
-                    <th>Quantity</th>
-                    <th>Unit Price</th>
-                    <th>Total Price</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>{{ invoice.sale.product.name }}</td>
-                    <td>{{ invoice.sale.quantity }}</td>
-                    <td>₹{{ invoice.sale.selling_price }}</td>
-                    <td>₹{{ invoice.sale.quantity * invoice.sale.selling_price }}</td>
-                </tr>
-            </tbody>
+            <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Total</th>
+            </tr>
+            {% for item in invoice.sale.items %}
+            <tr>
+                <td>{{ item.product.name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.price }}</td>
+                <td>{{ item.quantity * item.price }}</td>
+            </tr>
+            {% endfor %}
         </table>
 
         <!-- Invoice Total -->
         <div class="invoice-total">
-            <p><strong>Total Amount:</strong> ₹{{ invoice.sale.quantity * invoice.sale.selling_price }}</p>
-            <p><strong>Amount Received:</strong> ₹{{ invoice.sale.amount_received }}</p>
-            <p><strong>Balance Due:</strong> ₹{{ (invoice.sale.quantity * invoice.sale.selling_price) - invoice.sale.amount_received }}</p>
+            {% set total_amount = 0 %}
+            {% set amount_received = invoice.sale.amount_received %}
+            
+            <!-- Loop through items to calculate total amount -->
+            {% for item in invoice.sale.items %}
+                {% set total_amount = total_amount + (item.quantity * item.price) %}
+            {% endfor %}
+            
+            <p><strong>Total Amount:</strong> ₹{{ total_amount }}</p>
+            <p><strong>Amount Received:</strong> ₹{{ amount_received }}</p>
+
+            {% set balance_due = total_amount - amount_received %}
+            <p><strong>Balance Due:</strong> ₹{{ balance_due }}</p>
+
+            {% if balance_due == 0 %}
+                <p class="text-success"><strong>Paid in Full</strong></p>
+            {% endif %}
         </div>
 
         <!-- Invoice Footer -->
