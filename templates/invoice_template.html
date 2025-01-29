@@ -138,40 +138,59 @@
 
         <!-- Invoice Table -->
         <table class="invoice-table">
-            <tr>
-                <th>Product</th>
-                <th>Quantity</th>
-                <th>Price</th>
-                <th>Total</th>
-            </tr>
-            {% for item in invoice.sale.items %}
-            <tr>
-                <td>{{ item.product.name }}</td>
-                <td>{{ item.quantity }}</td>
-                <td>{{ item.price }}</td>
-                <td>{{ item.quantity * item.price }}</td>
-            </tr>
-            {% endfor %}
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Price (₹)</th>
+                    <th>Total (₹)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% set running_total = 0 %}
+                {% for item in invoice.sale.items %}
+                {% set item_total = item.quantity * item.price %}
+                {% set running_total = running_total + item_total %}
+                <tr>
+                    <td>{{ item.product.name }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ "%.2f"|format(item.price) }}</td>
+                    <td>{{ "%.2f"|format(item_total) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
         </table>
 
         <!-- Invoice Total -->
         <div class="invoice-total">
-            {% set total_amount = 0 %}
-            {% set amount_received = invoice.sale.amount_received %}
+            {% set amount_received = invoice.sale.amount_received|default(0) %}
             
-            <!-- Loop through items to calculate total amount -->
-            {% for item in invoice.sale.items %}
-                {% set total_amount = total_amount + (item.quantity * item.price) %}
-            {% endfor %}
+            <!-- Use running_total from table as subtotal -->
+            {% set subtotal = running_total %}
             
-            <p><strong>Total Amount:</strong> ₹{{ total_amount }}</p>
-            <p><strong>Amount Received:</strong> ₹{{ amount_received }}</p>
+            <!-- Calculate GST -->
+            {% set tax_rate = invoice.sale.tax_rate|default(0.18) %}
+            {% set tax_amount = (subtotal * tax_rate)|round(2) %}
+            
+            <!-- Calculate total including GST -->
+            {% set total_amount = (subtotal + tax_amount)|round(2) %}
+            
+            <!-- Display calculations -->
+            <p><strong>Subtotal:</strong> ₹{{ "%.2f"|format(subtotal) }}</p>
+            <p><strong>GST ({{ (tax_rate * 100)|round }}%):</strong> ₹{{ "%.2f"|format(tax_amount) }}</p>
+            <p class="fw-bold fs-5"><strong>Total Amount:</strong> ₹{{ "%.2f"|format(total_amount) }}</p>
+            <p><strong>Amount Received:</strong> ₹{{ "%.2f"|format(amount_received) }}</p>
 
-            {% set balance_due = total_amount - amount_received %}
-            <p><strong>Balance Due:</strong> ₹{{ balance_due }}</p>
+            {% set balance_due = (total_amount - amount_received)|round(2) %}
+            <p class="fw-bold"><strong>Balance Due:</strong> ₹{{ "%.2f"|format(balance_due) }}</p>
 
-            {% if balance_due == 0 %}
-                <p class="text-success"><strong>Paid in Full</strong></p>
+            <!-- Payment Status -->
+            {% if balance_due <= 0 %}
+                <p class="text-success fw-bold"><strong>Paid in Full</strong></p>
+            {% elif amount_received > 0 %}
+                <p class="text-warning fw-bold"><strong>Partially Paid</strong></p>
+            {% else %}
+                <p class="text-danger fw-bold"><strong>Payment Pending</strong></p>
             {% endif %}
         </div>
 
@@ -207,5 +226,6 @@
             alert('Share functionality is under development.');
         }
     </script>
+    
 </body>
 </html>

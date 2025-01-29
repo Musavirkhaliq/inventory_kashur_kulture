@@ -151,7 +151,17 @@
                                         data-sale-id="{{ sale.id }}">
                                     View Details
                                 </button>
+                                {% if sale.invoice %}
+                                <a href="/invoices/{{ sale.invoice.id }}" class="btn btn-sm btn-primary">
+                                    View Invoice
+                                </a>
+                                {% else %}
+                                    <a href="/invoices/{{ sale.invoice.id }}" class="btn btn-sm btn-primary">
+                                        Generate Invoice
+                                    </a>
+                                {% endif %}
                             </td>
+                            
                         </tr>
                     {% else %}
                         <tr>
@@ -159,6 +169,7 @@
                         </tr>
                     {% endfor %}
                 </tbody>
+                
             </table>
         </div>
     </div>

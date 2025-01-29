@@ -202,3 +202,5 @@ def get_sale_details(sale_id: int, db: Session = Depends(get_db)):
             "price": item.price,
         } for item in sale.items]
     }
+
+
