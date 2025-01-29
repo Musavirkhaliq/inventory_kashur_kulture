@@ -255,3 +255,4 @@ function showSaleDetails(details) {
     
     modal.show();
 }
+

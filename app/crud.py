@@ -23,12 +23,13 @@ def get_all_products(db: Session) -> List[models.Product]:
 
 
 
-def delete_product(db: Session, product_id: int) -> Optional[models.Product]:
-    db_product = get_product_by_id(db, product_id)
-    if db_product:
-        db.delete(db_product)
-        db.commit()
-    return db_product
+def delete_product(db: Session, product_id: int):
+    product = db.query(models.Product).filter(models.Product.id == product_id).first()
+    if product:
+        db.delete(product)
+        db.commit()  # Ensure changes are committed to the database
+        return product  # Return the deleted product or details
+    return None
 
 # Customer CRUD
 def create_customer(db: Session, customer: schemas.CustomerCreate) -> models.Customer:

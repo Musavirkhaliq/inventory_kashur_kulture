@@ -43,7 +43,7 @@ def create_product(product: schemas.ProductCreate, db: Session = Depends(get_db)
 
 @app.get("/products/{product_id}/edit", response_class=HTMLResponse)
 def edit_product(request: Request, product_id: int, db: Session = Depends(get_db)):
-    product = crud.get_product(db, product_id)
+    product = crud.get_product_by_id(db, product_id)
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
     return render_template("edit_product.html", request, {"product": product})
@@ -192,7 +192,6 @@ def get_sale_details(sale_id: int, db: Session = Depends(get_db)):
     sale = db.query(models.Sale).filter(models.Sale.id == sale_id).first()
     if not sale:
         raise HTTPException(status_code=404, detail="Sale not found")
-    
     return {
         "id": sale.id,
         "customer_name": sale.customer.name,

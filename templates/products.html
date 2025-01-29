@@ -61,7 +61,7 @@
                                 <td>{{ product.quantity }}</td>
                                 <td>
                                     <a href="/products/{{ product.id }}/edit" class="btn btn-sm btn-warning">Edit</a>
-                                    <a href="/products/{{ product.id }}/delete" class="btn btn-sm btn-danger">Delete</a>
+                                    <a href="#" class="btn btn-sm btn-danger delete-btn" data-id="{{ product.id }}">Delete</a>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -70,4 +70,38 @@
             </div>
         </div>
     </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".delete-btn").forEach(button => {
+            button.addEventListener("click", function (event) {
+                event.preventDefault();
+                const productId = this.getAttribute("data-id");
+
+                if (confirm("Are you sure you want to delete this product?")) {
+                    fetch(`/products/${productId}`, {
+                        method: "DELETE",
+                        headers: { "Content-Type": "application/json" }
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            return response.json();
+                        }
+                        throw new Error("Failed to delete product");
+                    })
+                    .then(data => {
+                        alert(data.message);
+                        this.closest("tr").remove(); // Remove row from table
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        alert("Failed to delete product");
+                    });
+                }
+            });
+        });
+    });
+</script>
+
 {% endblock %}
+
