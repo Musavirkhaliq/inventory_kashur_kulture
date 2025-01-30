@@ -156,24 +156,24 @@ def view_customer_transactions(request: Request, customer_id: int, db: Session =
     return render_template("customer_transactions.html", request, {"customer": customer, "transactions": transactions})
 
 
-@app.get("/sales/report", response_class=HTMLResponse)
-def sales_report(request: Request, db: Session = Depends(get_db)):
-    daily_sales = db.query(models.Sale).filter(models.Sale.sale_date >= datetime.today().date()).all()
-    weekly_sales = db.query(models.Sale).filter(models.Sale.sale_date >= datetime.today().date() - timedelta(days=7)).all()
-    monthly_sales = db.query(models.Sale).filter(models.Sale.sale_date >= datetime.today().date() - timedelta(days=30)).all()
+# @app.get("/sales/report", response_class=HTMLResponse)
+# def sales_report(request: Request, db: Session = Depends(get_db)):
+#     daily_sales = db.query(models.Sale).filter(models.Sale.sale_date >= datetime.today().date()).all()
+#     weekly_sales = db.query(models.Sale).filter(models.Sale.sale_date >= datetime.today().date() - timedelta(days=7)).all()
+#     monthly_sales = db.query(models.Sale).filter(models.Sale.sale_date >= datetime.today().date() - timedelta(days=30)).all()
 
-    daily_total = sum(sale.total_amount  for sale in daily_sales)
-    weekly_total = sum(sale.total_amount  for sale in weekly_sales)
-    monthly_total = sum(sale.total_amount  for sale in monthly_sales)
+#     daily_total = sum(sale.total_amount  for sale in daily_sales)
+#     weekly_total = sum(sale.total_amount  for sale in weekly_sales)
+#     monthly_total = sum(sale.total_amount  for sale in monthly_sales)
 
-    return render_template("sales_report.html", request, {
-        "daily_sales": daily_sales,
-        "weekly_sales": weekly_sales,
-        "monthly_sales": monthly_sales,
-        "daily_total": daily_total,
-        "weekly_total": weekly_total,
-        "monthly_total": monthly_total,
-    })
+#     return render_template("sales_report.html", request, {
+#         "daily_sales": daily_sales,
+#         "weekly_sales": weekly_sales,
+#         "monthly_sales": monthly_sales,
+#         "daily_total": daily_total,
+#         "weekly_total": weekly_total,
+#         "monthly_total": monthly_total,
+#     })
 
 @app.get("/customers/balances", response_class=HTMLResponse)
 def customer_balances(request: Request, db: Session = Depends(get_db)):
@@ -204,3 +204,40 @@ def get_sale_details(sale_id: int, db: Session = Depends(get_db)):
     }
 
 
+@app.get("/sales/report", response_class=HTMLResponse)
+def sales_report(request: Request, db: Session = Depends(get_db)):
+    # Fetch daily, weekly, and monthly sales data from the database
+    daily_sales_records = db.query(models.Sale).filter(models.Sale.sale_date >= datetime.today().date()).all()
+    weekly_sales_records = db.query(models.Sale).filter(models.Sale.sale_date >= datetime.today().date() - timedelta(days=7)).all()
+    monthly_sales_records = db.query(models.Sale).filter(models.Sale.sale_date >= datetime.today().date() - timedelta(days=30)).all()
+
+    # Calculate total sales
+    daily_sales_total = sum(sale.total_amount for sale in daily_sales_records)
+    weekly_sales_total = sum(sale.total_amount for sale in weekly_sales_records)
+    monthly_sales_total = sum(sale.total_amount for sale in monthly_sales_records)
+
+    # Prepare chart data
+    daily_sales_labels = [sale.sale_date.strftime("%Y-%m-%d") for sale in daily_sales_records]
+    daily_sales_data = [sale.total_amount for sale in daily_sales_records]
+
+    weekly_sales_labels = [sale.sale_date.strftime("%Y-%m-%d") for sale in weekly_sales_records]
+    weekly_sales_data = [sale.total_amount for sale in weekly_sales_records]
+
+    monthly_sales_labels = [sale.sale_date.strftime("%Y-%m") for sale in monthly_sales_records]
+    monthly_sales_data = [sale.total_amount for sale in monthly_sales_records]
+
+    return templates.TemplateResponse("sales_report.html", {
+        "request": request,
+        "daily_sales": daily_sales_records,  # Keep the original records if needed
+        "daily_total": daily_sales_total,
+        "daily_sales_labels": daily_sales_labels,
+        "daily_sales_data": daily_sales_data,
+        "weekly_sales": weekly_sales_records,
+        "weekly_total": weekly_sales_total,
+        "weekly_sales_labels": weekly_sales_labels,
+        "weekly_sales_data": weekly_sales_data,
+        "monthly_sales": monthly_sales_records,
+        "monthly_total": monthly_sales_total,
+        "monthly_sales_labels": monthly_sales_labels,
+        "monthly_sales_data": monthly_sales_data,
+    })

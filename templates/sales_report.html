@@ -11,36 +11,61 @@
             </div>
             <div class="card-body">
                 <p class="lead">Total: <strong>{{ daily_total }}</strong></p>
-                <table class="table table-striped">
+                <canvas id="dailySalesChart"></canvas>
+                <table class="table table-striped mt-4">
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Product</th>
                             <th>Customer</th>
-                            <th>Quantity</th>
-                            <th>Selling Price</th>
-                            <th>Amount Received</th>
-                            <th>Balance</th>
-                            <th>Profit</th>
                             <th>Sale Date</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for sale in daily_sales %}
                             <tr>
                                 <td>{{ sale.id }}</td>
-                                <td>{{ sale.product.name if sale.product else 'N/A' }}</td>
                                 <td>{{ sale.customer.name if sale.customer else 'N/A' }}</td>
-                                <td>{{ sale.quantity }}</td>
-                                <td>{{ sale.selling_price }}</td>
-                                <td>{{ sale.amount_received }}</td>
-                                <td>{{ sale.balance }}</td>
-                                <td>{{ sale.profit }}</td>
                                 <td>{{ sale.sale_date }}</td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm" onclick="toggleDetails('daily-sale-{{ sale.id }}')">Details</button>
+                                </td>
+                            </tr>
+                            <tr id="daily-sale-{{ sale.id }}" style="display: none;">
+                                <td colspan="4">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Product</th>
+                                                <th>Quantity</th>
+                                                <th>Selling Price</th>
+                                                <th>Cost Price</th>
+                                                <th>Profit</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for item in sale.items %}
+                                                <tr>
+                                                    <td>{{ item.product.name if item.product else 'N/A' }}</td>
+                                                    <td>{{ item.quantity }}</td>
+                                                    <td>{{ item.price }}</td>
+                                                    <td>{{ item.product.price if item.product else 'N/A' }}</td>
+                                                    <td>{{ (item.price - item.product.price) * item.quantity }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                         <tr>
+                                            <td colspan="2"><strong>Total</strong></td>
+                                            <td>{{ sale.total_amount }}</td>
+                                            <td>{{ sale.items | sum(attribute='product.price') }}</td>
+                                            <td>{{sale.total_amount -sale.items | sum(attribute='product.price')}}</td>
+                                        </tr>
+                                    </table>
+                                </td>
                             </tr>
                         {% else %}
                             <tr>
-                                <td colspan="9" class="text-center">No sales recorded today.</td>
+                                <td colspan="4" class="text-center">No sales recorded today.</td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -55,36 +80,61 @@
             </div>
             <div class="card-body">
                 <p class="lead">Total: <strong>{{ weekly_total }}</strong></p>
-                <table class="table table-striped">
+                <canvas id="weeklySalesChart"></canvas>
+                <table class="table table-striped mt-4">
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Product</th>
                             <th>Customer</th>
-                            <th>Quantity</th>
-                            <th>Selling Price</th>
-                            <th>Amount Received</th>
-                            <th>Balance</th>
-                            <th>Profit</th>
                             <th>Sale Date</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for sale in weekly_sales %}
                             <tr>
                                 <td>{{ sale.id }}</td>
-                                <td>{{ sale.product.name if sale.product else 'N/A' }}</td>
                                 <td>{{ sale.customer.name if sale.customer else 'N/A' }}</td>
-                                <td>{{ sale.quantity }}</td>
-                                <td>{{ sale.selling_price }}</td>
-                                <td>{{ sale.amount_received }}</td>
-                                <td>{{ sale.balance }}</td>
-                                <td>{{ sale.profit }}</td>
                                 <td>{{ sale.sale_date }}</td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm" onclick="toggleDetails('weekly-sale-{{ sale.id }}')">Details</button>
+                                </td>
+                            </tr>
+                            <tr id="weekly-sale-{{ sale.id }}" style="display: none;">
+                                <td colspan="4">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Product</th>
+                                                <th>Quantity</th>
+                                                <th>Selling Price</th>
+                                                <th>Cost Price</th>
+                                                <th>Profit</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for item in sale.items %}
+                                                <tr>
+                                                    <td>{{ item.product.name if item.product else 'N/A' }}</td>
+                                                    <td>{{ item.quantity }}</td>
+                                                    <td>{{ item.price }}</td>
+                                                    <td>{{ item.product.price if item.product else 'N/A' }}</td>
+                                                    <td>{{ (item.price - item.product.price) * item.quantity }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                         <tr>
+                                            <td colspan="2"><strong>Total</strong></td>
+                                            <td>{{ sale.total_amount }}</td>
+                                            <td>{{ sale.items | sum(attribute='product.price') }}</td>
+                                            <td>{{sale.total_amount -sale.items | sum(attribute='product.price')}}</td>
+                                        </tr>
+                                    </table>
+                                </td>
                             </tr>
                         {% else %}
                             <tr>
-                                <td colspan="9" class="text-center">No sales recorded this week.</td>
+                                <td colspan="4" class="text-center">No sales recorded this week.</td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -99,36 +149,61 @@
             </div>
             <div class="card-body">
                 <p class="lead">Total: <strong>{{ monthly_total }}</strong></p>
-                <table class="table table-striped">
+                <canvas id="monthlySalesChart"></canvas>
+                <table class="table table-striped mt-4">
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Product</th>
                             <th>Customer</th>
-                            <th>Quantity</th>
-                            <th>Selling Price</th>
-                            <th>Amount Received</th>
-                            <th>Balance</th>
-                            <th>Profit</th>
                             <th>Sale Date</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for sale in monthly_sales %}
                             <tr>
                                 <td>{{ sale.id }}</td>
-                                <td>{{ sale.product.name if sale.product else 'N/A' }}</td>
                                 <td>{{ sale.customer.name if sale.customer else 'N/A' }}</td>
-                                <td>{{ sale.quantity }}</td>
-                                <td>{{ sale.selling_price }}</td>
-                                <td>{{ sale.amount_received }}</td>
-                                <td>{{ sale.balance }}</td>
-                                <td>{{ sale.profit }}</td>
                                 <td>{{ sale.sale_date }}</td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm" onclick="toggleDetails('monthly-sale-{{ sale.id }}')">Details</button>
+                                </td>
+                            </tr>
+                            <tr id="monthly-sale-{{ sale.id }}" style="display: none;">
+                                <td colspan="4">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Product</th>
+                                                <th>Quantity</th>
+                                                <th>Selling Price</th>
+                                                <th>Cost Price</th>
+                                                <th>Profit</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for item in sale.items %}
+                                                <tr>
+                                                    <td>{{ item.product.name if item.product else 'N/A' }}</td>
+                                                    <td>{{ item.quantity }}</td>
+                                                    <td>{{ item.price }}</td>
+                                                    <td>{{ item.product.price if item.product else 'N/A' }}</td>
+                                                    <td>{{ (item.price - item.product.price) * item.quantity }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                         <tr>
+                                            <td colspan="2"><strong>Total</strong></td>
+                                            <td>{{ sale.total_amount }}</td>
+                                            <td>{{ sale.items | sum(attribute='product.price') }}</td>
+                                            <td>{{sale.total_amount -sale.items | sum(attribute='product.price')}}</td>
+                                        </tr>
+                                    </table>
+                                </td>
                             </tr>
                         {% else %}
                             <tr>
-                                <td colspan="9" class="text-center">No sales recorded this month.</td>
+                                <td colspan="4" class="text-center">No sales recorded this month.</td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -136,4 +211,86 @@
             </div>
         </div>
     </div>
+
+    <!-- Include Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Daily Sales Chart
+        const dailySalesCtx = document.getElementById('dailySalesChart').getContext('2d');
+        const dailySalesChart = new Chart(dailySalesCtx, {
+            type: 'bar',
+            data: {
+                labels: {{ daily_sales_labels | tojson }},
+                datasets: [{
+                    label: 'Daily Sales',
+                    data: {{ daily_sales_data | tojson }},
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Weekly Sales Chart
+        const weeklySalesCtx = document.getElementById('weeklySalesChart').getContext('2d');
+        const weeklySalesChart = new Chart(weeklySalesCtx, {
+            type: 'line',
+            data: {
+                labels: {{ weekly_sales_labels | tojson }},
+                datasets: [{
+                    label: 'Weekly Sales',
+                    data: {{ weekly_sales_data | tojson }},
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Monthly Sales Chart
+        const monthlySalesCtx = document.getElementById('monthlySalesChart').getContext('2d');
+        const monthlySalesChart = new Chart(monthlySalesCtx, {
+            type: 'bar',
+            data: {
+                labels: {{ monthly_sales_labels | tojson }},
+                datasets: [{
+                    label: 'Monthly Sales',
+                    data: {{ monthly_sales_data | tojson }},
+                    backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        function toggleDetails(id) {
+            const element = document.getElementById(id);
+            if (element.style.display === "none") {
+                element.style.display = "table-row";
+            } else {
+                element.style.display = "none";
+            }
+        }
+    </script>
 {% endblock %}
