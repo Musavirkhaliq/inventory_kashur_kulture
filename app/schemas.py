@@ -39,65 +39,17 @@ class Customer(CustomerBase):
     class Config:
         from_attributes = True
 
-class SaleBase(BaseModel):
-    product_id: int
-    customer_id: int
-    quantity: int = Field(gt=0)
-    selling_price: float = Field(gt=0)
-    amount_received: float = Field(ge=0)
-
-# class SaleCreate(SaleBase):
-#     pass
-
-# class Sale(SaleBase):
-#     id: int
-#     sale_date: datetime
-
-#     class Config:
-#         from_attributes = True
-
-class RestockBase(BaseModel):
-    product_id: int
-    quantity: int
-
-class RestockCreate(RestockBase):
-    pass
-
-class Restock(RestockBase):
-    id: int
-    restock_date: datetime
-    product_name: str  # Add product name
-
-    class Config:
-        from_attributes = True
-
-class InvoiceBase(BaseModel):
-    sale_id: int
-
-class InvoiceCreate(InvoiceBase):
-    pass
-
-class Invoice(InvoiceBase):
-    id: int
-    invoice_date: datetime
-
-    class Config:
-        from_attributes = True
-
-
-
-# schemas.py changes
-from pydantic import BaseModel, Field
-from typing import List, Optional
-from datetime import datetime
-
 class SaleItemBase(BaseModel):
     product_id: int
-    quantity: int
-    price: float
+    quantity: int = Field(gt=0)
+    price: float = Field(gt=0)
 
 class SaleItemCreate(SaleItemBase):
-    pass
+    @validator('quantity')
+    def validate_quantity(cls, v):
+        if v <= 0:
+            raise ValueError('Quantity must be positive')
+        return v
 
 class SaleItem(SaleItemBase):
     id: int
@@ -109,7 +61,13 @@ class SaleItem(SaleItemBase):
 class SaleCreate(BaseModel):
     customer_id: int
     items: List[SaleItemCreate]
-    amount_received: float
+    amount_received: float = Field(ge=0)
+
+    @validator('items')
+    def validate_items(cls, v):
+        if not v:
+            raise ValueError('Sale must have at least one item')
+        return v
 
 class Sale(BaseModel):
     id: int
@@ -120,6 +78,28 @@ class Sale(BaseModel):
     sale_date: datetime
     status: str
     items: List[SaleItem]
+
+    class Config:
+        from_attributes = True
+
+class RestockCreate(BaseModel):
+    product_id: int
+    quantity: int = Field(gt=0)
+
+class Restock(RestockCreate):
+    id: int
+    restock_date: datetime
+    product_name: str
+
+    class Config:
+        from_attributes = True
+
+class InvoiceCreate(BaseModel):
+    sale_id: int
+
+class Invoice(InvoiceCreate):
+    id: int
+    invoice_date: datetime
 
     class Config:
         from_attributes = True

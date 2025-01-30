@@ -4,41 +4,102 @@
     <div class="container">
         <h1 class="text-center mb-4">Transactions for {{ customer.name }}</h1>
 
+        {% with %}
+            {% set total_sales = namespace(amount=0) %}
+            {% set total_received = namespace(amount=0) %}
+            {% set total_balance = namespace(amount=0) %}
+            
+            {% for transaction in transactions %}
+                {% set total_sales.amount = total_sales.amount + transaction.total_amount %}
+                {% set total_received.amount = total_received.amount + transaction.amount_received %}
+                {% set total_balance.amount = total_balance.amount + transaction.balance %}
+            {% endfor %}
+
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title mb-0">Summary</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-4">
+                            <div class="border rounded p-3">
+                                <h4>Total Sales Amount</h4>
+                                <h2 class="text-primary">{{ "%.2f"|format(total_sales.amount) }}</h2>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="border rounded p-3">
+                                <h4>Total Amount Received</h4>
+                                <h2 class="text-success">{{ "%.2f"|format(total_received.amount) }}</h2>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="border rounded p-3">
+                                <h4>Total Balance</h4>
+                                <h2 class="text-danger">{{ "%.2f"|format(total_balance.amount) }}</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endwith %}
+
         <div class="card">
             <div class="card-header bg-info text-white">
                 <h2 class="card-title">Transaction History</h2>
             </div>
             <div class="card-body">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Product</th>
-                            <th>Quantity</th>
-                            <th>Selling Price</th>
-                            <th>Amount Received</th>
-                            <th>Balance</th>
-                            <th>Sale Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for transaction in transactions %}
-                            <tr>
-                                <td>{{ transaction.id }}</td>
-                                <td>{{ transaction.product.name if transaction.product else 'N/A' }}</td>
-                                <td>{{ transaction.quantity }}</td>
-                                <td>{{ transaction.selling_price }}</td>
-                                <td>{{ transaction.amount_received }}</td>
-                                <td>{{ transaction.balance }}</td>
-                                <td>{{ transaction.sale_date }}</td>
-                            </tr>
-                        {% else %}
-                            <tr>
-                                <td colspan="7" class="text-center">No transactions found.</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                {% if transactions %}
+                    {% for transaction in transactions %}
+                        <div class="transaction-group mb-4">
+                            <h4>Transaction #{{ transaction.id }}</h4>
+                            <div class="row">
+                                <div class="col">
+                                    <strong>Sale Date:</strong> {{ transaction.sale_date }}
+                                </div>
+                                <div class="col">
+                                    <strong>Total Amount Received:</strong> {{ "%.2f"|format(transaction.amount_received) }}
+                                </div>
+                                <div class="col">
+                                    <strong>Balance:</strong> {{ "%.2f"|format(transaction.balance) }}
+                                </div>
+                            </div>
+                            
+                            <table class="table table-striped mt-2">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Quantity</th>
+                                        <th>Unit Price</th>
+                                        <th>Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in transaction.items %}
+                                        {% set subtotal = item.quantity * item.price %}
+                                        <tr>
+                                            <td>{{ item.product.name if item.product else 'N/A' }}</td>
+                                            <td>{{ item.quantity }}</td>
+                                            <td>{{ "%.2f"|format(item.price) }}</td>
+                                            <td>{{ "%.2f"|format(subtotal) }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                    <tr class="table-info">
+                                        <td colspan="3" class="text-end"><strong>Transaction Total:</strong></td>
+                                        <td><strong>{{ "%.2f"|format(transaction.total_amount) }}</strong></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        {% if not loop.last %}
+                            <hr>
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-info text-center">
+                        No transactions found.
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>
