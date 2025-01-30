@@ -1,6 +1,3 @@
-
-
-
 // Function to handle form submissions
 async function submitForm(formId, endpoint, method = "POST") {
     const form = document.getElementById(formId);
@@ -256,3 +253,98 @@ function showSaleDetails(details) {
     modal.show();
 }
 
+
+
+// Store JWT token in localStorage
+function storeToken(token) {
+    localStorage.setItem('token', token);
+}
+
+// Get JWT token from localStorage
+function getToken() {
+    return localStorage.getItem('token');
+}
+
+// Remove JWT token from localStorage
+function removeToken() {
+    localStorage.removeItem('token');
+}
+
+// Check if user is logged in
+function isLoggedIn() {
+    return getToken() !== null;
+}
+
+// Update navigation bar based on login status
+function updateNavbar() {
+    const loginLink = document.getElementById('login-link');
+    const registerLink = document.getElementById('register-link');
+    const logoutLink = document.getElementById('logout-link');
+
+    if (isLoggedIn()) {
+        loginLink.style.display = 'none';
+        registerLink.style.display = 'none';
+        logoutLink.style.display = 'inline';
+    } else {
+        loginLink.style.display = 'inline';
+        registerLink.style.display = 'inline';
+        logoutLink.style.display = 'none';
+    }
+}
+
+// Handle login form submission
+document.getElementById('login-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    const response = await fetch('/token', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`,
+    });
+
+    if (response.ok) {
+        const data = await response.json();
+        storeToken(data.access_token);
+        updateNavbar();
+        window.location.href = '/';
+    } else {
+        document.getElementById('login-message').textContent = 'Login failed. Please check your credentials.';
+    }
+});
+
+// Handle registration form submission
+document.getElementById('register-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const username = document.getElementById('username').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    const response = await fetch('/register', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, email, password }),
+    });
+
+    if (response.ok) {
+        document.getElementById('register-message').textContent = 'Registration successful. Please login.';
+    } else {
+        document.getElementById('register-message').textContent = 'Registration failed. Please try again.';
+    }
+});
+
+// Handle logout
+document.getElementById('logout-link')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    removeToken();
+    updateNavbar();
+    window.location.href = '/';
+});
+
+// Update navbar on page load
+updateNavbar();

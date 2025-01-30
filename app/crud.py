@@ -42,38 +42,6 @@ def create_customer(db: Session, customer: schemas.CustomerCreate) -> models.Cus
 def get_all_customers(db: Session) -> List[models.Customer]:
     return db.query(models.Customer).all()
 
-# Sale CRUD
-# def create_sale(db: Session, sale: schemas.SaleCreate):
-#     product = get_product_by_id(db, sale.product_id)
-#     if not product:
-#         raise ValueError("Product not found")
-#     if product.quantity < sale.quantity:
-#         raise ValueError("Not enough stock available")
-
-#     customer = get_customer_by_id(db, sale.customer_id)
-#     if not customer:
-#         raise ValueError("Customer not found")
-
-#     profit = (sale.selling_price*sale.quantity) - (product.price * sale.quantity)
-#     balance = (sale.selling_price*sale.quantity) - sale.amount_received
-
-#     product.quantity -= sale.quantity
-#     customer.balance_owe += balance
-
-#     db_sale = models.Sale(
-#         product_id=sale.product_id,
-#         customer_id=sale.customer_id,
-#         quantity=sale.quantity,
-#         selling_price=sale.selling_price,
-#         amount_received=sale.amount_received,
-#         balance=balance,
-#         profit=profit,
-#     )
-
-#     db.add(db_sale)
-#     db.commit()
-#     db.refresh(db_sale)
-#     return db_sale
 
 def get_all_sales(db: Session) -> List[models.Sale]:
     return db.query(models.Sale).all()
@@ -123,14 +91,6 @@ def update_product(db: Session, product_id: int, product_update: schemas.Product
     db.refresh(db_product)
     return db_product
 
-# def update_product(db: Session, product_id: int, product: schemas.ProductUpdate) -> Optional[models.Product]:
-#     db_product = get_product_by_id(db, product_id)
-#     if db_product:
-#         for key, value in product.dict(exclude_unset=True).items():
-#             setattr(db_product, key, value)
-#         db.commit()
-#         db.refresh(db_product)
-#     return db_product
 
 
 from sqlalchemy.exc import SQLAlchemyError
@@ -222,3 +182,25 @@ def update_sale_payment(db: Session, sale_id: int, amount: float):
     db.commit()
     db.refresh(sale)
     return sale
+
+
+from sqlalchemy.orm import Session
+from .models import User
+from .schemas import UserCreate  # Import UserCreate
+from passlib.context import CryptContext
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def get_user_by_username(db: Session, username: str):
+    return db.query(User).filter(User.username == username).first()
+
+def create_user(db: Session, user: UserCreate):
+    hashed_password = pwd_context.hash(user.password)
+    db_user = User(username=user.username, email=user.email, hashed_password=hashed_password)
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+
+def verify_password(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)
