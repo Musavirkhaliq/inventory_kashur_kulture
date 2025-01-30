@@ -276,10 +276,10 @@
                 </tr>
             </thead>
             <tbody>
-                {% set running_total = 0 %}
+                {% set subtotal = namespace(value=0) %}
                 {% for item in invoice.sale.items %}
                 {% set item_total = item.quantity * item.price %}
-                {% set running_total = running_total + item_total %}
+                {% set subtotal.value = subtotal.value + item_total %}
                 <tr>
                     <td>{{ item.product.name }}</td>
                     <td>{{ item.quantity }}</td>
@@ -292,14 +292,13 @@
 
         <div class="invoice-total">
             {% set amount_received = invoice.sale.amount_received|default(0) %}
-            {% set subtotal = running_total %}
             {% set tax_rate = invoice.sale.tax_rate|default(0.18) %}
-            {% set tax_amount = (subtotal * tax_rate)|round(2) %}
-            {% set total_amount = (subtotal + tax_amount)|round(2) %}
+            {% set tax_amount = (subtotal.value * tax_rate)|round(2) %}
+            {% set total_amount = (subtotal.value + tax_amount)|round(2) %}
             
             <p>
                 <span>Subtotal:</span>
-                <span>₹{{ "%.2f"|format(subtotal) }}</span>
+                <span>₹{{ "%.2f"|format(subtotal.value) }}</span>
             </p>
             <p>
                 <span>GST ({{ (tax_rate * 100)|round }}%):</span>
