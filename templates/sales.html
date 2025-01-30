@@ -14,14 +14,16 @@
                 <!-- Customer Selection -->
                 <div class="col-md-12 mb-3">
                     <label for="customer_id" class="form-label">Customer</label>
-                    <select id="customer_id" name="customer_id" class="form-select" required>
-                        {% for customer in customers %}
-                            <option value="{{ customer.id }}">{{ customer.name }}</option>
-                        {% else %}
-                            <option value="" disabled>No customers available</option>
-                        {% endfor %}
-                    </select>
-                    <a href="/customers" class="btn btn-link mt-2">Add New Customer</a>
+                    <div class="input-group">
+                        <select id="customer_id" name="customer_id" class="form-select" required>
+                            {% for customer in customers %}
+                                <option value="{{ customer.id }}">{{ customer.name }}</option>
+                            {% else %}
+                                <option value="" disabled>No customers available</option>
+                            {% endfor %}
+                        </select>
+                        <a href="/customers" class="btn btn-secondary">+ Add Customer</a>
+                    </div>
                 </div>
 
                 <!-- Product Addition Section -->
@@ -34,17 +36,20 @@
                             <div class="row">
                                 <div class="col-md-3">
                                     <label for="product_id" class="form-label">Product</label>
-                                    <select id="product_id" class="form-select">
-                                        {% for product in products %}
-                                            <option value="{{ product.id }}" 
-                                                    data-price="{{ product.price }}"
-                                                    data-stock="{{ product.quantity }}">
-                                                {{ product.name }} (Stock: {{ product.quantity }})
-                                            </option>
-                                        {% else %}
-                                            <option value="" disabled>No products available</option>
-                                        {% endfor %}
-                                    </select>
+                                    <div class="input-group">
+                                        <select id="product_id" class="form-select">
+                                            {% for product in products %}
+                                                <option value="{{ product.id }}" 
+                                                        data-price="{{ product.price }}"
+                                                        data-stock="{{ product.quantity }}">
+                                                    {{ product.name }} (Stock: {{ product.quantity }})
+                                                </option>
+                                            {% else %}
+                                                <option value="" disabled>No products available</option>
+                                            {% endfor %}
+                                        </select>
+                                        <a href="/products" class="btn btn-secondary">+ Add Product</a>
+                                    </div>
                                 </div>
                                 <div class="col-md-3">
                                     <label for="quantity" class="form-label">Quantity</label>
@@ -63,6 +68,21 @@
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <!-- Discount & Tax Options -->
+                <div class="col-md-6">
+                    <label for="discount" class="form-label">Discount (%)</label>
+                    <input type="number" id="discount" class="form-control" min="0" step="0.01">
+                </div>
+                <div class="col-md-6">
+                    <label for="tax" class="form-label">Tax Rate (%)</label>
+                    <select id="tax" class="form-select">
+                        <option value="0">No Tax</option>
+                        <option value="5">5%</option>
+                        <option value="10">10%</option>
+                        <option value="15">15%</option>
+                    </select>
                 </div>
 
                 <!-- Selected Products Table -->
@@ -116,6 +136,7 @@
             </form>
         </div>
     </div>
+</div>
 
     <!-- Sales History Table -->
     <div class="card">
@@ -191,66 +212,84 @@
 
 <!-- Add this to the bottom of your template, just before the closing body tag -->
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize product price when selecting a product
-        document.getElementById('product_id').addEventListener('change', function() {
-            const selectedOption = this.options[this.selectedIndex];
-            document.getElementById('selling_price').value = selectedOption.dataset.price;
+    document.addEventListener('DOMContentLoaded', function () {
+        const productDropdown = document.getElementById('product_id');
+        const sellingPriceInput = document.getElementById('selling_price');
+        const addItemButton = document.getElementById('add-item');
+        const totalAmountDisplay = document.getElementById('total-amount');
+
+        // Function to update selling price when product changes
+        function updateSellingPrice() {
+            const selectedOption = productDropdown.options[productDropdown.selectedIndex];
+            sellingPriceInput.value = selectedOption.dataset.price || 0;
+        }
+
+        // Function to handle invoice generation
+        async function generateInvoice(event) {
+            event.preventDefault();
+
+            const form = event.target;
+            const saleId = form.querySelector('input[name="sale_id"]').value;
+            const button = form.querySelector('button');
+
+            try {
+                button.disabled = true;
+                button.textContent = 'Generating...';
+
+                const response = await fetch('/invoices/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sale_id: parseInt(saleId) }),
+                });
+
+                if (!response.ok) throw new Error('Failed to generate invoice');
+
+                const invoice = await response.json();
+
+                // Replace form with a "View Invoice" button
+                const viewLink = document.createElement('a');
+                viewLink.href = `/invoices/${invoice.id}`;
+                viewLink.className = 'btn btn-sm btn-primary';
+                viewLink.target = '_blank';
+                viewLink.textContent = 'View Invoice';
+                form.replaceWith(viewLink);
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to generate invoice. Please try again.');
+                button.disabled = false;
+                button.textContent = 'Generate Invoice';
+            }
+        }
+
+        // Function to update total amount
+        function updateTotalAmount() {
+            const quantity = parseFloat(document.getElementById('quantity').value) || 0;
+            const price = parseFloat(sellingPriceInput.value) || 0;
+            const discount = parseFloat(document.getElementById('discount').value) || 0;
+            const tax = parseFloat(document.getElementById('tax').value) || 0;
+
+            let subtotal = quantity * price;
+            subtotal -= subtotal * (discount / 100);
+            subtotal += subtotal * (tax / 100);
+
+            totalAmountDisplay.textContent = subtotal.toFixed(2);
+        }
+
+        // Attach event listeners
+        productDropdown.addEventListener('change', updateSellingPrice);
+        document.addEventListener('submit', function (e) {
+            if (e.target.matches('.generate-invoice-form')) {
+                generateInvoice(e);
+            }
         });
 
-        // Trigger change event to set initial price
-        document.getElementById('product_id').dispatchEvent(new Event('change'));
+        if (addItemButton) {
+            addItemButton.addEventListener('click', updateTotalAmount);
+        }
+
+        // Initialize price on page load
+        updateSellingPrice();
     });
 </script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Existing product price initialization code...
-        
-        // Handle invoice generation
-        document.querySelectorAll('.generate-invoice-form').forEach(form => {
-            form.addEventListener('submit', async function(e) {
-                e.preventDefault();
-                const saleId = this.querySelector('input[name="sale_id"]').value;
-                const button = this.querySelector('button');
-                
-                try {
-                    button.disabled = true;
-                    button.textContent = 'Generating...';
-                    
-                    const response = await fetch('/invoices/', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ sale_id: parseInt(saleId) })
-                    });
 
-                    if (!response.ok) {
-                        throw new Error('Failed to generate invoice');
-                    }
-
-                    const invoice = await response.json();
-                    
-                    // Replace the form with a view invoice link
-                    const viewLink = document.createElement('a');
-                    viewLink.href = `/invoices/${invoice.id}`;
-                    viewLink.className = 'btn btn-sm btn-primary';
-                    viewLink.target = '_blank';
-                    viewLink.textContent = 'View Invoice';
-                    
-                    this.replaceWith(viewLink);
-                    
-                } catch (error) {
-                    console.error('Error:', error);
-                    alert('Failed to generate invoice. Please try again.');
-                    button.disabled = false;
-                    button.textContent = 'Generate Invoice';
-                }
-            });
-        });
-
-        // Trigger change event to set initial price
-        document.getElementById('product_id').dispatchEvent(new Event('change'));
-    });
-</script>
 {% endblock %}
