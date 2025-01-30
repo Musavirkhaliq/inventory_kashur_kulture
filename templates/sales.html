@@ -152,16 +152,16 @@
                                     View Details
                                 </button>
                                 {% if sale.invoice %}
-                                <a href="/invoices/{{ sale.invoice.id }}" class="btn btn-sm btn-primary">
-                                    View Invoice
-                                </a>
-                                {% else %}
-                                    <a href="/invoices/{{ sale.invoice.id }}" class="btn btn-sm btn-primary">
-                                        Generate Invoice
+                                    <a href="/invoices/{{ sale.invoice.id }}" class="btn btn-sm btn-primary" target="_blank">
+                                        View Invoice
                                     </a>
+                                {% else %}
+                                    <form class="generate-invoice-form d-inline">
+                                        <input type="hidden" name="sale_id" value="{{ sale.id }}">
+                                        <button type="submit" class="btn btn-sm btn-primary">Generate Invoice</button>
+                                    </form>
                                 {% endif %}
                             </td>
-                            
                         </tr>
                     {% else %}
                         <tr>
@@ -169,7 +169,6 @@
                         </tr>
                     {% endfor %}
                 </tbody>
-                
             </table>
         </div>
     </div>
@@ -197,6 +196,57 @@
         document.getElementById('product_id').addEventListener('change', function() {
             const selectedOption = this.options[this.selectedIndex];
             document.getElementById('selling_price').value = selectedOption.dataset.price;
+        });
+
+        // Trigger change event to set initial price
+        document.getElementById('product_id').dispatchEvent(new Event('change'));
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Existing product price initialization code...
+        
+        // Handle invoice generation
+        document.querySelectorAll('.generate-invoice-form').forEach(form => {
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const saleId = this.querySelector('input[name="sale_id"]').value;
+                const button = this.querySelector('button');
+                
+                try {
+                    button.disabled = true;
+                    button.textContent = 'Generating...';
+                    
+                    const response = await fetch('/invoices/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ sale_id: parseInt(saleId) })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to generate invoice');
+                    }
+
+                    const invoice = await response.json();
+                    
+                    // Replace the form with a view invoice link
+                    const viewLink = document.createElement('a');
+                    viewLink.href = `/invoices/${invoice.id}`;
+                    viewLink.className = 'btn btn-sm btn-primary';
+                    viewLink.target = '_blank';
+                    viewLink.textContent = 'View Invoice';
+                    
+                    this.replaceWith(viewLink);
+                    
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Failed to generate invoice. Please try again.');
+                    button.disabled = false;
+                    button.textContent = 'Generate Invoice';
+                }
+            });
         });
 
         // Trigger change event to set initial price
