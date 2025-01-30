@@ -292,7 +292,7 @@
 
         <div class="invoice-total">
             {% set amount_received = invoice.sale.amount_received|default(0) %}
-            {% set tax_rate = invoice.sale.tax_rate|default(0.18) %}
+            {% set tax_rate = invoice.sale.tax_rate|default(0.0) %}
             {% set tax_amount = (subtotal.value * tax_rate)|round(2) %}
             {% set total_amount = (subtotal.value + tax_amount)|round(2) %}
             
