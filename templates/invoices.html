@@ -1,60 +1,204 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <div class="container">
-        <h1 class="text-center mb-4">Invoice Management</h1>
-
-        <!-- Generate Invoice Form -->
-        <div class="card mb-4">
-            <div class="card-header bg-primary text-white">
-                <h2 class="card-title">Generate Invoice</h2>
-            </div>
-            <div class="card-body">
-                <form id="invoiceForm" class="row g-3">
-                    <div class="col-md-6">
-                        <label for="sale_id" class="form-label">Sale ID</label>
-                        <input type="number" id="sale_id" name="sale_id" class="form-control" required>
-                    </div>
-                    <div class="col-12">
-                        <button type="submit" class="btn btn-success">Generate Invoice</button>
-                    </div>
-                </form>
-            </div>
+    <div class="container py-4">
+        <!-- Page Header -->
+        <div class="text-center mb-5">
+            <h1 class="display-4 fw-bold text-primary mb-2">Invoice Management</h1>
+            <p class="text-muted lead">Generate and manage your invoices efficiently</p>
+            <div class="border-bottom border-primary w-25 mx-auto mt-3"></div>
         </div>
 
-        <!-- Invoice History Table -->
-        <div class="card">
-            <div class="card-header bg-info text-white">
-                <h2 class="card-title">Invoice History</h2>
+        <div class="row">
+            <!-- Generate Invoice Form Card -->
+            <div class="col-lg-4 mb-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-gradient position-relative py-3" 
+                         style="background: linear-gradient(45deg, #4CAF50, #45a049);">
+                        <h2 class="card-title h5 text-white mb-0">
+                            <i class="fas fa-file-invoice me-2"></i>Generate Invoice
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        <form id="invoiceForm" class="needs-validation" novalidate>
+                            <div class="mb-4">
+                                <label for="sale_id" class="form-label fw-semibold">Sale ID</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light">
+                                        <i class="fas fa-hashtag"></i>
+                                    </span>
+                                    <input type="number" 
+                                           id="sale_id" 
+                                           name="sale_id" 
+                                           class="form-control form-control-lg shadow-none"
+                                           placeholder="Enter Sale ID"
+                                           required>
+                                </div>
+                                <div class="invalid-feedback">
+                                    Please provide a valid Sale ID.
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success btn-lg w-100 rounded-pill">
+                                <i class="fas fa-file-invoice me-2"></i>Generate Invoice
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Sale ID</th>
-                            <th>Invoice Date</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for invoice in invoices %}
-                            <tr>
-                                <td>{{ invoice.id }}</td>
-                                <td>{{ invoice.sale_id }}</td>
-                                <td>{{ invoice.invoice_date }}</td>
-                                <td>
-                                    <a href="/invoices/{{ invoice.id }}" class="btn btn-sm btn-primary" target="_blank">View Invoice</a>
-                                </td>
-                            </tr>
-                        {% else %}
-                            <tr>
-                                <td colspan="4" class="text-center">No invoices generated yet.</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+
+            <!-- Invoice History Card -->
+            <div class="col-lg-8 mb-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-gradient position-relative py-3"
+                         style="background: linear-gradient(45deg, #2196F3, #1976D2);">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h2 class="card-title h5 text-white mb-0">
+                                <i class="fas fa-history me-2"></i>Invoice History
+                            </h2>
+                            <div class="d-flex gap-2">
+                                <input type="text" 
+                                       class="form-control form-control-sm shadow-none" 
+                                       placeholder="Search invoices..."
+                                       id="invoiceSearch">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0" id="invoiceTable">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="px-4">ID</th>
+                                        <th>Sale ID</th>
+                                        <th>Invoice Date</th>
+                                        <th>Name</th>
+                                        <th class="text-end px-4">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for invoice in invoices %}
+                                        <tr>
+                                            <td class="px-4">#{{ invoice.id }}</td>
+                                            <td>{{ invoice.sale_id }}</td>
+                                            <td>
+                                                <span class="text-muted">
+                                                    <i class="far fa-calendar-alt me-1"></i>
+                                                    {{ invoice.invoice_date }}
+                                                </span>
+                                            </td>
+                                            <td>{{invoice.name}}</td>
+                                            <td class="text-end px-4">
+                                                <div class="btn-group">
+                                                    <a href="/invoices/{{ invoice.id }}" 
+                                                       class="btn btn-primary btn-sm rounded-pill me-2"
+                                                       target="_blank">
+                                                        <i class="fas fa-eye me-1"></i>View
+                                                    </a>
+                                                    <button class="btn btn-outline-primary btn-sm rounded-pill"
+                                                            onclick="downloadInvoice({{ invoice.id }})">
+                                                        <i class="fas fa-download me-1"></i>Download
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="4" class="text-center py-5">
+                                                <div class="text-muted">
+                                                    <i class="fas fa-file-invoice fa-3x mb-3"></i>
+                                                    <p>No invoices generated yet.</p>
+                                                    <button class="btn btn-primary btn-sm rounded-pill" 
+                                                            onclick="focusGenerateForm()">
+                                                        Generate Your First Invoice
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- Custom Styles -->
+    <style>
+        .bg-gradient {
+            background-size: 200% 200%;
+            animation: gradient 15s ease infinite;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .card {
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .btn {
+            transition: all 0.2s ease-in-out;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(33, 150, 243, 0.05);
+        }
+
+        .form-control:focus {
+            border-color: #2196F3;
+            box-shadow: 0 0 0 0.2rem rgba(33, 150, 243, 0.25);
+        }
+    </style>
+
+    <!-- JavaScript for enhanced functionality -->
+    <script>
+        // Form validation
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('invoiceForm');
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            });
+
+            // Invoice search functionality
+            const searchInput = document.getElementById('invoiceSearch');
+            searchInput.addEventListener('keyup', function() {
+                const searchTerm = this.value.toLowerCase();
+                const table = document.getElementById('invoiceTable');
+                const rows = table.getElementsByTagName('tr');
+
+                for (let i = 1; i < rows.length; i++) {
+                    const row = rows[i];
+                    const text = row.textContent.toLowerCase();
+                    row.style.display = text.includes(searchTerm) ? '' : 'none';
+                }
+            });
+        });
+
+        function focusGenerateForm() {
+            document.getElementById('sale_id').focus();
+        }
+
+        function downloadInvoice(id) {
+            // Implement download functionality
+            console.log('Downloading invoice:', id);
+        }
+    </script>
+
+    <!-- Add Font Awesome in your base template -->
+    {% block extra_head %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    {% endblock %}
 {% endblock %}
