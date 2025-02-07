@@ -1,295 +1,381 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container">
-    <h1 class="text-center mb-4">Sales Management</h1>
+<div class="container py-4">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2 mb-0 text-gradient">Sales Management</h1>
+        <div class="btn-group">
+            <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#recordSaleForm">
+                <i class="fas fa-plus-circle me-2"></i>New Sale
+            </button>
+            <a href="/sales/report" class="btn btn-outline-primary">
+                <i class="fas fa-chart-bar me-2"></i>Sales Report
+            </a>
+        </div>
+    </div>
 
     <!-- Record Sale Form -->
-    <div class="card mb-4">
-        <div class="card-header bg-primary text-white">
-            <h2 class="card-title">Record Sale</h2>
-        </div>
-        <div class="card-body">
-            <form id="saleForm" class="row g-3">
-                <!-- Customer Selection -->
-                <div class="col-md-12 mb-3">
-                    <label for="customer_id" class="form-label">Customer</label>
-                    <div class="input-group">
-                        <select id="customer_id" name="customer_id" class="form-select" required>
-                            {% for customer in customers %}
-                                <option value="{{ customer.id }}">{{ customer.name }}</option>
-                            {% else %}
-                                <option value="" disabled>No customers available</option>
-                            {% endfor %}
-                        </select>
-                        <a href="/customers" class="btn btn-secondary">+ Add Customer</a>
-                    </div>
-                </div>
-
-                <!-- Product Addition Section -->
-                <div class="col-12 mb-4">
-                    <div class="card">
-                        <div class="card-header bg-light">
-                            <h4>Add Products</h4>
+    <div class="collapse show" id="recordSaleForm">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-gradient-primary border-0 text-white py-3">
+                <h2 class="card-title h5 mb-0">
+                    <i class="fas fa-shopping-cart me-2"></i>Record New Sale
+                </h2>
+            </div>
+            <div class="card-body p-4">
+                <form id="saleForm" class="needs-validation" novalidate>
+                    <!-- Customer Selection with Search -->
+                    <div class="row mb-4">
+                        <div class="col-md-8">
+                            <label class="form-label">Customer</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light">
+                                    <i class="fas fa-user"></i>
+                                </span>
+                                <select id="customer_id" name="customer_id" class="form-select" required>
+                                    <option value="">Select Customer</option>
+                                    {% for customer in customers %}
+                                        <option value="{{ customer.id }}">{{ customer.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
+                                    <i class="fas fa-plus me-1"></i>New
+                                </button>
+                            </div>
                         </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Sale Date</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light">
+                                    <i class="fas fa-calendar"></i>
+                                </span>
+                                <input type="date" class="form-control" name="sale_date" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product Addition Section -->
+                    <div class="card bg-light border mb-4">
                         <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <label for="product_id" class="form-label">Product</label>
+                            <div class="row g-3">
+                                <div class="col-md-5">
+                                    <label class="form-label">Product</label>
                                     <div class="input-group">
+                                        <span class="input-group-text bg-white">
+                                            <i class="fas fa-box"></i>
+                                        </span>
                                         <select id="product_id" class="form-select">
+                                            <option value="">Select Product</option>
                                             {% for product in products %}
                                                 <option value="{{ product.id }}" 
                                                         data-price="{{ product.price }}"
                                                         data-stock="{{ product.quantity }}">
                                                     {{ product.name }} (Stock: {{ product.quantity }})
                                                 </option>
-                                            {% else %}
-                                                <option value="" disabled>No products available</option>
                                             {% endfor %}
                                         </select>
-                                        <a href="/products" class="btn btn-secondary">+ Add Product</a>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
-                                    <label for="quantity" class="form-label">Quantity</label>
+                                <div class="col-md-2">
+                                    <label class="form-label">Quantity</label>
                                     <input type="number" id="quantity" class="form-control" min="1">
                                 </div>
                                 <div class="col-md-3">
-                                    <label for="selling_price" class="form-label">Price</label>
-                                    <input type="number" id="selling_price" class="form-control" step="0.01">
+                                    <label class="form-label">Unit Price</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" id="selling_price" class="form-control" step="0.01">
+                                    </div>
                                 </div>
-                                <div class="col-md-3">
-                                    <label class="form-label">&nbsp;</label>
-                                    <button type="button" id="add-item" class="btn btn-primary form-control">
-                                        Add Item
+                                <div class="col-md-2">
+                                    <label class="form-label d-none d-md-block">&nbsp;</label>
+                                    <button type="button" id="add-item" class="btn btn-primary w-100">
+                                        <i class="fas fa-plus me-1"></i>Add
                                     </button>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Discount & Tax Options -->
-                <div class="col-md-6">
-                    <label for="discount" class="form-label">Discount (%)</label>
-                    <input type="number" id="discount" class="form-control" min="0" step="0.01">
-                </div>
-                <div class="col-md-6">
-                    <label for="tax" class="form-label">Tax Rate (%)</label>
-                    <select id="tax" class="form-select">
-                        <option value="0">No Tax</option>
-                        <option value="5">5%</option>
-                        <option value="10">10%</option>
-                        <option value="15">15%</option>
-                    </select>
-                </div>
-
-                <!-- Selected Products Table -->
-                <div class="col-12 mb-4">
-                    <div class="card">
-                        <div class="card-header bg-light">
-                            <h4>Selected Products</h4>
-                        </div>
-                        <div class="card-body">
-                            <table class="table table-bordered">
-                                <thead>
+                    <!-- Selected Products Table -->
+                    <div class="card border mb-4">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="bg-light">
                                     <tr>
                                         <th>Product</th>
-                                        <th>Quantity</th>
-                                        <th>Price</th>
-                                        <th>Subtotal</th>
-                                        <th>Actions</th>
+                                        <th class="text-center">Quantity</th>
+                                        <th class="text-end">Price</th>
+                                        <th class="text-end">Subtotal</th>
+                                        <th class="text-center">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="sale-items-tbody">
-                                    <!-- Sale items will be added here dynamically -->
+                                    <!-- Items will be added here -->
                                 </tbody>
-                                <tfoot>
+                                <tfoot class="border-top">
                                     <tr>
-                                        <td colspan="3" class="text-end"><strong>Total Amount:</strong></td>
-                                        <td colspan="2"><span id="total-amount">0.00</span></td>
+                                        <td colspan="3" class="text-end"><strong>Subtotal:</strong></td>
+                                        <td class="text-end" id="subtotal">$0.00</td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3" class="text-end">
+                                            <div class="input-group input-group-sm justify-content-end">
+                                                <span class="input-group-text">Discount</span>
+                                                <input type="number" id="discount" class="form-control" style="max-width: 80px" min="0" max="100" value="0">
+                                                <span class="input-group-text">%</span>
+                                            </div>
+                                        </td>
+                                        <td class="text-end" id="discount-amount">-$0.00</td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="3" class="text-end">
+                                            <div class="input-group input-group-sm justify-content-end">
+                                                <span class="input-group-text">Tax</span>
+                                                <select id="tax" class="form-select" style="max-width: 100px">
+                                                    <option value="0">No Tax</option>
+                                                    <option value="5">5%</option>
+                                                    <option value="10">10%</option>
+                                                    <option value="15">15%</option>
+                                                </select>
+                                            </div>
+                                        </td>
+                                        <td class="text-end" id="tax-amount">+$0.00</td>
+                                        <td></td>
+                                    </tr>
+                                    <tr class="table-active">
+                                        <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                                        <td class="text-end"><strong id="total-amount">$0.00</strong></td>
+                                        <td></td>
                                     </tr>
                                 </tfoot>
                             </table>
                         </div>
                     </div>
-                </div>
 
-                <!-- Payment Section -->
-                <div class="col-md-6">
-                    <label for="amount_received" class="form-label">Amount Received</label>
-                    <input type="number" id="amount_received" name="amount_received" 
-                           class="form-control" step="0.01" required>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">Balance</label>
-                    <div class="form-control bg-light" id="balance-amount">0.00</div>
-                </div>
+                    <!-- Payment Section -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="number" id="amount_received" name="amount_received" 
+                                       class="form-control" step="0.01" required>
+                                <label>Amount Received ($)</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="text" id="balance-amount" class="form-control-plaintext" 
+                                       readonly value="$0.00">
+                                <label>Balance</label>
+                            </div>
+                        </div>
+                    </div>
 
-                <!-- Submit Button -->
-                <div class="col-12">
-                    <button type="submit" class="btn btn-success" id="submit-sale">
-                        Complete Sale
-                    </button>
-                </div>
-            </form>
+                    <!-- Submit Buttons -->
+                    <div class="text-end">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#recordSaleForm">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="submit-sale">
+                            <i class="fas fa-check me-2"></i>Complete Sale
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 
-    <!-- Sales History Table -->
-    <div class="card">
-        <div class="card-header bg-info text-white">
-            <h2 class="card-title">Sales History</h2>
+    <!-- Sales History -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white py-3">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h3 class="h5 mb-0">
+                        <i class="fas fa-history me-2"></i>Sales History
+                    </h3>
+                </div>
+                <div class="col-auto">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" id="searchSales" class="form-control" placeholder="Search sales...">
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="card-body">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Customer</th>
-                        <th>Total Amount</th>
-                        <th>Amount Received</th>
-                        <th>Balance</th>
-                        <th>Status</th>
-                        <th>Sale Date</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for sale in sales %}
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
                         <tr>
-                            <td>{{ sale.id }}</td>
+                            <th class="ps-4">ID</th>
+                            <th>Customer</th>
+                            <th class="text-end">Total</th>
+                            <th class="text-end">Received</th>
+                            <th class="text-end">Balance</th>
+                            <th class="text-center">Status</th>
+                            <th>Date</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sale in sales %}
+                        <tr>
+                            <td class="ps-4">#{{ sale.id }}</td>
                             <td>{{ sale.customer.name if sale.customer else 'N/A' }}</td>
-                            <td>{{ sale.total_amount }}</td>
-                            <td>{{ sale.amount_received }}</td>
-                            <td>{{ sale.balance }}</td>
-                            <td>{{ sale.status }}</td>
-                            <td>{{ sale.sale_date }}</td>
-                            <td>
-                                <button class="btn btn-sm btn-info view-details" 
+                            <td class="text-end">${{ "%.2f"|format(sale.total_amount) }}</td>
+                            <td class="text-end">${{ "%.2f"|format(sale.amount_received) }}</td>
+                            <td class="text-end">${{ "%.2f"|format(sale.balance) }}</td>
+                            <td class="text-center">
+                                <span class="badge bg-{{ 'success' if sale.status == 'Paid' else 'warning' }}">
+                                    {{ sale.status }}
+                                </span>
+                            </td>
+                            <td>{{ sale.sale_date.strftime('%Y-%m-%d') }}</td>
+                            <td class="text-end pe-4">
+                                <button class="btn btn-sm btn-link text-primary view-details" 
                                         data-sale-id="{{ sale.id }}">
-                                    View Details
+                                    <i class="fas fa-eye"></i>
                                 </button>
                                 {% if sale.invoice %}
-                                    <a href="/invoices/{{ sale.invoice.id }}" class="btn btn-sm btn-primary" target="_blank">
-                                        View Invoice
+                                    <a href="/invoices/{{ sale.invoice.id }}" 
+                                       class="btn btn-sm btn-link text-success" 
+                                       target="_blank">
+                                        <i class="fas fa-file-invoice"></i>
                                     </a>
                                 {% else %}
-                                    <form class="generate-invoice-form d-inline">
-                                        <input type="hidden" name="sale_id" value="{{ sale.id }}">
-                                        <button type="submit" class="btn btn-sm btn-primary">Generate Invoice</button>
-                                    </form>
+                                    <button class="btn btn-sm btn-link text-primary generate-invoice"
+                                            data-sale-id="{{ sale.id }}">
+                                        <i class="fas fa-file-medical"></i>
+                                    </button>
                                 {% endif %}
                             </td>
                         </tr>
-                    {% else %}
-                        <tr>
-                            <td colspan="8" class="text-center">No sales recorded yet.</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- Sale Details Modal -->
-    <div class="modal fade" id="saleDetailsModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Sale Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body" id="saleDetailsContent">
-                    <!-- Sale details will be loaded here -->
-                </div>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Add this to the bottom of your template, just before the closing body tag -->
+<!-- Sale Details Modal -->
+<div class="modal fade" id="saleDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0">
+            <div class="modal-header bg-gradient-primary text-white">
+                <h5 class="modal-title">Sale Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="saleDetailsContent">
+                <!-- Content will be loaded dynamically -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .text-gradient {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    }
+    
+    .btn-link {
+        text-decoration: none;
+    }
+    
+    .form-floating > .form-control:focus ~ label,
+    .form-floating > .form-control:not(:placeholder-shown) ~ label {
+        color: #6366f1;
+    }
+    
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #8b5cf6;
+        box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.25);
+    }
+    
+    .badge {
+        padding: 0.5em 0.75em;
+    }
+</style>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const productDropdown = document.getElementById('product_id');
-        const sellingPriceInput = document.getElementById('selling_price');
-        const addItemButton = document.getElementById('add-item');
-        const totalAmountDisplay = document.getElementById('total-amount');
-
-        // Function to update selling price when product changes
-        function updateSellingPrice() {
-            const selectedOption = productDropdown.options[productDropdown.selectedIndex];
-            sellingPriceInput.value = selectedOption.dataset.price || 0;
+    document.addEventListener("DOMContentLoaded", function () {
+        const saleItems = [];
+        
+        function updateTotals() {
+            let subtotal = saleItems.reduce((sum, item) => sum + item.quantity * item.price, 0);
+            let discount = parseFloat(document.getElementById("discount").value) || 0;
+            let discountAmount = (subtotal * discount) / 100;
+            let tax = parseFloat(document.getElementById("tax").value) || 0;
+            let taxAmount = ((subtotal - discountAmount) * tax) / 100;
+            let total = subtotal - discountAmount + taxAmount;
+            
+            document.getElementById("subtotal").textContent = `$${subtotal.toFixed(2)}`;
+            document.getElementById("discount-amount").textContent = `-$${discountAmount.toFixed(2)}`;
+            document.getElementById("tax-amount").textContent = `+$${taxAmount.toFixed(2)}`;
+            document.getElementById("total-amount").textContent = `$${total.toFixed(2)}`;
         }
 
-        // Function to handle invoice generation
-        async function generateInvoice(event) {
-            event.preventDefault();
+        document.getElementById("add-item").addEventListener("click", function () {
+            let productSelect = document.getElementById("product_id");
+            let productId = productSelect.value;
+            let productName = productSelect.options[productSelect.selectedIndex].text;
+            let quantity = parseInt(document.getElementById("quantity").value) || 1;
+            let price = parseFloat(document.getElementById("selling_price").value) || 0;
 
-            const form = event.target;
-            const saleId = form.querySelector('input[name="sale_id"]').value;
-            const button = form.querySelector('button');
-
-            try {
-                button.disabled = true;
-                button.textContent = 'Generating...';
-
-                const response = await fetch('/invoices/', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ sale_id: parseInt(saleId) }),
-                });
-
-                if (!response.ok) throw new Error('Failed to generate invoice');
-
-                const invoice = await response.json();
-
-                // Replace form with a "View Invoice" button
-                const viewLink = document.createElement('a');
-                viewLink.href = `/invoices/${invoice.id}`;
-                viewLink.className = 'btn btn-sm btn-primary';
-                viewLink.target = '_blank';
-                viewLink.textContent = 'View Invoice';
-                form.replaceWith(viewLink);
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Failed to generate invoice. Please try again.');
-                button.disabled = false;
-                button.textContent = 'Generate Invoice';
-            }
-        }
-
-        // Function to update total amount
-        function updateTotalAmount() {
-            const quantity = parseFloat(document.getElementById('quantity').value) || 0;
-            const price = parseFloat(sellingPriceInput.value) || 0;
-            const discount = parseFloat(document.getElementById('discount').value) || 0;
-            const tax = parseFloat(document.getElementById('tax').value) || 0;
-
-            let subtotal = quantity * price;
-            subtotal -= subtotal * (discount / 100);
-            subtotal += subtotal * (tax / 100);
-
-            totalAmountDisplay.textContent = subtotal.toFixed(2);
-        }
-
-        // Attach event listeners
-        productDropdown.addEventListener('change', updateSellingPrice);
-        document.addEventListener('submit', function (e) {
-            if (e.target.matches('.generate-invoice-form')) {
-                generateInvoice(e);
+            if (productId && quantity > 0 && price > 0) {
+                saleItems.push({ id: productId, name: productName, quantity, price });
+                let row = `<tr>
+                    <td>${productName}</td>
+                    <td class="text-center">${quantity}</td>
+                    <td class="text-end">$${price.toFixed(2)}</td>
+                    <td class="text-end">$${(quantity * price).toFixed(2)}</td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-sm btn-outline-danger remove-item">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                </tr>`;
+                document.getElementById("sale-items-tbody").insertAdjacentHTML("beforeend", row);
+                updateTotals();
             }
         });
 
-        if (addItemButton) {
-            addItemButton.addEventListener('click', updateTotalAmount);
-        }
+        document.getElementById("sale-items-tbody").addEventListener("click", function (event) {
+            if (event.target.closest(".remove-item")) {
+                event.target.closest("tr").remove();
+                updateTotals();
+            }
+        });
 
-        // Initialize price on page load
-        updateSellingPrice();
+        document.getElementById("amount_received").addEventListener("input", function () {
+            let received = parseFloat(this.value) || 0;
+            let total = parseFloat(document.getElementById("total-amount").textContent.replace("$", "")) || 0;
+            let balance = received - total;
+            document.getElementById("balance-amount").value = `$${balance.toFixed(2)}`;
+        });
+
+        document.getElementById("saleForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+            alert("Sale recorded successfully!");
+        });
     });
+
+    function deleteSale(saleId) {
+        if (confirm("Are you sure you want to delete this sale?")) {
+            alert(`Sale #${saleId} deleted.`);
+        }
+    }
 </script>
 
 {% endblock %}

@@ -1,80 +1,243 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <div class="container">
-        <h1 class="text-center mb-4">Customer Management</h1>
+<div class="container py-4">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2 mb-0 text-gradient">Customer Management</h1>
+        <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#addCustomerForm">
+            <i class="fas fa-user-plus me-2"></i>Add New Customer
+        </button>
+    </div>
 
-        <!-- Add Customer Form -->
-        <div class="card mb-4">
-            <div class="card-header bg-primary text-white">
-                <h2 class="card-title">Add Customer</h2>
+    <!-- Add Customer Form -->
+    <div class="collapse mb-4" id="addCustomerForm">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-gradient-primary border-0 text-white py-3">
+                <h2 class="card-title h5 mb-0"><i class="fas fa-user-edit me-2"></i>Add New Customer</h2>
             </div>
             <div class="card-body">
                 <form id="customerForm" class="row g-3">
                     <div class="col-md-6">
-                        <label for="name" class="form-label">Name</label>
-                        <input type="text" id="name" name="name" class="form-control" required>
+                        <div class="form-floating">
+                            <input type="text" id="name" name="name" class="form-control" placeholder="Customer Name" required>
+                            <label for="name"><i class="fas fa-user me-2"></i>Customer Name</label>
+                        </div>
                     </div>
                     <div class="col-md-6">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" id="email" name="email" class="form-control" required>
+                        <div class="form-floating">
+                            <input type="email" id="email" name="email" class="form-control" placeholder="Email" required>
+                            <label for="email"><i class="fas fa-envelope me-2"></i>Email Address</label>
+                        </div>
                     </div>
                     <div class="col-md-6">
-                        <label for="phone_number" class="form-label">Phone Number</label>
-                        <input type="text" id="phone_number" name="phone_number" class="form-control">
+                        <div class="form-floating">
+                            <input type="tel" id="phone_number" name="phone_number" class="form-control" placeholder="Phone Number">
+                            <label for="phone_number"><i class="fas fa-phone me-2"></i>Phone Number</label>
+                        </div>
                     </div>
                     <div class="col-md-6">
-                        <label for="address" class="form-label">Address</label>
-                        <input type="text" id="address" name="address" class="form-control">
+                        <div class="form-floating">
+                            <input type="text" id="address" name="address" class="form-control" placeholder="Address">
+                            <label for="address"><i class="fas fa-map-marker-alt me-2"></i>Address</label>
+                        </div>
                     </div>
-                    <div class="col-12">
-                        <button type="submit" class="btn btn-success">Add Customer</button>
+                    <div class="col-12 text-end">
+                        <button type="button" class="btn btn-outline-secondary me-2" data-bs-toggle="collapse" data-bs-target="#addCustomerForm">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Save Customer
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
+    </div>
 
-        <!-- Customer List Table -->
-        <div class="card">
-            <div class="card-header bg-info text-white">
-                <h2 class="card-title">Customer List</h2>
+    <!-- Customer List -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white py-3">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h2 class="card-title h5 mb-0"><i class="fas fa-users me-2"></i>Customer List</h2>
+                </div>
+                <div class="col-auto">
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-end-0">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" id="searchCustomer" class="form-control border-start-0" placeholder="Search customers...">
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                <table class="table table-striped">
-                    <thead>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="bg-light">
                         <tr>
-                            <th>ID</th>
+                            <th class="ps-4">ID</th>
                             <th>Name</th>
                             <th>Email</th>
-                            <th>Phone Number</th>
+                            <th>Phone</th>
                             <th>Address</th>
-                            <th>Balance Owe</th>
-                            <th>Actions</th>
+                            <th>Balance</th>
+                            <th class="text-end pe-4">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for customer in customers %}
-                            <tr>
-                                <td>{{ customer.id }}</td>
-                                <td>{{ customer.name }}</td>
-                                <td>{{ customer.email }}</td>
-                                <td>{{ customer.phone_number }}</td>
-                                <td>{{ customer.address }}</td>
-                                <td>{{ customer.balance_owe }}</td>
-                                <td>
-                                    <button class="btn btn-sm btn-primary" onclick="viewTransactions({{ customer.id }})">View Transactions</button>
-                                </td>
-                            </tr>
+                        <tr class="customer-row">
+                            <td class="ps-4">{{ customer.id }}</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-circle me-2">{{ customer.name[:1].upper() }}</div>
+                                    <span class="fw-medium">{{ customer.name }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <a href="mailto:{{ customer.email }}" class="text-decoration-none">
+                                    {{ customer.email }}
+                                </a>
+                            </td>
+                            <td>{{ customer.phone_number }}</td>
+                            <td>
+                                <span class="text-truncate d-inline-block" style="max-width: 200px;" title="{{ customer.address }}">
+                                    {{ customer.address }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge {{ 'bg-success' if customer.balance_owe == 0 else 'bg-warning' }}">
+                                    ${{ "%.2f"|format(customer.balance_owe) }}
+                                </span>
+                            </td>
+                            <td class="text-end pe-4">
+                                <button class="btn btn-sm btn-primary view-transactions" 
+                                        onclick="viewTransactions({{ customer.id }})"
+                                        data-bs-toggle="tooltip" 
+                                        title="View Transactions">
+                                    <i class="fas fa-history"></i>
+                                </button>
+                                <button class="btn btn-sm btn-info edit-customer" 
+                                        data-id="{{ customer.id }}"
+                                        data-bs-toggle="tooltip" 
+                                        title="Edit Customer">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            </td>
+                        </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
+</div>
 
-    <script>
-        function viewTransactions(customerId) {
-            window.location.href = `/customers/${customerId}/transactions`;
-        }
-    </script>
+<style>
+    .text-gradient {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    }
+    
+    .avatar-circle {
+        width: 32px;
+        height: 32px;
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 500;
+    }
+    
+    .customer-row {
+        transition: all 0.3s ease;
+    }
+    
+    .customer-row:hover {
+        background-color: rgba(99, 102, 241, 0.05);
+    }
+    
+    .form-floating > .form-control:focus ~ label,
+    .form-floating > .form-control:not(:placeholder-shown) ~ label {
+        color: #6366f1;
+    }
+    
+    .form-control:focus {
+        border-color: #8b5cf6;
+        box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.25);
+    }
+
+    .btn {
+        transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-1px);
+    }
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Initialize tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // Search functionality
+    const searchInput = document.getElementById('searchCustomer');
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        document.querySelectorAll('.customer-row').forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(searchTerm) ? '' : 'none';
+        });
+    });
+
+    // Customer form submission
+    document.getElementById('customerForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const data = Object.fromEntries(formData.entries());
+        
+        fetch('/customers', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: 'Customer added successfully',
+                showConfirmButton: false,
+                timer: 1500
+            }).then(() => location.reload());
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire('Error!', 'Failed to add customer', 'error');
+        });
+    });
+});
+
+function viewTransactions(customerId) {
+    window.location.href = `/customers/${customerId}/transactions`;
+}
+</script>
+
+{% block extra_head %}
+<link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-borderless/borderless.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+{% endblock %}
 {% endblock %}

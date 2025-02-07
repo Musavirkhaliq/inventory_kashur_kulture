@@ -1,62 +1,173 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <!-- Hero Banner -->
-    <div class="py-5 text-center bg-light">
-        <h1 class="display-4 fw-bold text-primary">Welcome to KashurKulture</h1>
-        <p class="lead">Streamlining Inventory Management with Elegance and Simplicity</p>
-        <a href="/products" class="btn btn-primary btn-lg">Explore Now</a>
+    <!-- Hero Banner with Gradient Background -->
+    <div class="hero-section position-relative overflow-hidden">
+        <div class="position-absolute top-0 start-0 w-100 h-100" style="
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            opacity: 0.9;
+            z-index: -1;
+        "></div>
+        <div class="container py-5 text-center text-white">
+            <h1 class="display-3 fw-bold mb-4 animate__animated animate__fadeIn">
+                Welcome to KashurKulture
+            </h1>
+            <p class="lead mb-4 fw-light animate__animated animate__fadeIn animate__delay-1s">
+                Elevating Inventory Management to an Art Form
+            </p>
+            <a href="/products" class="btn btn-light btn-lg px-5 py-3 rounded-pill shadow-sm hover-scale animate__animated animate__fadeIn animate__delay-2s">
+                <i class="fas fa-box-open me-2"></i>Explore Now
+            </a>
+        </div>
     </div>
 
-    <!-- Quick Links Section -->
-    <div class="container mt-5">
-        <h2 class="text-center mb-4">Quick Links</h2>
-        <div class="row gy-4">
-            <div class="col-md-4">
-                <div class="card shadow-sm h-100">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Manage Products</h5>
-                        <p class="card-text">Add, edit, or delete products in your inventory.</p>
-                        <a href="/products" class="btn btn-primary">Go</a>
+    <!-- Quick Links Section with Enhanced Cards -->
+    <div class="container my-6">
+        <h2 class="text-center mb-5 position-relative">
+            <span class="border-bottom border-primary border-3 pb-2">Quick Links</span>
+        </h2>
+        <div class="row g-4">
+            <!-- Products Card -->
+            <div class="col-md-4 col-sm-6">
+                <div class="card h-100 border-0 shadow-hover transition-all">
+                    <div class="card-body p-4">
+                        <div class="icon-wrapper mb-4">
+                            <i class="fas fa-boxes fa-2x text-primary"></i>
+                        </div>
+                        <h5 class="card-title fw-bold mb-3">Manage Products</h5>
+                        <p class="card-text text-muted mb-4">Streamline your inventory with our intuitive product management system.</p>
+                        <a href="/products" class="btn btn-outline-primary rounded-pill w-100 hover-lift">
+                            <span>Access Products</span>
+                            <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card shadow-sm h-100">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Manage Customers</h5>
-                        <p class="card-text">View and manage customer details seamlessly.</p>
-                        <a href="/customers" class="btn btn-primary">Go</a>
+
+            <!-- Customers Card -->
+            <div class="col-md-4 col-sm-6">
+                <div class="card h-100 border-0 shadow-hover transition-all">
+                    <div class="card-body p-4">
+                        <div class="icon-wrapper mb-4">
+                            <i class="fas fa-users fa-2x text-success"></i>
+                        </div>
+                        <h5 class="card-title fw-bold mb-3">Manage Customers</h5>
+                        <p class="card-text text-muted mb-4">Build lasting relationships with comprehensive customer management.</p>
+                        <a href="/customers" class="btn btn-outline-success rounded-pill w-100 hover-lift">
+                            <span>View Customers</span>
+                            <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card shadow-sm h-100">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Record Sales</h5>
-                        <p class="card-text">Keep track of sales transactions efficiently.</p>
-                        <a href="/sales" class="btn btn-primary">Go</a>
+
+            <!-- Sales Card -->
+            <div class="col-md-4 col-sm-6">
+                <div class="card h-100 border-0 shadow-hover transition-all">
+                    <div class="card-body p-4">
+                        <div class="icon-wrapper mb-4">
+                            <i class="fas fa-chart-line fa-2x text-info"></i>
+                        </div>
+                        <h5 class="card-title fw-bold mb-3">Record Sales</h5>
+                        <p class="card-text text-muted mb-4">Track and analyze your sales data with powerful insights.</p>
+                        <a href="/sales" class="btn btn-outline-info rounded-pill w-100 hover-lift">
+                            <span>Manage Sales</span>
+                            <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card shadow-sm h-100">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Record Restocks</h5>
-                        <p class="card-text">Manage and track restock operations easily.</p>
-                        <a href="/restocks" class="btn btn-primary">Go</a>
+
+            <!-- Restocks Card -->
+            <div class="col-md-4 col-sm-6">
+                <div class="card h-100 border-0 shadow-hover transition-all">
+                    <div class="card-body p-4">
+                        <div class="icon-wrapper mb-4">
+                            <i class="fas fa-truck-loading fa-2x text-warning"></i>
+                        </div>
+                        <h5 class="card-title fw-bold mb-3">Record Restocks</h5>
+                        <p class="card-text text-muted mb-4">Efficiently manage inventory replenishment and tracking.</p>
+                        <a href="/restocks" class="btn btn-outline-warning rounded-pill w-100 hover-lift">
+                            <span>Handle Restocks</span>
+                            <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card shadow-sm h-100">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Generate Invoices</h5>
-                        <p class="card-text">Create and manage invoices with ease.</p>
-                        <a href="/invoices" class="btn btn-primary">Go</a>
+
+            <!-- Invoices Card -->
+            <div class="col-md-4 col-sm-6">
+                <div class="card h-100 border-0 shadow-hover transition-all">
+                    <div class="card-body p-4">
+                        <div class="icon-wrapper mb-4">
+                            <i class="fas fa-file-invoice-dollar fa-2x text-danger"></i>
+                        </div>
+                        <h5 class="card-title fw-bold mb-3">Generate Invoices</h5>
+                        <p class="card-text text-muted mb-4">Create professional invoices with our automated system.</p>
+                        <a href="/invoices" class="btn btn-outline-danger rounded-pill w-100 hover-lift">
+                            <span>Create Invoices</span>
+                            <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Required CSS -->
+    <style>
+        .hero-section {
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+        }
+
+        .shadow-hover {
+            transition: all 0.3s ease;
+        }
+
+        .shadow-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 1rem 3rem rgba(0,0,0,.175)!important;
+        }
+
+        .hover-scale {
+            transition: transform 0.3s ease;
+        }
+
+        .hover-scale:hover {
+            transform: scale(1.05);
+        }
+
+        .hover-lift {
+            transition: all 0.3s ease;
+        }
+
+        .hover-lift:hover {
+            transform: translateY(-2px);
+        }
+
+        .icon-wrapper {
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .transition-all {
+            transition: all 0.3s ease;
+        }
+
+        .my-6 {
+            margin-top: 4rem;
+            margin-bottom: 4rem;
+        }
+    </style>
+
+    <!-- Add Font Awesome and Animate.css CDN links in your base template -->
+    {% block extra_head %}
+    <link rel="stylesheet" href="static/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    {% endblock %}
 {% endblock %}
