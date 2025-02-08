@@ -1,68 +1,156 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <div class="container">
-        <h1 class="text-center mb-4">Restock Management</h1>
-
-        <!-- Record Restock Form -->
-        <div class="card mb-4">
-            <div class="card-header bg-primary text-white">
-                <h2 class="card-title">Record Restock</h2>
-            </div>
-            <div class="card-body">
-                <form id="restockForm" class="row g-3">
-                    <div class="col-md-6">
-                        <label for="product_id" class="form-label">Product</label>
-                        <select id="product_id" name="product_id" class="form-select" required>
-                            {% for product in products %}
-                                <option value="{{ product.id }}">{{ product.name }}</option>
-                            {% else %}
-                                <option value="" disabled>No products available</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="quantity" class="form-label">Quantity</label>
-                        <input type="number" id="quantity" name="quantity" class="form-control" required>
-                    </div>
-                    <div class="col-12">
-                        <button type="submit" class="btn btn-success">Record Restock</button>
-                    </div>
-                </form>
-            </div>
+    <div class="container py-4">
+        <!-- Page Header -->
+        <div class="text-center mb-5">
+            <h1 class="display-4 fw-bold text-primary mb-2">Restock Management</h1>
+            <p class="text-muted lead">Efficiently manage your inventory restocks</p>
         </div>
 
-        <!-- Restock History Table -->
-        <div class="card">
-            <div class="card-header bg-info text-white">
-                <h2 class="card-title">Restock History</h2>
+        <div class="row">
+            <!-- Record Restock Form Card -->
+            <div class="col-lg-5 mb-4 mb-lg-0">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-gradient position-relative py-3" 
+                         style="background: linear-gradient(45deg, #2196F3, #00BCD4);">
+                        <h2 class="card-title text-white m-0 fs-4">
+                            <i class="fas fa-plus-circle me-2"></i>Record Restock
+                        </h2>
+                    </div>
+                    <div class="card-body p-4">
+                        <form id="restockForm" class="needs-validation" novalidate>
+                            <div class="mb-4">
+                                <label for="product_id" class="form-label fw-medium">
+                                    <i class="fas fa-box me-2 text-primary"></i>Product
+                                </label>
+                                <select id="product_id" name="product_id" 
+                                        class="form-select form-select-lg shadow-sm" required>
+                                    {% for product in products %}
+                                        <option value="{{ product.id }}">{{ product.name }}</option>
+                                    {% else %}
+                                        <option value="" disabled>No products available</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="invalid-feedback">Please select a product</div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="quantity" class="form-label fw-medium">
+                                    <i class="fas fa-calculator me-2 text-primary"></i>Quantity
+                                </label>
+                                <input type="number" id="quantity" name="quantity" 
+                                       class="form-control form-control-lg shadow-sm" 
+                                       min="1" required>
+                                <div class="invalid-feedback">Please enter a valid quantity</div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-lg w-100 shadow-sm">
+                                <i class="fas fa-save me-2"></i>Record Restock
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Product Name</th>
-                            <th>Quantity</th>
-                            <th>Restock Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for restock in restocks %}
-                            <tr>
-                                <td>{{ restock.id }}</td>
-                                <td>{{ restock.product_name }}</td>
-                                <td>{{ restock.quantity }}</td>
-                                <td>{{ restock.restock_date }}</td>
-                            </tr>
-                        {% else %}
-                            <tr>
-                                <td colspan="4" class="text-center">No restocks recorded yet.</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+
+            <!-- Restock History Card -->
+            <div class="col-lg-7">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-gradient position-relative py-3"
+                         style="background: linear-gradient(45deg, #4CAF50, #8BC34A);">
+                        <h2 class="card-title text-white m-0 fs-4">
+                            <i class="fas fa-history me-2"></i>Restock History
+                        </h2>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th class="py-3 px-4">ID</th>
+                                        <th class="py-3 px-4">Product Name</th>
+                                        <th class="py-3 px-4">Quantity</th>
+                                        <th class="py-3 px-4">Restock Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for restock in restocks %}
+                                        <tr class="align-middle">
+                                            <td class="py-3 px-4">#{{ restock.id }}</td>
+                                            <td class="py-3 px-4 fw-medium">{{ restock.product_name }}</td>
+                                            <td class="py-3 px-4">
+                                                <span class="badge bg-success rounded-pill px-3">
+                                                    {{ restock.quantity }}
+                                                </span>
+                                            </td>
+                                            <td class="py-3 px-4 text-muted">
+                                                {{ restock.restock_date }}
+                                            </td>
+                                        </tr>
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="4" class="text-center py-5 text-muted">
+                                                <i class="fas fa-box-open fa-3x mb-3 d-block"></i>
+                                                No restocks recorded yet.
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- Custom Styles -->
+    <style>
+        .bg-gradient {
+            background-size: 200% 200%;
+            animation: gradient 15s ease infinite;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #2196F3;
+            box-shadow: 0 0 0 0.25rem rgba(33, 150, 243, 0.1);
+        }
+
+        .table th {
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        .badge {
+            font-weight: 500;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+    </style>
+
+    <!-- Form Validation Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('restockForm');
+            
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            });
+        });
+    </script>
+
+    <!-- Add Font Awesome in your base template -->
+    {% block extra_head %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    {% endblock %}
 {% endblock %}

@@ -1,8 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <div class="container">
-        <h1 class="text-center mb-4">Transactions for {{ customer.name }}</h1>
+    <div class="container py-4">
+        <!-- Customer Header -->
+        <div class="customer-header text-center mb-5">
+            <h1 class="display-5 fw-bold text-gradient mb-2">{{ customer.name }}'s Transactions</h1>
+            <div class="text-muted">Customer ID: #{{ customer.id }}</div>
+        </div>
 
         {% with %}
             {% set total_sales = namespace(amount=0) %}
@@ -15,92 +19,182 @@
                 {% set total_balance.amount = total_balance.amount + transaction.balance %}
             {% endfor %}
 
-            <div class="card mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="card-title mb-0">Summary</h3>
+            <!-- Summary Cards -->
+            <div class="row g-4 mb-5">
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm summary-card sales-card">
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="icon-wrapper bg-primary-subtle rounded-circle me-3">
+                                    <i class="fas fa-shopping-cart text-primary"></i>
+                                </div>
+                                <h4 class="card-title mb-0">Total Sales</h4>
+                            </div>
+                            <h2 class="display-6 fw-bold text-primary mb-0">₹{{ "%.2f"|format(total_sales.amount) }}</h2>
+                            <div class="text-muted small">Lifetime sales value</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="row text-center">
-                        <div class="col-md-4">
-                            <div class="border rounded p-3">
-                                <h4>Total Sales Amount</h4>
-                                <h2 class="text-primary">{{ "%.2f"|format(total_sales.amount) }}</h2>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm summary-card received-card">
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="icon-wrapper bg-success-subtle rounded-circle me-3">
+                                    <i class="fas fa-money-bill-wave text-success"></i>
+                                </div>
+                                <h4 class="card-title mb-0">Amount Received</h4>
                             </div>
+                            <h2 class="display-6 fw-bold text-success mb-0">₹{{ "%.2f"|format(total_received.amount) }}</h2>
+                            <div class="text-muted small">Total payments received</div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="border rounded p-3">
-                                <h4>Total Amount Received</h4>
-                                <h2 class="text-success">{{ "%.2f"|format(total_received.amount) }}</h2>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm summary-card balance-card">
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="icon-wrapper bg-danger-subtle rounded-circle me-3">
+                                    <i class="fas fa-balance-scale text-danger"></i>
+                                </div>
+                                <h4 class="card-title mb-0">Balance Due</h4>
                             </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="border rounded p-3">
-                                <h4>Total Balance</h4>
-                                <h2 class="text-danger">{{ "%.2f"|format(total_balance.amount) }}</h2>
-                            </div>
+                            <h2 class="display-6 fw-bold text-danger mb-0">₹{{ "%.2f"|format(total_balance.amount) }}</h2>
+                            <div class="text-muted small">Outstanding balance</div>
                         </div>
                     </div>
                 </div>
             </div>
         {% endwith %}
 
-        <div class="card">
-            <div class="card-header bg-info text-white">
-                <h2 class="card-title">Transaction History</h2>
+        <!-- Transactions List -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-bottom-0 py-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2 class="card-title h4 mb-0">Transaction History</h2>
+                    <span class="badge bg-primary rounded-pill">{{ transactions|length }} Transactions</span>
+                </div>
             </div>
-            <div class="card-body">
+            <div class="card-body p-0">
                 {% if transactions %}
                     {% for transaction in transactions %}
-                        <div class="transaction-group mb-4">
-                            <h4>Transaction #{{ transaction.id }}</h4>
-                            <div class="row">
-                                <div class="col">
-                                    <strong>Sale Date:</strong> {{ transaction.sale_date }}
+                        <div class="transaction-item p-4 {% if not loop.last %}border-bottom{% endif %}">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div>
+                                    <h4 class="mb-1">Transaction #{{ transaction.id }}</h4>
+                                    <div class="text-muted">
+                                        <i class="far fa-calendar-alt me-2"></i>{{ transaction.sale_date }}
+                                    </div>
                                 </div>
-                                <div class="col">
-                                    <strong>Total Amount Received:</strong> {{ "%.2f"|format(transaction.amount_received) }}
-                                </div>
-                                <div class="col">
-                                    <strong>Balance:</strong> {{ "%.2f"|format(transaction.balance) }}
+                                <div class="text-end">
+                                    <div class="mb-1">
+                                        <span class="badge bg-success">Received: ₹{{ "%.2f"|format(transaction.amount_received) }}</span>
+                                        {% if transaction.balance > 0 %}
+                                            <span class="badge bg-danger ms-2">Balance: ₹{{ "%.2f"|format(transaction.balance) }}</span>
+                                        {% endif %}
+                                    </div>
                                 </div>
                             </div>
                             
-                            <table class="table table-striped mt-2">
-                                <thead class="bg-light">
-                                    <tr>
-                                        <th>Product</th>
-                                        <th>Quantity</th>
-                                        <th>Unit Price</th>
-                                        <th>Subtotal</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for item in transaction.items %}
-                                        {% set subtotal = item.quantity * item.price %}
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light">
                                         <tr>
-                                            <td>{{ item.product.name if item.product else 'N/A' }}</td>
-                                            <td>{{ item.quantity }}</td>
-                                            <td>{{ "%.2f"|format(item.price) }}</td>
-                                            <td>{{ "%.2f"|format(subtotal) }}</td>
+                                            <th class="border-0">Product</th>
+                                            <th class="border-0 text-center">Quantity</th>
+                                            <th class="border-0 text-end">Unit Price</th>
+                                            <th class="border-0 text-end">Subtotal</th>
                                         </tr>
-                                    {% endfor %}
-                                    <tr class="table-info">
-                                        <td colspan="3" class="text-end"><strong>Transaction Total:</strong></td>
-                                        <td><strong>{{ "%.2f"|format(transaction.total_amount) }}</strong></td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        {% for item in transaction.items %}
+                                            {% set subtotal = item.quantity * item.price %}
+                                            <tr>
+                                                <td class="border-0">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="product-icon bg-light rounded-circle me-2">
+                                                            <i class="fas fa-box text-primary"></i>
+                                                        </div>
+                                                        {{ item.product.name if item.product else 'N/A' }}
+                                                    </div>
+                                                </td>
+                                                <td class="border-0 text-center">{{ item.quantity }}</td>
+                                                <td class="border-0 text-end">₹{{ "%.2f"|format(item.price) }}</td>
+                                                <td class="border-0 text-end">₹{{ "%.2f"|format(subtotal) }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                        <tr class="table-light fw-bold">
+                                            <td colspan="3" class="border-0 text-end">Transaction Total:</td>
+                                            <td class="border-0 text-end">₹{{ "%.2f"|format(transaction.total_amount) }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                        {% if not loop.last %}
-                            <hr>
-                        {% endif %}
                     {% endfor %}
                 {% else %}
-                    <div class="alert alert-info text-center">
-                        No transactions found.
+                    <div class="text-center py-5">
+                        <div class="mb-3">
+                            <i class="fas fa-receipt fa-3x text-muted"></i>
+                        </div>
+                        <h3 class="h5 text-muted">No Transactions Found</h3>
+                        <p class="text-muted mb-0">This customer hasn't made any transactions yet.</p>
                     </div>
                 {% endif %}
             </div>
         </div>
     </div>
+
+    <style>
+        .text-gradient {
+            background: linear-gradient(45deg, #2937f0, #9f1ae2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .icon-wrapper {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-wrapper i {
+            font-size: 1.5rem;
+        }
+
+        .summary-card {
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-icon {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .transaction-item {
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        .transaction-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        @media (max-width: 768px) {
+            .table-responsive {
+                margin: 0 -1rem;
+            }
+        }
+    </style>
+
+    {% block extra_head %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    {% endblock %}
 {% endblock %}

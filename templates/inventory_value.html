@@ -1,8 +1,103 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <div class="container text-center">
-        <h1 class="display-4">Inventory Value</h1>
-        <p class="lead">The total value of all items in the store is: <strong>{{ total_value }}</strong></p>
+    <!-- Inventory Value Dashboard Section -->
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-lg">
+                    <div class="card-body p-5">
+                        <!-- Header -->
+                        <div class="text-center mb-4">
+                            <div class="display-6 fw-bold text-primary mb-2">Store Inventory Dashboard</div>
+                            <p class="text-muted">Real-time inventory valuation</p>
+                        </div>
+
+                        <!-- Value Display -->
+                        <div class="bg-light rounded-3 p-4 mb-4">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <h6 class="text-muted mb-2">Total Inventory Value</h6>
+                                    <h2 class="display-5 fw-bold text-success mb-0">{{ total_value }}</h2>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="rounded-circle bg-success bg-opacity-10 p-3">
+                                        <i class="fas fa-chart-pie fa-2x text-success"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Stats -->
+                        <div class="row g-4">
+                            <!-- Categories -->
+                            <div class="col-sm-6">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="fas fa-tags text-primary me-2"></i>
+                                            <h6 class="mb-0">Categories</h6>
+                                        </div>
+                                        <h3 class="fw-bold mb-0">{{ categories_count }}</h3>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Total Items -->
+                            <div class="col-sm-6">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="fas fa-box text-primary me-2"></i>
+                                            <h6 class="mb-0">Total Items</h6>
+                                        </div>
+                                        <h3 class="fw-bold mb-0">{{ items_count }}</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex justify-content-center gap-3 mt-4">
+                            <a href="/products" class="btn btn-primary px-4">
+                                <i class="fas fa-boxes me-2"></i>View Products
+                            </a>
+                            <a href="/export-inventory" class="btn btn-outline-primary px-4">
+                                <i class="fas fa-file-export me-2"></i>Export Report
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Last Updated -->
+                <div class="text-center text-muted mt-4">
+                    <small>Last updated: {{ last_updated|default('Just now') }}</small>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <!-- Required CSS -->
+    <style>
+        .card {
+            transition: transform 0.2s ease-in-out;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .btn {
+            transition: all 0.2s ease-in-out;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+
+    <!-- Add Font Awesome in your base template if not already present -->
+    {% block extra_head %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    {% endblock %}
 {% endblock %}

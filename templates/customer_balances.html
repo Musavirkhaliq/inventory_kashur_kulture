@@ -1,43 +1,210 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <div class="container">
-        <h1 class="text-center mb-4">Customer Balances</h1>
-
-        <div class="card">
-            <div class="card-header bg-info text-white">
-                <h2 class="card-title">Customer Balances</h2>
+    <div class="container py-4">
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h2 mb-0">Customer Balances</h1>
+            <div class="d-flex gap-2">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0">
+                        <i class="fas fa-search text-muted"></i>
+                    </span>
+                    <input type="text" id="customerSearch" class="form-control border-start-0" placeholder="Search customers...">
+                </div>
+                <button class="btn btn-outline-primary" onclick="exportToExcel()">
+                    <i class="fas fa-file-export me-2"></i>Export
+                </button>
             </div>
-            <div class="card-body">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Phone Number</th>
-                            <th>Address</th>
-                            <th>Balance Owe</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for customer in customers %}
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-4">
+                <div class="card border-0 bg-primary bg-opacity-10">
+                    <div class="card-body">
+                        <h6 class="text-primary mb-2">Total Customers</h6>
+                        <h3 class="mb-0">{{ customers|length }}</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 bg-danger bg-opacity-10">
+                    <div class="card-body">
+                        <h6 class="text-danger mb-2">Total Outstanding</h6>
+                        <h3 class="mb-0">${{ customers|sum(attribute='balance_owe') }}</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 bg-success bg-opacity-10">
+                    <div class="card-body">
+                        <h6 class="text-success mb-2">Average Balance</h6>
+                        <h3 class="mb-0">${{ (customers|sum(attribute='balance_owe') / customers|length)|round(2) if customers|length > 0 else 0 }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Table Card -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0" id="customersTable">
+                        <thead class="bg-light">
                             <tr>
-                                <td>{{ customer.id }}</td>
-                                <td>{{ customer.name }}</td>
-                                <td>{{ customer.email }}</td>
-                                <td>{{ customer.phone_number }}</td>
-                                <td>{{ customer.address }}</td>
-                                <td>{{ customer.balance_owe }}</td>
+                                <th class="border-0 px-4" onclick="sortTable(0)">
+                                    ID <i class="fas fa-sort ms-1"></i>
+                                </th>
+                                <th class="border-0" onclick="sortTable(1)">
+                                    Name <i class="fas fa-sort ms-1"></i>
+                                </th>
+                                <th class="border-0" onclick="sortTable(2)">
+                                    Email <i class="fas fa-sort ms-1"></i>
+                                </th>
+                                <th class="border-0" onclick="sortTable(3)">
+                                    Phone Number <i class="fas fa-sort ms-1"></i>
+                                </th>
+                                <th class="border-0">Address</th>
+                                <th class="border-0" onclick="sortTable(5)">
+                                    Balance Owe <i class="fas fa-sort ms-1"></i>
+                                </th>
+                                <th class="border-0">Actions</th>
                             </tr>
-                        {% else %}
-                            <tr>
-                                <td colspan="6" class="text-center">No customers found.</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {% for customer in customers %}
+                                <tr class="align-middle">
+                                    <td class="px-4">{{ customer.id }}</td>
+                                    <td>{{ customer.name }}</td>
+                                    <td>
+                                        <a href="mailto:{{ customer.email }}" class="text-decoration-none">
+                                            {{ customer.email }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="tel:{{ customer.phone_number }}" class="text-decoration-none">
+                                            {{ customer.phone_number }}
+                                        </a>
+                                    </td>
+                                    <td>{{ customer.address }}</td>
+                                    <td>
+                                        <span class="badge {{ 'bg-danger' if customer.balance_owe > 1000 else 'bg-warning' if customer.balance_owe > 0 else 'bg-success' }} rounded-pill px-3 py-2">
+                                            ${{ customer.balance_owe }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <button class="btn btn-sm btn-outline-primary" onclick="viewDetails({{ customer.id }})">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-success" onclick="recordPayment({{ customer.id }})">
+                                                <i class="fas fa-dollar-sign"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="7" class="text-center py-4 text-muted">
+                                        <i class="fas fa-users fa-2x mb-3 d-block"></i>
+                                        No customers found.
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- Required JavaScript -->
+    <script>
+        // Search functionality
+        document.getElementById('customerSearch').addEventListener('keyup', function() {
+            const searchValue = this.value.toLowerCase();
+            const table = document.getElementById('customersTable');
+            const rows = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+                const cells = row.getElementsByTagName('td');
+                let found = false;
+
+                for (let cell of cells) {
+                    if (cell.textContent.toLowerCase().includes(searchValue)) {
+                        found = true;
+                        break;
+                    }
+                }
+
+                row.style.display = found ? '' : 'none';
+            }
+        });
+
+        // Sorting functionality
+        function sortTable(column) {
+            const table = document.getElementById('customersTable');
+            const rows = Array.from(table.rows).slice(1);
+            const isNumeric = column === 0 || column === 5;
+
+            rows.sort((a, b) => {
+                let aValue = a.cells[column].textContent.trim();
+                let bValue = b.cells[column].textContent.trim();
+
+                if (isNumeric) {
+                    aValue = parseFloat(aValue.replace(/[^0-9.-]+/g, ''));
+                    bValue = parseFloat(bValue.replace(/[^0-9.-]+/g, ''));
+                }
+
+                if (aValue < bValue) return -1;
+                if (aValue > bValue) return 1;
+                return 0;
+            });
+
+            rows.forEach(row => table.tBodies[0].appendChild(row));
+        }
+
+        // Export functionality
+        function exportToExcel() {
+            // Add export logic here
+            alert('Export functionality to be implemented');
+        }
+
+        // View details functionality
+        function viewDetails(customerId) {
+            // Add view details logic here
+            alert('View details functionality to be implemented for customer ' + customerId);
+        }
+
+        // Record payment functionality
+        function recordPayment(customerId) {
+            // Add payment recording logic here
+            alert('Payment recording functionality to be implemented for customer ' + customerId);
+        }
+    </script>
+
+    <style>
+        .table th {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .table th:hover {
+            background-color: #f8f9fa;
+        }
+
+        .btn-group .btn {
+            padding: 0.25rem 0.5rem;
+        }
+
+        .table td, .table th {
+            padding: 1rem;
+        }
+    </style>
+
+    {% block extra_head %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    {% endblock %}
 {% endblock %}
