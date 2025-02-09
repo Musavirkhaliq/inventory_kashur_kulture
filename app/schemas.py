@@ -103,3 +103,40 @@ class Invoice(InvoiceCreate):
 
     class Config:
         from_attributes = True
+
+
+
+
+class PaymentBase(BaseModel):
+    amount: float
+    method: str
+    reference: Optional[str] = None
+    notes: Optional[str] = None
+
+class PaymentCreate(PaymentBase):
+    customer_id: int
+    date: datetime
+
+class PaymentResponse(PaymentBase):
+    id: int
+    customer_id: int
+    date: datetime
+
+    class Config:
+        from_attributes = True
+
+# class CustomerBase(BaseModel):
+#     name: str
+#     email: str
+#     phone_number: str
+#     address: str
+#     balance_owe: float
+
+class CustomerResponse(CustomerBase):
+    id: int
+    last_payment_date: Optional[datetime] = None
+    payment_count: int = 0
+    payments: List[PaymentResponse] = []
+
+    class Config:
+        from_attributes = True

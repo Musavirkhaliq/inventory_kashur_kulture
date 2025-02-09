@@ -34,6 +34,8 @@ class Customer(Base):
     )
 
     sales = relationship("Sale", back_populates="customer")
+    payments = relationship("Payment", back_populates="customer", lazy="joined")
+
 
 class SaleItem(Base):
     __tablename__ = 'sale_items'
@@ -90,3 +92,17 @@ class Invoice(Base):
     invoice_date = Column(DateTime, default=func.now(), nullable=False)
 
     sale = relationship("Sale", back_populates="invoice")
+
+from datetime import datetime
+class Payment(Base):
+    __tablename__ = "payments"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    customer_id = Column(Integer, ForeignKey("customers.id"))
+    amount = Column(Float)
+    method = Column(String)
+    reference = Column(String, nullable=True)
+    notes = Column(String, nullable=True)
+    date = Column(DateTime, default=datetime.utcnow)
+    
+    customer = relationship("Customer", back_populates="payments")

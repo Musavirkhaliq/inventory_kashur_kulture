@@ -222,3 +222,33 @@ def update_sale_payment(db: Session, sale_id: int, amount: float):
     db.commit()
     db.refresh(sale)
     return sale
+
+
+##############
+from sqlalchemy import desc
+
+def get_customer(db: Session, customer_id: int):
+    customer = db.query(models.Customer).filter(models.Customer.id == customer_id).first()
+    if customer:
+        # Get the last payment date
+        last_payment = db.query(models.Payment)\
+            .filter(models.Payment.customer_id == customer_id)\
+            .order_by(desc(models.Payment.date))\
+            .first()
+        
+        setattr(customer, 'last_payment_date', last_payment.date if last_payment else None)
+        setattr(customer, 'payment_count', len(customer.payments))
+    return customer
+
+def create_payment(db: Session, payment: schemas.PaymentCreate):
+    db_payment = models.Payment(**payment.model_dump())
+    db.add(db_payment)
+    
+    # Update customer balance
+    customer = db.query(models.Customer).filter(models.Customer.id == payment.customer_id).first()
+    if customer:
+        customer.balance_owe -= payment.amount
+    
+    db.commit()
+    db.refresh(db_payment)
+    return db_payment

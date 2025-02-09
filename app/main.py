@@ -241,3 +241,28 @@ def sales_report(request: Request, db: Session = Depends(get_db)):
         "monthly_sales_labels": monthly_sales_labels,
         "monthly_sales_data": monthly_sales_data,
     })
+
+
+###########################
+from fastapi import FastAPI, APIRouter, Depends, HTTPException
+# from sqlalchemy.orm import Session
+from . import crud, schemas, models
+from .database import engine
+# Create tables
+models.Base.metadata.create_all(bind=engine)
+
+# app = FastAPI()
+router = APIRouter()
+
+@router.get("/api/customers/{customer_id}", response_model=schemas.CustomerResponse)
+def read_customer(customer_id: int, db: Session = Depends(get_db)):
+    customer = crud.get_customer(db, customer_id)
+    if customer is None:
+        raise HTTPException(status_code=404, detail="Customer not found")
+    return customer
+
+@router.post("/api/payments", response_model=schemas.PaymentResponse)
+def create_payment(payment: schemas.PaymentCreate, db: Session = Depends(get_db)):
+    return crud.create_payment(db, payment)
+
+app.include_router(router)
