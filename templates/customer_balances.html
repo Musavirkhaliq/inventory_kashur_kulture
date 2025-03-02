@@ -1,461 +1,550 @@
-{% extends "base.html" %}
+{% extends "base.html" %} {% block content %}
+<div class="container py-4">
+  <!-- Page Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2 mb-0">Customer Balances</h1>
+    <div class="d-flex gap-2">
+      <div class="input-group">
+        <span class="input-group-text bg-white border-end-0">
+          <i class="fas fa-search text-muted"></i>
+        </span>
+        <input
+          type="text"
+          id="customerSearch"
+          class="form-control border-start-0"
+          placeholder="Search customers..."
+        />
+      </div>
+      <button class="btn btn-outline-primary" onclick="exportToExcel()">
+        <i class="fas fa-file-export me-2"></i>Export
+      </button>
+    </div>
+  </div>
 
-{% block content %}
-    <div class="container py-4">
-        <!-- Page Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="h2 mb-0">Customer Balances</h1>
-            <div class="d-flex gap-2">
-                <div class="input-group">
-                    <span class="input-group-text bg-white border-end-0">
-                        <i class="fas fa-search text-muted"></i>
-                    </span>
-                    <input type="text" id="customerSearch" class="form-control border-start-0" placeholder="Search customers...">
-                </div>
-                <button class="btn btn-outline-primary" onclick="exportToExcel()">
-                    <i class="fas fa-file-export me-2"></i>Export
-                </button>
-            </div>
+  <!-- Summary Cards -->
+  <div class="row g-4 mb-4">
+    <div class="col-md-4">
+      <div class="card border-0 bg-primary bg-opacity-10">
+        <div class="card-body">
+          <h6 class="text-primary mb-2">Total Customers</h6>
+          <h3 class="mb-0">{{ customers|length }}</h3>
         </div>
-
-        <!-- Summary Cards -->
-        <div class="row g-4 mb-4">
-            <div class="col-md-4">
-                <div class="card border-0 bg-primary bg-opacity-10">
-                    <div class="card-body">
-                        <h6 class="text-primary mb-2">Total Customers</h6>
-                        <h3 class="mb-0">{{ customers|length }}</h3>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card border-0 bg-danger bg-opacity-10">
-                    <div class="card-body">
-                        <h6 class="text-danger mb-2">Total Outstanding</h6>
-                        <h3 class="mb-0">${{ customers|sum(attribute='balance_owe') }}</h3>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card border-0 bg-success bg-opacity-10">
-                    <div class="card-body">
-                        <h6 class="text-success mb-2">Average Balance</h6>
-                        <h3 class="mb-0">${{ (customers|sum(attribute='balance_owe') / customers|length)|round(2) if customers|length > 0 else 0 }}</h3>
-                    </div>
-                </div>
-            </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-0 bg-danger bg-opacity-10">
+        <div class="card-body">
+          <h6 class="text-danger mb-2">Total Outstanding</h6>
+          <h3 class="mb-0">${{ customers|sum(attribute='balance_owe') }}</h3>
         </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-0 bg-success bg-opacity-10">
+        <div class="card-body">
+          <h6 class="text-success mb-2">Average Balance</h6>
+          <h3 class="mb-0">
+            ${{ (customers|sum(attribute='balance_owe') /
+            customers|length)|round(2) if customers|length > 0 else 0 }}
+          </h3>
+        </div>
+      </div>
+    </div>
+  </div>
 
-        <!-- Main Table Card -->
-        <div class="card border-0 shadow-sm">
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0" id="customersTable">
-                        <thead class="bg-light">
-                            <tr>
-                                <th class="border-0 px-4" onclick="sortTable(0)">
-                                    ID <i class="fas fa-sort ms-1"></i>
-                                </th>
-                                <th class="border-0" onclick="sortTable(1)">
-                                    Name <i class="fas fa-sort ms-1"></i>
-                                </th>
-                                <th class="border-0" onclick="sortTable(2)">
-                                    Email <i class="fas fa-sort ms-1"></i>
-                                </th>
-                                <th class="border-0" onclick="sortTable(3)">
-                                    Phone Number <i class="fas fa-sort ms-1"></i>
-                                </th>
-                                <th class="border-0">Address</th>
-                                <th class="border-0" onclick="sortTable(5)">
-                                    Balance Owe <i class="fas fa-sort ms-1"></i>
-                                </th>
-                                <th class="border-0">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for customer in customers %}
-                                <tr class="align-middle">
-                                    <td class="px-4">{{ customer.id }}</td>
-                                    <td>{{ customer.name }}</td>
-                                    <td>
-                                        <a href="mailto:{{ customer.email }}" class="text-decoration-none">
-                                            {{ customer.email }}
-                                        </a>
-                                    </td>
-                                    <td>
-                                        <a href="tel:{{ customer.phone_number }}" class="text-decoration-none">
-                                            {{ customer.phone_number }}
-                                        </a>
-                                    </td>
-                                    <td>{{ customer.address }}</td>
-                                    <td>
-                                        <span class="badge {{ 'bg-danger' if customer.balance_owe > 1000 else 'bg-warning' if customer.balance_owe > 0 else 'bg-success' }} rounded-pill px-3 py-2">
-                                            ${{ customer.balance_owe }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group">
-                                            <button class="btn btn-sm btn-outline-primary" onclick="viewDetails({{ customer.id }})">
+  <!-- Main Table Card -->
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0" id="customersTable">
+          <thead class="bg-light">
+            <tr>
+              <th class="border-0 px-4" onclick="sortTable(0)">
+                ID <i class="fas fa-sort ms-1"></i>
+              </th>
+              <th class="border-0" onclick="sortTable(1)">
+                Name <i class="fas fa-sort ms-1"></i>
+              </th>
+              <th class="border-0" onclick="sortTable(2)">
+                Email <i class="fas fa-sort ms-1"></i>
+              </th>
+              <th class="border-0" onclick="sortTable(3)">
+                Phone Number <i class="fas fa-sort ms-1"></i>
+              </th>
+              <th class="border-0">Address</th>
+              <th class="border-0" onclick="sortTable(5)">
+                Balance Owe <i class="fas fa-sort ms-1"></i>
+              </th>
+              <th class="border-0">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for customer in customers %}
+            <tr class="align-middle">
+              <td class="px-4">{{ customer.id }}</td>
+              <td>{{ customer.name }}</td>
+              <td>
+                <a
+                  href="mailto:{{ customer.email }}"
+                  class="text-decoration-none"
+                >
+                  {{ customer.email }}
+                </a>
+              </td>
+              <td>
+                <a
+                  href="tel:{{ customer.phone_number }}"
+                  class="text-decoration-none"
+                >
+                  {{ customer.phone_number }}
+                </a>
+              </td>
+              <td>{{ customer.address }}</td>
+              <td>
+                <span
+                  class="badge {{ 'bg-danger' if customer.balance_owe > 1000 else 'bg-warning' if customer.balance_owe > 0 else 'bg-success' }} rounded-pill px-3 py-2"
+                >
+                  ${{ customer.balance_owe }}
+                </span>
+              </td>
+              <td>
+                <div class="btn-group">
+                  <!-- <button class="btn btn-sm btn-outline-primary" onclick="viewDetails({{ customer.id }})">
                                                 <i class="fas fa-eye"></i>
                                             </button>
                                             <button class="btn btn-sm btn-outline-success" onclick="recordPayment({{ customer.id }})">
                                                 <i class="fas fa-dollar-sign"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            {% else %}
-                                <tr>
-                                    <td colspan="7" class="text-center py-4 text-muted">
-                                        <i class="fas fa-users fa-2x mb-3 d-block"></i>
-                                        No customers found.
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                                            </button> -->
                 </div>
-            </div>
-        </div>
+              </td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="7" class="text-center py-4 text-muted">
+                <i class="fas fa-users fa-2x mb-3 d-block"></i>
+                No customers found.
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
+  </div>
+</div>
 
-        <!-- View Details Modal -->
+<!-- View Details Modal -->
 <div class="modal fade" id="viewDetailsModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content shadow-lg border-0">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title"><i class="bi bi-person-circle"></i> Customer Details</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content shadow-lg border-0">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">
+          <i class="bi bi-person-circle"></i> Customer Details
+        </h5>
+        <button
+          type="button"
+          class="btn-close btn-close-white"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-4">
+          <!-- Personal Information -->
+          <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+              <div class="card-body">
+                <h6 class="card-subtitle mb-3 text-muted">
+                  <i class="bi bi-info-circle"></i> Personal Information
+                </h6>
+                <dl class="row mb-0">
+                  <dt class="col-sm-4">Name</dt>
+                  <dd class="col-sm-8 fw-bold" id="detailName"></dd>
+
+                  <dt class="col-sm-4">Email</dt>
+                  <dd class="col-sm-8 text-primary" id="detailEmail"></dd>
+
+                  <dt class="col-sm-4">Phone</dt>
+                  <dd class="col-sm-8" id="detailPhone"></dd>
+
+                  <dt class="col-sm-4">Address</dt>
+                  <dd class="col-sm-8" id="detailAddress"></dd>
+                </dl>
+              </div>
             </div>
-            <div class="modal-body">
-                <div class="row g-4">
-                    <!-- Personal Information -->
-                    <div class="col-md-6">
-                        <div class="card border-0 shadow-sm">
-                            <div class="card-body">
-                                <h6 class="card-subtitle mb-3 text-muted"><i class="bi bi-info-circle"></i> Personal Information</h6>
-                                <dl class="row mb-0">
-                                    <dt class="col-sm-4">Name</dt>
-                                    <dd class="col-sm-8 fw-bold" id="detailName"></dd>
+          </div>
 
-                                    <dt class="col-sm-4">Email</dt>
-                                    <dd class="col-sm-8 text-primary" id="detailEmail"></dd>
+          <!-- Financial Summary -->
+          <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+              <div class="card-body">
+                <h6 class="card-subtitle mb-3 text-muted">
+                  <i class="bi bi-cash-coin"></i> Financial Summary
+                </h6>
+                <dl class="row mb-0">
+                  <dt class="col-sm-6">Current Balance</dt>
+                  <dd
+                    class="col-sm-6 text-success fw-bold"
+                    id="detailBalance"
+                  ></dd>
 
-                                    <dt class="col-sm-4">Phone</dt>
-                                    <dd class="col-sm-8" id="detailPhone"></dd>
+                  <dt class="col-sm-6">Last Payment Date</dt>
+                  <dd class="col-sm-6" id="detailLastPayment"></dd>
 
-                                    <dt class="col-sm-4">Address</dt>
-                                    <dd class="col-sm-8" id="detailAddress"></dd>
-                                </dl>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Financial Summary -->
-                    <div class="col-md-6">
-                        <div class="card border-0 shadow-sm">
-                            <div class="card-body">
-                                <h6 class="card-subtitle mb-3 text-muted"><i class="bi bi-cash-coin"></i> Financial Summary</h6>
-                                <dl class="row mb-0">
-                                    <dt class="col-sm-6">Current Balance</dt>
-                                    <dd class="col-sm-6 text-success fw-bold" id="detailBalance"></dd>
-
-                                    <dt class="col-sm-6">Last Payment Date</dt>
-                                    <dd class="col-sm-6" id="detailLastPayment"></dd>
-
-                                    <dt class="col-sm-6">Payment History</dt>
-                                    <dd class="col-sm-6" id="detailPaymentCount"></dd>
-                                </dl>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Payment History Table -->
-                <div class="mt-4">
-                    <h6 class="mb-3"><i class="bi bi-receipt"></i> Recent Payments</h6>
-                    <div class="table-responsive">
-                        <table class="table table-hover table-bordered align-middle" id="paymentHistoryTable">
-                            <thead class="table-primary">
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Amount</th>
-                                    <th>Method</th>
-                                    <th>Reference</th>
-                                </tr>
-                            </thead>
-                            <tbody id="paymentHistoryBody"></tbody>
-                        </table>
-                    </div>
-                </div>
+                  <dt class="col-sm-6">Payment History</dt>
+                  <dd class="col-sm-6" id="detailPaymentCount"></dd>
+                </dl>
+              </div>
             </div>
+          </div>
         </div>
+
+        <!-- Payment History Table -->
+        <div class="mt-4">
+          <h6 class="mb-3"><i class="bi bi-receipt"></i> Recent Payments</h6>
+          <div class="table-responsive">
+            <table
+              class="table table-hover table-bordered align-middle"
+              id="paymentHistoryTable"
+            >
+              <thead class="table-primary">
+                <tr>
+                  <th>Date</th>
+                  <th>Amount</th>
+                  <th>Method</th>
+                  <th>Reference</th>
+                </tr>
+              </thead>
+              <tbody id="paymentHistoryBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
 
 <!-- Record Payment Modal -->
 <div class="modal fade" id="recordPaymentModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content shadow-lg border-0">
-            <div class="modal-header bg-success text-white">
-                <h5 class="modal-title"><i class="bi bi-wallet-fill"></i> Record Payment</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+  <div class="modal-dialog">
+    <div class="modal-content shadow-lg border-0">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title">
+          <i class="bi bi-wallet-fill"></i> Record Payment
+        </h5>
+        <button
+          type="button"
+          class="btn-close btn-close-white"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form id="paymentForm">
+          <input type="hidden" id="paymentCustomerId" />
+          <div class="mb-3">
+            <label class="form-label">Customer Name</label>
+            <input
+              type="text"
+              class="form-control"
+              id="paymentCustomerName"
+              readonly
+            />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Current Balance</label>
+            <input
+              type="text"
+              class="form-control"
+              id="paymentCurrentBalance"
+              readonly
+            />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Payment Amount *</label>
+            <div class="input-group">
+              <span class="input-group-text">$</span>
+              <input
+                type="number"
+                class="form-control"
+                id="paymentAmount"
+                required
+                step="0.01"
+                min="0.01"
+              />
             </div>
-            <div class="modal-body">
-                <form id="paymentForm">
-                    <input type="hidden" id="paymentCustomerId">
-                    <div class="mb-3">
-                        <label class="form-label">Customer Name</label>
-                        <input type="text" class="form-control" id="paymentCustomerName" readonly>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Current Balance</label>
-                        <input type="text" class="form-control" id="paymentCurrentBalance" readonly>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Payment Amount *</label>
-                        <div class="input-group">
-                            <span class="input-group-text">$</span>
-                            <input type="number" class="form-control" id="paymentAmount" required step="0.01" min="0.01">
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Payment Method *</label>
-                        <select class="form-select" id="paymentMethod" required>
-                            <option value="">Select payment method</option>
-                            <option value="cash">Cash</option>
-                            <option value="credit_card">Credit Card</option>
-                            <option value="bank_transfer">Bank Transfer</option>
-                            <option value="check">Check</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Reference Number</label>
-                        <input type="text" class="form-control" id="paymentReference" placeholder="Optional">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Notes</label>
-                        <textarea class="form-control" id="paymentNotes" rows="2" placeholder="Optional"></textarea>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle"></i> Cancel</button>
-                <button type="button" class="btn btn-success" onclick="submitPayment()"><i class="bi bi-check-circle"></i> Record Payment</button>
-            </div>
-        </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Payment Method *</label>
+            <select class="form-select" id="paymentMethod" required>
+              <option value="">Select payment method</option>
+              <option value="cash">Cash</option>
+              <option value="credit_card">Credit Card</option>
+              <option value="bank_transfer">Bank Transfer</option>
+              <option value="check">Check</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Reference Number</label>
+            <input
+              type="text"
+              class="form-control"
+              id="paymentReference"
+              placeholder="Optional"
+            />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Notes</label>
+            <textarea
+              class="form-control"
+              id="paymentNotes"
+              rows="2"
+              placeholder="Optional"
+            ></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-outline-secondary"
+          data-bs-dismiss="modal"
+        >
+          <i class="bi bi-x-circle"></i> Cancel
+        </button>
+        <button type="button" class="btn btn-success" onclick="submitPayment()">
+          <i class="bi bi-check-circle"></i> Record Payment
+        </button>
+      </div>
     </div>
+  </div>
 </div>
 
 <!-- Include Bootstrap Icons -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"
+/>
 
+<!-- Required JavaScript -->
+<script>
+  // Initialize modals
+  let viewDetailsModal, recordPaymentModal;
 
-    <!-- Required JavaScript -->
-    <script>
-        // Initialize modals
-        let viewDetailsModal, recordPaymentModal;
+  document.addEventListener("DOMContentLoaded", function () {
+    // Initialize modals
+    viewDetailsModal = new bootstrap.Modal(
+      document.getElementById("viewDetailsModal")
+    );
+    recordPaymentModal = new bootstrap.Modal(
+      document.getElementById("recordPaymentModal")
+    );
+  });
 
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize modals
-            viewDetailsModal = new bootstrap.Modal(document.getElementById('viewDetailsModal'));
-            recordPaymentModal = new bootstrap.Modal(document.getElementById('recordPaymentModal'));
-        });
-        
-        // View details functionality
-        async function viewDetails(customerId) {
-            try {
-                const response = await fetch(`/api/customers/${customerId}`);
-                const customer = await response.json();
-                
-                // Update customer details
-                document.getElementById('detailName').textContent = customer.name;
-                document.getElementById('detailEmail').textContent = customer.email;
-                document.getElementById('detailPhone').textContent = customer.phone_number;
-                document.getElementById('detailAddress').textContent = customer.address;
-                document.getElementById('detailBalance').textContent = `$${customer.balance_owe}`;
-                document.getElementById('detailLastPayment').textContent = customer.last_payment_date || 'No payments';
-                document.getElementById('detailPaymentCount').textContent = `${customer.payment_count || 0} payments`;
-                
-                // Update payment history table
-                const paymentHistoryBody = document.getElementById('paymentHistoryBody');
-                paymentHistoryBody.innerHTML = '';
-                
-                if (customer.payments && customer.payments.length > 0) {
-                    customer.payments.forEach(payment => {
-                        paymentHistoryBody.innerHTML += `
+  // View details functionality
+  async function viewDetails(customerId) {
+    try {
+      const response = await fetch(`/api/customers/${customerId}`);
+      const customer = await response.json();
+
+      // Update customer details
+      document.getElementById("detailName").textContent = customer.name;
+      document.getElementById("detailEmail").textContent = customer.email;
+      document.getElementById("detailPhone").textContent =
+        customer.phone_number;
+      document.getElementById("detailAddress").textContent = customer.address;
+      document.getElementById(
+        "detailBalance"
+      ).textContent = `$${customer.balance_owe}`;
+      document.getElementById("detailLastPayment").textContent =
+        customer.last_payment_date || "No payments";
+      document.getElementById("detailPaymentCount").textContent = `${
+        customer.payment_count || 0
+      } payments`;
+
+      // Update payment history table
+      const paymentHistoryBody = document.getElementById("paymentHistoryBody");
+      paymentHistoryBody.innerHTML = "";
+
+      if (customer.payments && customer.payments.length > 0) {
+        customer.payments.forEach((payment) => {
+          paymentHistoryBody.innerHTML += `
                             <tr>
-                                <td>${new Date(payment.date).toLocaleDateString()}</td>
+                                <td>${new Date(
+                                  payment.date
+                                ).toLocaleDateString()}</td>
                                 <td>$${payment.amount}</td>
                                 <td>${payment.method}</td>
-                                <td>${payment.reference || '-'}</td>
+                                <td>${payment.reference || "-"}</td>
                             </tr>
                         `;
-                    });
-                } else {
-                    paymentHistoryBody.innerHTML = `
+        });
+      } else {
+        paymentHistoryBody.innerHTML = `
                         <tr>
                             <td colspan="4" class="text-center text-muted">No payment history available</td>
                         </tr>
                     `;
-                }
-                
-                viewDetailsModal.show();
-            } catch (error) {
-                console.error('Error fetching customer details:', error);
-                alert('Failed to load customer details. Please try again.');
-            }
-            
+      }
+
+      viewDetailsModal.show();
+    } catch (error) {
+      console.error("Error fetching customer details:", error);
+      alert("Failed to load customer details. Please try again.");
+    }
+  }
+
+  // Record payment functionality
+  async function recordPayment(customerId) {
+    try {
+      const response = await fetch(`/api/customers/${customerId}`);
+      const customer = await response.json();
+
+      // Update payment form
+      document.getElementById("paymentCustomerId").value = customer.id;
+      document.getElementById("paymentCustomerName").value = customer.name;
+      document.getElementById(
+        "paymentCurrentBalance"
+      ).value = `$${customer.balance_owe}`;
+
+      // Reset form fields
+      document.getElementById("paymentAmount").value = "";
+      document.getElementById("paymentMethod").value = "";
+      document.getElementById("paymentReference").value = "";
+      document.getElementById("paymentNotes").value = "";
+
+      recordPaymentModal.show();
+    } catch (error) {
+      console.error("Error loading customer for payment:", error);
+      alert("Failed to load customer information. Please try again.");
+    }
+  }
+
+  // Submit payment
+  async function submitPayment() {
+    const form = document.getElementById("paymentForm");
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    const paymentData = {
+      customer_id: document.getElementById("paymentCustomerId").value,
+      amount: parseFloat(document.getElementById("paymentAmount").value),
+      method: document.getElementById("paymentMethod").value,
+      reference: document.getElementById("paymentReference").value,
+      notes: document.getElementById("paymentNotes").value,
+      date: new Date().toISOString(),
+    };
+
+    try {
+      const response = await fetch("/api/payments", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(paymentData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Payment failed");
+      }
+
+      // Close modal and refresh page
+      recordPaymentModal.hide();
+      location.reload();
+    } catch (error) {
+      console.error("Error recording payment:", error);
+      alert("Failed to record payment. Please try again.");
+    }
+  }
+  // Search functionality
+  document
+    .getElementById("customerSearch")
+    .addEventListener("keyup", function () {
+      const searchValue = this.value.toLowerCase();
+      const table = document.getElementById("customersTable");
+      const rows = table.getElementsByTagName("tr");
+
+      for (let i = 1; i < rows.length; i++) {
+        const row = rows[i];
+        const cells = row.getElementsByTagName("td");
+        let found = false;
+
+        for (let cell of cells) {
+          if (cell.textContent.toLowerCase().includes(searchValue)) {
+            found = true;
+            break;
+          }
         }
 
-        // Record payment functionality
-        async function recordPayment(customerId) {
-            try {
-                const response = await fetch(`/api/customers/${customerId}`);
-                const customer = await response.json();
-                
-                // Update payment form
-                document.getElementById('paymentCustomerId').value = customer.id;
-                document.getElementById('paymentCustomerName').value = customer.name;
-                document.getElementById('paymentCurrentBalance').value = `$${customer.balance_owe}`;
-                
-                // Reset form fields
-                document.getElementById('paymentAmount').value = '';
-                document.getElementById('paymentMethod').value = '';
-                document.getElementById('paymentReference').value = '';
-                document.getElementById('paymentNotes').value = '';
-                
-                recordPaymentModal.show();
-            } catch (error) {
-                console.error('Error loading customer for payment:', error);
-                alert('Failed to load customer information. Please try again.');
-            }
-        }
+        row.style.display = found ? "" : "none";
+      }
+    });
 
-        // Submit payment
-        async function submitPayment() {
-            const form = document.getElementById('paymentForm');
-            if (!form.checkValidity()) {
-                form.reportValidity();
-                return;
-            }
+  // Sorting functionality
+  function sortTable(column) {
+    const table = document.getElementById("customersTable");
+    const rows = Array.from(table.rows).slice(1);
+    const isNumeric = column === 0 || column === 5;
 
-            const paymentData = {
-                customer_id: document.getElementById('paymentCustomerId').value,
-                amount: parseFloat(document.getElementById('paymentAmount').value),
-                method: document.getElementById('paymentMethod').value,
-                reference: document.getElementById('paymentReference').value,
-                notes: document.getElementById('paymentNotes').value,
-                date: new Date().toISOString()
-            };
+    rows.sort((a, b) => {
+      let aValue = a.cells[column].textContent.trim();
+      let bValue = b.cells[column].textContent.trim();
 
-            try {
-                const response = await fetch('/api/payments', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(paymentData)
-                });
+      if (isNumeric) {
+        aValue = parseFloat(aValue.replace(/[^0-9.-]+/g, ""));
+        bValue = parseFloat(bValue.replace(/[^0-9.-]+/g, ""));
+      }
 
-                if (!response.ok) {
-                    throw new Error('Payment failed');
-                }
+      if (aValue < bValue) return -1;
+      if (aValue > bValue) return 1;
+      return 0;
+    });
 
-                // Close modal and refresh page
-                recordPaymentModal.hide();
-                location.reload();
-            } catch (error) {
-                console.error('Error recording payment:', error);
-                alert('Failed to record payment. Please try again.');
-            }
-        }
-        // Search functionality
-        document.getElementById('customerSearch').addEventListener('keyup', function() {
-            const searchValue = this.value.toLowerCase();
-            const table = document.getElementById('customersTable');
-            const rows = table.getElementsByTagName('tr');
+    rows.forEach((row) => table.tBodies[0].appendChild(row));
+  }
 
-            for (let i = 1; i < rows.length; i++) {
-                const row = rows[i];
-                const cells = row.getElementsByTagName('td');
-                let found = false;
+  // Export functionality
+  function exportToExcel() {
+    // Add export logic here
+    alert("Export functionality to be implemented");
+  }
 
-                for (let cell of cells) {
-                    if (cell.textContent.toLowerCase().includes(searchValue)) {
-                        found = true;
-                        break;
-                    }
-                }
+  // View details functionality
+  // function viewDetails(customerId) {
+  //     // Add view details logic here
+  //     alert('View details functionality to be implemented for customer ' + customerId);
+  // }
 
-                row.style.display = found ? '' : 'none';
-            }
-        });
+  // // Record payment functionality
+  // function recordPayment(customerId) {
+  //     // Add payment recording logic here
+  //     alert('Payment recording functionality to be implemented for customer ' + customerId);
+  // }
+</script>
 
-        // Sorting functionality
-        function sortTable(column) {
-            const table = document.getElementById('customersTable');
-            const rows = Array.from(table.rows).slice(1);
-            const isNumeric = column === 0 || column === 5;
+<style>
+  .table th {
+    cursor: pointer;
+    user-select: none;
+  }
 
-            rows.sort((a, b) => {
-                let aValue = a.cells[column].textContent.trim();
-                let bValue = b.cells[column].textContent.trim();
+  .table th:hover {
+    background-color: #f8f9fa;
+  }
 
-                if (isNumeric) {
-                    aValue = parseFloat(aValue.replace(/[^0-9.-]+/g, ''));
-                    bValue = parseFloat(bValue.replace(/[^0-9.-]+/g, ''));
-                }
+  .btn-group .btn {
+    padding: 0.25rem 0.5rem;
+  }
 
-                if (aValue < bValue) return -1;
-                if (aValue > bValue) return 1;
-                return 0;
-            });
+  .table td,
+  .table th {
+    padding: 1rem;
+  }
+</style>
 
-            rows.forEach(row => table.tBodies[0].appendChild(row));
-        }
-
-        // Export functionality
-        function exportToExcel() {
-            // Add export logic here
-            alert('Export functionality to be implemented');
-        }
-
-        // View details functionality
-        // function viewDetails(customerId) {
-        //     // Add view details logic here
-        //     alert('View details functionality to be implemented for customer ' + customerId);
-        // }
-
-        // // Record payment functionality
-        // function recordPayment(customerId) {
-        //     // Add payment recording logic here
-        //     alert('Payment recording functionality to be implemented for customer ' + customerId);
-        // }
-
-        
-    </script>
-
-    <style>
-        .table th {
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .table th:hover {
-            background-color: #f8f9fa;
-        }
-
-        .btn-group .btn {
-            padding: 0.25rem 0.5rem;
-        }
-
-        .table td, .table th {
-            padding: 1rem;
-        }
-    </style>
-
-    {% block extra_head %}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    {% endblock %}
-{% endblock %}
+{% block extra_head %}
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+/>
+{% endblock %} {% endblock %}
