@@ -1,6 +1,8 @@
 from fastapi import FastAPI, Request 
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
+
+from .web_routers import router as web_routers
 from .api_router import router as api_router
 from app.utils.utils import render_template
 
@@ -22,3 +24,4 @@ def read_root(request: Request):
 
 
 app.include_router(api_router)
+app.include_router(web_routers)

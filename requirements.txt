@@ -6,3 +6,10 @@ pydantic
 python-jose[cryptography]
 passlib
 jinja2
+itsdangerous
+authlib
+httpx
+pydantic-settings
+python-dotenv
+bcrypt
+python-multipart

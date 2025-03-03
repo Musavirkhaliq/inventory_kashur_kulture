@@ -1,41 +1,84 @@
-.
-├── app
-│   ├── crud.py
-│   ├── database.py
-│   ├── main.py
-│   ├── models.py
-│   └── schemas.py
-├── __init__.py
-├── inventory.db
-├── learn.md
-├── print_contents.txt
-├── README.md
-├── requirements.txt
-├── specifications.txt
-├── static
-│   ├── css
-│   │   └── style.css
-│   └── js
-│       └── main.js
-├── structure.txt
-├── templates
-│   ├── base.html
-│   ├── customer_balances.html
-│   ├── customers.html
-│   ├── customer_transactions.html
-│   ├── edit_product.html
-│   ├── index.html
-│   ├── inventory_value.html
-│   ├── invoices.html
-│   ├── invoice_template.html
-│   ├── products.html
-│   ├── restocks.html
-│   ├── sales.html
-│   └── sales_report.html
-└── test.py
+<!-- Structure -->
 
-7 directories, 43 files
-\n\n./test.py:\n
+app/
+├── auth/
+│ ├── router.py
+│ ├── oauth.py
+│ └── services.py
+│ ├── dependencies.py
+├── _pycache_/
+├── customers/
+│ ├── router.py
+│ ├── schemas.py
+│ └── services.py
+├── invoices/
+│ ├── router.py
+│ ├── schemas.py
+│ └── services.py
+├── products/
+│ ├── router.py
+│ ├── schemas.py
+│ └── services.py
+├── restock/
+│ ├── router.py
+│ ├── schemas.py
+│ └── services.py
+├── sales/
+│ ├── router.py
+│ ├── schemas.py
+│ └── services.py
+├── users/
+│ ├── router.py
+│ ├── schemas.py
+│ └── services.py
+├── models/
+│ ├── customer_models.py
+| ├── email_varification.py
+│ ├── invoice_models.py
+│ ├── user_model.py
+│ ├── products_models.py
+│ ├── restock_models.py
+│ ├── sale_models.py
+├── utils/
+│ ├──utils.py
+
+├── venv/
+├── **init**.py
+├── api_router.py
+├── config.py
+├── crud.py
+├── database.py
+├── main.py
+├── models.py
+├── schemas.py
+├── web_routers.py
+├── frontend/
+├── static/
+|--templates/
+| ├── callback.html
+| ├── login.py
+| ├── register.py
+| ├── varify_email.py
+├── node_modules/
+├── static/
+├── templates/
+│ ├── base.py
+│ ├── customer_models.py
+│ ├── customer_balances.py
+| ├── customer_transactions.py
+│ ├── customers.py
+│ ├── edit_product.py
+│ ├── index.py
+│ ├── inventory_value.py
+│ ├── invoice_template.py
+│ ├── invoices.py
+│ ├── products.py
+│ ├── restocks.py
+│ └── sales_report.py
+│ └── sales.py
+└── venv/
+
+
 from fastapi import FastAPI
 from pydantic import BaseModel
 
