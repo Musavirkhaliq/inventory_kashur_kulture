@@ -3,10 +3,16 @@ from fastapi.templating import Jinja2Templates
 from passlib.context import CryptContext
 # Initialize templates
 templates = Jinja2Templates(directory="templates")
+frontend_templates = Jinja2Templates(directory="frontend/templates")
 
 def render_template(template_name: str, request, context: dict = {}):
     context["request"] = request
     return templates.TemplateResponse(template_name, context)
+
+def render_frontend_template(template_name: str, request, context: dict = {}):
+    context["request"] = request
+    return frontend_templates.TemplateResponse(template_name, context)
+
 
 
 # Password hashing utilities
