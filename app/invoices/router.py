@@ -4,7 +4,8 @@ from sqlalchemy.orm import Session, joinedload
 from typing import List
 
 from app.database import get_db
-from ..models import invoice_models, sale_models
+from ..models import invoice_models, sale_models,customer_models
+
 from app.invoices.schemas import Invoice, InvoiceCreate
 from app.invoices.services import get_all_invoices, create_invoice as create_invoice_service
 from app.utils.utils import render_template
@@ -45,3 +46,9 @@ def generate_invoice(invoice_id: int, request: Request, db: Session = Depends(ge
         raise HTTPException(status_code=404, detail="Invoice not found")
 
     return render_template("invoice_template.html", request, {"invoice": invoice})
+
+
+@router.get("/customers/balances", response_class=HTMLResponse)
+def customer_balances(request: Request, db: Session = Depends(get_db)):
+    customers = db.query(customer_models.Customer).all()
+    return render_template("customer_balances.html", request, {"customers": customers})

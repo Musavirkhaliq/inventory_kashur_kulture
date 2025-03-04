@@ -5,9 +5,9 @@ from typing import List
 
 from app.database import get_db
 from ..models import customer_models
-from app.customers.schemas import CustomerCreate, Customer, CustomerResponse 
+from app.customers.schemas import CustomerCreate, Customer, CustomerResponse
 from app.customers.services import get_all_customers, get_customer_by_id, create_customer_service
-from app.utils.utils import render_template  
+from app.utils.utils import render_template
 
 router = APIRouter(prefix="/customers", tags=["customers"])
 
@@ -23,7 +23,7 @@ def create_customer(customer: CustomerCreate, db: Session = Depends(get_db)):
     return create_customer_service(db, customer)
 
 # Route to get a specific customer by ID (JSON response)
-@router.get("/{customer_id}", response_model=CustomerResponse)  
+@router.get("/{customer_id}", response_model=CustomerResponse)
 def read_customer(customer_id: int, db: Session = Depends(get_db)):
     customer = get_customer_by_id(db, customer_id)
     if customer is None:
@@ -41,7 +41,7 @@ def view_customer_transactions(request: Request, customer_id: int, db: Session =
     return render_template("customer_transactions.html", request, {"customer": customer, "transactions": transactions})
 
 # Route to display customer balances (HTML response)
-@router.get("/balances", response_class=HTMLResponse)
-def customer_balances(request: Request, db: Session = Depends(get_db)):
-    customers = get_all_customers(db)
-    return render_template("customer_balances.html", request, {"customers": customers})
+# @router.get("/customers/balances", response_class=HTMLResponse)
+# def customer_balances(request: Request, db: Session = Depends(get_db)):
+#     customers = db.query(customer_models.Customer).all()
+#     return render_template("customer_balances.html", request, {"customers": customers})

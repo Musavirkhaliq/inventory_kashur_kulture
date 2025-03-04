@@ -1,0 +1,138 @@
+{% extends "base.html" %} {% block content %}
+<!-- Hero Section (E-commerce Style) -->
+<div class="hero-section position-relative overflow-hidden">
+  <div
+    class="position-absolute top-0 start-0 w-100 h-100"
+    style="
+      background: linear-gradient(
+        135deg,
+        rgba(67, 97, 238, 0.9) 0%,
+        rgba(63, 55, 201, 0.9) 100%
+      );
+      z-index: -1;
+    "
+  ></div>
+  <div
+    class="container py-5 text-center text-white h-100 d-flex align-items-center justify-content-center"
+  >
+    <div class="hero-content">
+      <h1 class="display-3 fw-bold mb-3 animate__animated animate__fadeIn">
+        Welcome to KashurKulture
+      </h1>
+      <a
+        href="/products"
+        class="btn btn-light btn-lg px-5 py-3 rounded-pill shadow-sm hover-scale animate__animated animate__fadeIn animate__delay-2s"
+      >
+        <i class="fas fa-box-open me-2"></i>Shop Now
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Links Section with Enhanced Cards (E-commerce Focus) - Placeholder -->
+<div class="container my-6">
+  <h2 class="text-center mb-5 position-relative">
+    <span class="border-bottom border-primary border-3 pb-2"
+      >Frontend side (Coming Soon!)</span
+    >
+  </h2>
+  <div class="row g-4">
+    <!-- Placeholder for future implementation -->
+    <div class="col-12 text-center">
+      <p class="text-muted">
+        Stay tuned for exciting features to manage Products, Customers, Sales,
+        Restocks, and Invoices. Check back soon!
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- Required CSS -->
+<style>
+  .hero-section {
+    min-height: 500px;
+    display: flex;
+    align-items: center;
+  }
+
+  .hero-content {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .shadow-hover {
+    transition: all 0.3s ease;
+  }
+
+  .shadow-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175) !important;
+  }
+
+  .hover-scale {
+    transition: transform 0.3s ease;
+  }
+
+  .hover-scale:hover {
+    transform: scale(1.05);
+  }
+
+  .hover-lift {
+    transition: all 0.3s ease;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-2px);
+  }
+
+  .icon-wrapper {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .transition-all {
+    transition: all 0.3s ease;
+  }
+
+  .my-6 {
+    margin-top: 4rem;
+    margin-bottom: 4rem;
+  }
+
+  /* E-commerce Branding Adjustments with New Color Scheme */
+  .btn-outline-primary,
+  .border-primary {
+    border-color: var(--primary-color) !important;
+    color: var(--primary-color);
+  }
+
+  .btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #fff;
+  }
+
+  .text-dark {
+    color: var(--dark-color);
+  }
+
+  .small.text-white-50 {
+    font-size: 0.875rem;
+    opacity: 0.7;
+  }
+</style>
+
+<!-- Add Font Awesome and Animate.css CDN links in your base template -->
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', path='style.css') }}" />
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+/>
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+/>
+{% endblock %} {% endblock %}

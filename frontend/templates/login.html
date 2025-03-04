@@ -286,10 +286,11 @@
 
           if (response.ok) {
             let result = await response.json();
-            if (result.access_token) {
-              localStorage.setItem("access_token", result.access_token);
-              window.location.href = "/";
-            }
+            // if (result.access_token) {
+            localStorage.setItem("access_token", result.access_token);
+            window.alert("Login successful!");
+            window.location.href = "/kashur_kulture";
+            // }
             return result;
           } else {
             const errorData = await response.json();
@@ -321,10 +322,6 @@
             { username: email, password: password },
             false
           );
-          if (data && data.access_token) {
-            localStorage.setItem("access_token", data.access_token);
-            window.location.href = "/";
-          }
         });
     </script>
   </body>
