@@ -43,52 +43,6 @@ view redoc api docs here
 http://localhost:9000/redoc
 ````
 
-<!-- Structure -->
-
-app/
-├── _pycache_/
-├── customers/
-│ ├── router.py
-│ ├── schemas.py
-│ └── services.py
-├── invoices/
-│ ├── router.py
-│ ├── schemas.py
-│ └── services.py
-├── products/
-│ ├── router.py
-│ ├── schemas.py
-│ └── services.py
-├── restock/
-│ ├── router.py
-│ ├── schemas.py
-│ └── services.py
-├── sales/
-│ ├── router.py
-│ ├── schemas.py
-│ └── services.py
-├── models/
-│ ├── customer_models.py
-│ ├── invoice_models.py
-│ ├── products_models.py
-│ ├── restock_models.py
-│ ├── sale_models.py
-├── utils/
-│ ├──utils.py
-
-├── venv/
-├── **init**.py
-├── api_router.py
-├── crud.py
-├── database.py
-├── main.py
-├── models.py
-├── schemas.py
-├── node_modules/
-├── static/
-├── templates/
-└── venv/
-
 Authentication
 
 - Use the default admin/public credentials
