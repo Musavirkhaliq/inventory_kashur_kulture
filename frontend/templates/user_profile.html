@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+{% block content %}
+
+<main class="main-content">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4 mb-4">
+        <div class="card shadow-lg">
+          <div class="card-header bg-primary text-white text-center">
+            <h3>My Account</h3>
+          </div>
+          <div class="card-body text-center">
+            <h4>{{ profile.username }}</h4>
+            <p class="text-muted">{{ profile.email }}</p>
+            <p>{{ profile.first_name }} {{ profile.last_name }}</p> <!-- Uncommented to show full name -->
+            <small>Member since: {{ profile.created_at.strftime('%Y-%m-%d') }}</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-8">
+        <div class="card shadow-lg animate__animated animate__fadeIn">
+          <div class="card-header bg-primary text-white">
+            <h2>Profile Details</h2>
+          </div>
+          <div class="card-body">
+            <form id="profileForm" class="needs-validation" novalidate>
+              <!-- Personal Information -->
+              <h5 class="mb-3">Personal Information</h5>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="firstName" class="form-label">First Name</label>
+                  <input type="text" class="form-control" id="firstName" value="{{ profile.first_name or '' }}" required />
+                  <div class="invalid-feedback">Please enter your first name.</div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="lastName" class="form-label">Last Name</label>
+                  <input type="text" class="form-control" id="lastName" value="{{ profile.last_name or '' }}" required />
+                  <div class="invalid-feedback">Please enter your last name.</div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="email" class="form-label">Email</label>
+                  <input type="email" class="form-control" id="email" value="{{ profile.email }}" readonly />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="phone" class="form-label">Phone Number</label>
+                  <input type="tel" class="form-control" id="phone" value="{{ profile.phone or '' }}" placeholder="Enter your phone number" />
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="dateOfBirth" class="form-label">Date of Birth</label>
+                  <input type="date" class="form-control" id="dateOfBirth" value="{{ profile.date_of_birth.strftime('%Y-%m-%d') if profile.date_of_birth else '' }}" />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="gender" class="form-label">Gender</label>
+                  <select class="form-select" id="gender">
+                    <option value="" {% if not profile.gender %}selected{% endif %}>Select Gender</option>
+                    <option value="Male" {% if profile.gender == 'Male' %}selected{% endif %}>Male</option>
+                    <option value="Female" {% if profile.gender == 'Female' %}selected{% endif %}>Female</option>
+                    <option value="Other" {% if profile.gender == 'Other' %}selected{% endif %}>Other</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Shipping Address -->
+              <h5 class="mb-3">Shipping Address</h5>
+              <div class="mb-3">
+                <label for="shippingAddress" class="form-label">Address</label>
+                <input type="text" class="form-control" id="shippingAddress" value="{{ profile.shipping_address or '' }}" placeholder="Street address" />
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="shippingCity" class="form-label">City</label>
+                  <input type="text" class="form-control" id="shippingCity" value="{{ profile.shipping_city or '' }}" />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="shippingState" class="form-label">State</label>
+                  <input type="text" class="form-control" id="shippingState" value="{{ profile.shipping_state or '' }}" />
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="shippingCountry" class="form-label">Country</label>
+                  <input type="text" class="form-control" id="shippingCountry" value="{{ profile.shipping_country or '' }}" />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="shippingPostalCode" class="form-label">Postal Code</label>
+                  <input type="text" class="form-control" id="shippingPostalCode" value="{{ profile.shipping_postal_code or '' }}" />
+                </div>
+              </div>
+
+              <!-- Preferences -->
+              <h5 class="mb-3">Preferences</h5>
+              <div class="row">
+                <div class="col-md-4 mb-3">
+                  <label for="preferredLanguage" class="form-label">Language</label>
+                  <select class="form-select" id="preferredLanguage">
+                    <option value="en" {% if profile.preferred_language == 'en' %}selected{% endif %}>English</option>
+                    <option value="es" {% if profile.preferred_language == 'es' %}selected{% endif %}>Spanish</option>
+                    <option value="hi" {% if profile.preferred_language == 'hi' %}selected{% endif %}>Hindi</option>
+                  </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label for="currencyPreference" class="form-label">Currency</label>
+                  <select class="form-select" id="currencyPreference">
+                    <option value="USD" {% if profile.currency_preference == 'USD' %}selected{% endif %}>USD</option>
+                    <option value="INR" {% if profile.currency_preference == 'INR' %}selected{% endif %}>INR</option>
+                    <option value="EUR" {% if profile.currency_preference == 'EUR' %}selected{% endif %}>EUR</option>
+                  </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label for="timezone" class="form-label">Timezone</label>
+                  <input type="text" class="form-control" id="timezone" value="{{ profile.timezone or 'UTC' }}" />
+                </div>
+              </div>
+
+              <!-- Password Update -->
+              <h5 class="mb-3">Security</h5>
+              <div class="mb-3">
+                <label for="password" class="form-label">New Password (optional)</label>
+                <input type="password" class="form-control" id="password" placeholder="Leave blank to keep current password" />
+              </div>
+
+              <button type="submit" class="btn btn-primary" id="updateProfileBtn">
+                <i class="fas fa-save me-2"></i>Update Details
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.getElementById("profileForm")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const formData = {
+      first_name: document.getElementById("firstName").value,
+      last_name: document.getElementById("lastName").value,
+      phone: document.getElementById("phone").value || null,
+      date_of_birth: document.getElementById("dateOfBirth").value || null,
+      gender: document.getElementById("gender").value || null,
+      shipping_address: document.getElementById("shippingAddress").value || null,
+      shipping_city: document.getElementById("shippingCity").value || null,
+      shipping_state: document.getElementById("shippingState").value || null,
+      shipping_country: document.getElementById("shippingCountry").value || null,
+      shipping_postal_code: document.getElementById("shippingPostalCode").value || null,
+      preferred_language: document.getElementById("preferredLanguage").value,
+      currency_preference: document.getElementById("currencyPreference").value,
+      timezone: document.getElementById("timezone").value,
+      password: document.getElementById("password").value || null
+    };
+
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+      alert("Please log in to update your profile.");
+      return;
+    }
+
+    try {
+      const response = await fetch("/users/update-profile", { 
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        alert("Profile updated successfully!");
+        window.location.reload();
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Failed to update profile.");
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      alert(error.message);
+    }
+  });
+
+  // Bootstrap validation
+  (function () {
+    "use strict";
+    var forms = document.querySelectorAll(".needs-validation");
+    Array.prototype.slice.call(forms).forEach(function (form) {
+      form.addEventListener("submit", function (event) {
+        if (!form.checkValidity()) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add("was-validated");
+      }, false);
+    });
+  })();
+</script>
+{% endblock %}
