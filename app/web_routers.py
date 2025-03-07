@@ -25,6 +25,8 @@ async def read_login(request: Request, error: Optional[str] = Query(None)):
 async def read_register(request: Request):
     return templates.TemplateResponse("register.html", {"request": request})
 
+
+
 @router.get("/verify-email", response_class=HTMLResponse)
 async def read_verify_email(
     request: Request,

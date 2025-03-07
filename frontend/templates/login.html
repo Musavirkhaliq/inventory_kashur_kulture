@@ -286,11 +286,22 @@
 
           if (response.ok) {
             let result = await response.json();
-            // if (result.access_token) {
-            localStorage.setItem("access_token", result.access_token);
-            window.alert("Login successful!");
-            window.location.href = "/kashur_kulture";
-            // }
+            if (result.access_token) {
+              localStorage.setItem(
+                "kashur_kulture_user",
+                JSON.stringify(result.user)
+              );
+              localStorage.setItem("access_token", result.access_token);
+              window.location.href = "/kashur_kulture"; // Redirect to admin dashboard
+            } else if (result.message === "verify_email") {
+              window.location.href = `/verify-email?email=${encodeURIComponent(
+                result.email
+              )}`;
+            } else {
+              throw new Error(
+                "Unexpected response from server. Please try again."
+              );
+            }
             return result;
           } else {
             const errorData = await response.json();
@@ -316,7 +327,7 @@
         ?.addEventListener("submit", async (e) => {
           const email = document.getElementById("email").value;
           const password = document.getElementById("password").value;
-          const data = await submitForm(
+          await submitForm(
             e,
             "/auth/token",
             { username: email, password: password },

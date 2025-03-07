@@ -1,14 +1,14 @@
 from sqlalchemy.orm import Session
 from ..models.user_model import User
-
 from app.models.email_varification import EmailVerification
 from ..utils.utils import get_password_hash
-from .schemas import UserCreate
+from .schemas import UserCreate, UserUpdate
 from datetime import datetime, timedelta
 import random
 import string
 import httpx
 
+# Existing functions (unchanged)
 def get_user(db: Session, user_id: int):
     return db.query(User).filter(User.id == user_id).first()
 
@@ -72,3 +72,17 @@ def create_user(db: Session, user: UserCreate):
     db.commit()
     db.refresh(db_user)
     return db_user
+
+# New function to update user profile
+def update_user_profile(db: Session, user: User, update_data: UserUpdate):
+    update_dict = update_data.dict(exclude_unset=True) 
+    for key, value in update_dict.items():
+        if key == "password" and value:
+            setattr(user, "hashed_password", get_password_hash(value))
+        elif key == "date_of_birth" and value:
+            setattr(user, key, value)
+        else:
+            setattr(user, key, value)
+    db.commit()
+    db.refresh(user)
+    return user

@@ -141,56 +141,45 @@
         transform: translateX(5px);
       }
 
-      /* E-commerce Cart Icon */
-      .nav-cart {
-        position: relative;
-        margin-left: 1rem;
-      }
-
-      .nav-cart .nav-link {
-        padding: 0.5rem 0.75rem;
-      }
-
-      .nav-cart .cart-count {
-        position: absolute;
-        top: -5px;
-        right: -5px;
-        background: var(--accent-color);
-        color: var(--dark-color);
-        border-radius: 50%;
-        width: 18px;
-        height: 18px;
-        font-size: 0.75rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
-      }
-
-      /* Account Dropdown for E-commerce */
-      .nav-account.dropdown .dropdown-toggle {
+      /* User Profile Section */
+      .nav-user {
         display: flex;
         align-items: center;
         gap: 0.5rem;
+        color: #fff;
+        font-weight: 600;
+        padding: 0.75rem 1.25rem;
+        border-radius: 10px;
+        transition: all 0.3s ease;
       }
 
-      .nav-account.dropdown .dropdown-toggle::after {
-        display: none;
+      .nav-user:hover {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.15);
+        transform: translateY(-2px);
       }
 
-      .nav-account.dropdown .dropdown-menu {
-        min-width: 200px;
-      }
-
-      .nav-account .dropdown-item {
+      /* Auth Buttons */
+      .nav-auth-buttons {
         display: flex;
-        align-items: center;
         gap: 0.5rem;
       }
 
-      .nav-account .dropdown-item i {
+      .nav-auth-buttons .btn {
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+        border-radius: 10px;
+        transition: all 0.3s ease;
         font-size: 1rem;
-        color: var(--accent-color);
+        color: #fff !important;
+        background-color: var(--accent-color);
+        border: none;
+      }
+
+      .nav-auth-buttons .btn:hover {
+        background-color: var(--secondary-color);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       }
 
       /* Main Content Area */
@@ -285,6 +274,12 @@
           transform: translateY(0);
         }
       }
+
+      /* Loading State for User Details */
+      .nav-user.loading {
+        opacity: 0.5;
+        pointer-events: none;
+      }
     </style>
   </head>
   <body>
@@ -360,7 +355,11 @@
                 <i class="fas fa-chart-line me-1"></i>Sales
               </a>
               <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">Record Sales</a></li>
+                <li>
+                  <a class="dropdown-item" href="/users/profile"
+                    >Record Sales</a
+                  >
+                </li>
                 <li>
                   <a class="dropdown-item" href="#">Sales Report</a>
                 </li>
@@ -384,7 +383,7 @@
               </a>
               <ul class="dropdown-menu">
                 <li>
-                  <a class="dropdown-item" href="#"
+                  <a class="dropdown-item" href="/users/profile"
                     ><i class="fas fa-user-circle"></i> Profile</a
                   >
                 </li>
@@ -394,11 +393,16 @@
                   >
                 </li>
                 <li>
-                  <a class="dropdown-item" href="#"
+                  <a class="dropdown-item" href="#" onclick="logout()"
                     ><i class="fas fa-sign-out-alt"></i> Logout</a
                   >
                 </li>
               </ul>
+            </li>
+
+            <li class="nav-item nav-auth-buttons">
+              <a href="/login" class="btn">Login</a>
+              <a href="/register" class="btn">Sign Up</a>
             </li>
           </ul>
         </div>
@@ -441,23 +445,31 @@
             link.classList.add("active");
           }
         });
-
-        // Update cart count (example, replace with real data from backend)
-        const cartCount = document.querySelector(".cart-count");
-        const token = localStorage.getItem("access_token");
-        if (token) {
-          fetch("/api/cart/count", {
-            headers: { Authorization: `Bearer ${token}` },
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              cartCount.textContent = data.count || 0;
-            })
-            .catch((error) =>
-              console.error("Error fetching cart count:", error)
-            );
-        }
       });
+
+      // Update cart count and user details (example, replace with real data from backend)
+      const cartCount = document.querySelector(".cart-count");
+      const token = localStorage.getItem("access_token");
+      const userDisplay = document.getElementById("userDisplay");
+
+      if (token) {
+        // Fallback: Try decoding token for username if backend fetch fails
+        const navAuthButtons = document.querySelector(".nav-auth-buttons");
+        navAuthButtons.style.display = "none";
+      } else {
+        const cartLink = document.querySelector(".nav-cart");
+        const accountLink = document.querySelector(".nav-account");
+        const userLink = document.querySelector(".nav-user");
+        if (cartLink) cartLink.style.display = "none";
+        if (accountLink) accountLink.style.display = "none";
+        if (userLink) userLink.style.display = "none";
+      }
+
+      // Logout functionality
+      function logout() {
+        localStorage.removeItem("access_token");
+        window.location.href = "/kashur_kulture";
+      }
 
       // Smooth scroll behavior
       document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
@@ -468,6 +480,38 @@
           });
         });
       });
+
+      // function navigateToProfile(event) {
+      //   event.preventDefault();
+      //   const token = localStorage.getItem("access_token");
+      //   if (!token) {
+      //     alert("Please log in to view your profile.");
+      //     window.location.href = "/login";
+      //     return;
+      //   }
+
+      //   fetch("/users/profile", {
+      //     headers: { Authorization: `Bearer ${token}` },
+      //   })
+      //     .then((response) => {
+      //       if (!response.ok)
+      //         throw new Error("Unauthorized or profile not found");
+      //       return response.text(); // Handle HTML response
+      //     })
+      //     .then((html) => {
+      //       document.open();
+      //       document.write(html);
+      //       document.close();
+      //     })
+      //     .catch((error) => {
+      //       console.error("Error fetching profile:", error);
+      //       if (error.message.includes("Unauthorized")) {
+      //         alert("Please log in to view your profile.");
+      //         localStorage.removeItem("access_token");
+      //         window.location.href = "/login";
+      //       }
+      //     });
+      // }
     </script>
     {% block extra_scripts %}{% endblock %}
   </body>
