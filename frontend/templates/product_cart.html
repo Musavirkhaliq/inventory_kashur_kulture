@@ -1,0 +1,145 @@
+{% extends "base.html" %} {% block title %}Cart | Kashur Kulture{% endblock %}
+{% block content %}
+<div class="container product-cart mt-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/">Home</a></li>
+      <li class="breadcrumb-item"><a href="/filter-products">Products</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Cart</li>
+    </ol>
+  </nav>
+
+  <h2 class="mb-4">Your Cart ({{ cart_items|length }} Items)</h2>
+
+  {% if cart_items|length > 0 %}
+  <div class="row">
+    <div class="col-md-8">
+      <div class="card mb-4">
+        <div class="card-body">
+          {% for item in cart_items %}
+          <div class="row cart-item mb-4 pb-3 border-bottom">
+            <div class="col-3">
+              <img
+                src="{{ item.product.image_url or '/static/images/placeholder.jpg' }}"
+                alt="{{ item.product.name }}"
+                class="img-fluid rounded"
+                style="max-height: 120px"
+              />
+            </div>
+            <div class="col-9">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <h5 class="mb-1">{{ item.product.name }}</h5>
+                  <p class="text-muted mb-1">{{ item.product.brand }}</p>
+                  <p class="text-muted">Size: {{ item.size or 'M' }}</p>
+                </div>
+                <div class="text-end">
+                  <p class="fw-bold">
+                    ₹{{ item.product.price * item.quantity }}
+                  </p>
+                  <p class="text-muted text-decoration-line-through">
+                    ₹{{ item.product.original_price * item.quantity }}
+                  </p>
+                  <p class="text-success">
+                    ({{ item.product.discount_percentage }}% off)
+                  </p>
+                </div>
+              </div>
+              <div
+                class="d-flex justify-content-between align-items-center mt-2"
+              >
+                <div class="quantity-selector">
+                  <button
+                    class="btn btn-sm btn-outline-secondary"
+                    onclick="updateQuantity({{ item.id }}, -1)"
+                  >
+                    -
+                  </button>
+                  <span class="mx-2">{{ item.quantity }}</span>
+                  <button
+                    class="btn btn-sm btn-outline-secondary"
+                    onclick="updateQuantity({{ item.id }}, 1)"
+                  >
+                    +
+                  </button>
+                </div>
+                <a href="/cart/remove/{{ item.id }}" class="text-danger"
+                  >Remove</a
+                >
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-header">
+          <h5>Order Summary</h5>
+        </div>
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <span>Subtotal ({{ cart_items|length }} items)</span>
+            <span>₹{{ subtotal }}</span>
+          </div>
+          <div class="d-flex justify-content-between mt-2">
+            <span>Discount</span>
+            <span class="text-success">-₹{{ discount }}</span>
+          </div>
+          <div class="d-flex justify-content-between mt-2">
+            <span>Delivery Charges</span>
+            <span>₹{{ delivery_charges }}</span>
+          </div>
+          <hr />
+          <div class="d-flex justify-content-between fw-bold">
+            <span>Total</span>
+            <span>₹{{ total }}</span>
+          </div>
+        </div>
+        <div class="card-footer">
+          <a href="/checkout" class="btn btn-primary w-100"
+            >Proceed to Checkout</a
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="text-center py-5">
+    <h4>Your cart is empty!</h4>
+    <p>
+      <a href="/filter-products" class="btn btn-outline-primary"
+        >Continue Shopping</a
+      >
+    </p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %} {% block scripts %}
+<script>
+  const token = localStorage.getItem("token");
+  function updateQuantity(cartId, change) {
+    fetch(`/cart/update/${cartId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ quantity: change > 0 ? change : -1 }),
+      credentials: "include",
+      mode: "same-origin",
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          window.location.reload(); // Reload to reflect updated cart
+        } else {
+          alert("Error updating quantity");
+        }
+      })
+      .catch((error) => console.error("Error:", error));
+  }
+</script>
+{% endblock %}

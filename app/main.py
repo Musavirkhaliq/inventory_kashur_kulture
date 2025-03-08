@@ -4,6 +4,7 @@ from fastapi.staticfiles import StaticFiles
 
 from .web_routers import router as web_routers
 from .api_router import router as api_router
+from .public_router import router as public_router
 from app.utils.utils import render_template,render_frontend_template
 from fastapi.templating import Jinja2Templates
 from passlib.context import CryptContext
@@ -18,14 +19,15 @@ app = FastAPI()
 
 # Mount static files
 app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/frontend/static", StaticFiles(directory="frontend/static"), name="static")
 
 # Root Endpoint
 @app.get("/", response_class=HTMLResponse)
 def read_root(request: Request): 
-    return render_frontend_template("/login.html", request)
+    return render_frontend_template("/index.html", request)
 
 # This index.html is in frontedn --> templates
-@app.get("/kashur_kulture", response_class=HTMLResponse)
+@app.get("/", response_class=HTMLResponse)
 def read_root(request: Request): 
     return render_frontend_template("/index.html", request)
 
@@ -37,3 +39,4 @@ def read_root(request: Request):
 
 app.include_router(api_router)
 app.include_router(web_routers)
+app.include_router(public_router)

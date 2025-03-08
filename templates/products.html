@@ -1,273 +1,657 @@
-{% extends "base.html" %}
-
-{% block content %}
+{% extends "base.html" %} {% block content %}
 <div class="container py-4">
-    <!-- Page Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h2 mb-0 text-gradient">Product Management</h1>
-        <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#addProductForm">
-            <i class="fas fa-plus me-2"></i>Add New Product
-        </button>
-    </div>
+  <!-- Page Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2 mb-0 text-gradient">Product Management</h1>
+    <button
+      class="btn btn-primary"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#addProductForm"
+    >
+      <i class="fas fa-plus me-2"></i>Add New Product
+    </button>
+  </div>
 
-    <!-- Add Product Form -->
-    <div class="collapse mb-4" id="addProductForm">
-        <div class="card border-0 shadow-sm">
-            <div class="card-header bg-gradient-primary border-0 text-white py-3">
-                <h2 class="card-title h5 mb-0"><i class="fas fa-box-open me-2"></i>Add New Product</h2>
-            </div>
-            <div class="card-body">
-                <form id="productForm" class="row g-3">
-                    <div class="col-md-6">
-                        <div class="form-floating">
-                            <input type="text" id="name" name="name" class="form-control" placeholder="Product Name" required>
-                            <label for="name">Product Name</label>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-floating">
-                            <input type="text" id="description" name="description" class="form-control" placeholder="Description">
-                            <label for="description">Description</label>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-floating">
-                            <input type="number" id="price" name="price" class="form-control" step="0.01" placeholder="Price" required>
-                            <label for="price">Price ($)</label>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-floating">
-                            <input type="number" id="quantity" name="quantity" class="form-control" placeholder="Quantity" required>
-                            <label for="quantity">Quantity</label>
-                        </div>
-                    </div>
-                    <div class="col-12 text-end">
-                        <button type="button" class="btn btn-outline-secondary me-2" data-bs-toggle="collapse" data-bs-target="#addProductForm">
-                            Cancel
-                        </button>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save me-2"></i>Save Product
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Product List -->
+  <!-- Add Product Form -->
+  <div class="collapse mb-4" id="addProductForm">
     <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white py-3">
-            <div class="row align-items-center">
-                <div class="col">
-                    <h2 class="card-title h5 mb-0"><i class="fas fa-list me-2"></i>Product List</h2>
-                </div>
-                <div class="col-auto">
-                    <div class="input-group">
-                        <span class="input-group-text bg-transparent border-end-0">
-                            <i class="fas fa-search"></i>
-                        </span>
-                        <input type="text" id="searchProduct" class="form-control border-start-0" placeholder="Search products...">
-                    </div>
-                </div>
+      <div class="card-header bg-gradient-primary border-0 text-white py-3">
+        <h2 class="card-title h5 mb-0">
+          <i class="fas fa-box-open me-2"></i>Add New Product
+        </h2>
+      </div>
+      <div class="card-body">
+        <form id="productForm" class="row g-3">
+          <!-- Basic Info -->
+          <div class="col-md-6">
+            <div class="form-floating">
+              <input
+                type="text"
+                id="name"
+                name="name"
+                class="form-control"
+                placeholder="Product Name"
+                required
+              />
+              <label for="name">Product Name</label>
             </div>
-        </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <thead class="bg-light">
-                        <tr>
-                            <th class="ps-4">ID</th>
-                            <th>Name</th>
-                            <th>Description</th>
-                            <th>Price</th>
-                            <th>Quantity</th>
-                            <th class="text-end pe-4">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for product in products %}
-                        <tr class="product-row">
-                            <td class="ps-4">{{ product.id }}</td>
-                            <td class="fw-medium">{{ product.name }}</td>
-                            <td>{{ product.description }}</td>
-                            <td>${{ "%.2f"|format(product.price) }}</td>
-                            <td>
-                                <span class="badge bg-{{ 'success' if product.quantity > 10 else 'warning' if product.quantity > 0 else 'danger' }}">
-                                    {{ product.quantity }}
-                                </span>
-                            </td>
-                            <td class="text-end pe-4">
-                                <button class="btn btn-sm btn-link text-primary edit-btn" data-id="{{ product.id }}">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn btn-sm btn-link text-danger delete-btn" data-id="{{ product.id }}">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+          </div>
+          <div class="col-md-6">
+            <div class="form-floating">
+              <input
+                type="text"
+                id="brand"
+                name="brand"
+                class="form-control"
+                placeholder="Brand"
+                required
+              />
+              <label for="brand">Brand</label>
             </div>
-        </div>
+          </div>
+          <div class="col-12">
+            <div class="form-floating">
+              <input
+                type="text"
+                id="description"
+                name="description"
+                class="form-control"
+                placeholder="Description"
+              />
+              <label for="description">Description</label>
+            </div>
+          </div>
+
+          <!-- Pricing -->
+          <div class="col-md-4">
+            <div class="form-floating">
+              <input
+                type="number"
+                id="original_price"
+                name="original_price"
+                class="form-control"
+                step="0.01"
+                placeholder="Original Price"
+                required
+              />
+              <label for="original_price">Original Price ($)</label>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-floating">
+              <input
+                type="number"
+                id="price"
+                name="price"
+                class="form-control"
+                step="0.01"
+                placeholder="Sale Price"
+                required
+              />
+              <label for="price">Sale Price ($)</label>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-floating">
+              <input
+                type="number"
+                id="quantity"
+                name="quantity"
+                class="form-control"
+                placeholder="Quantity"
+                required
+              />
+              <label for="quantity">Quantity</label>
+            </div>
+          </div>
+
+          <!-- Additional Info -->
+          <div class="col-md-4">
+            <div class="form-floating">
+              <select id="category" name="category" class="form-select">
+                <option value="">Select Category</option>
+                <option value="Shirts">Shirts</option>
+                <option value="Pants">Pants</option>
+                <option value="Shoes">Shoes</option>
+                <option value="Accessories">Accessories</option>
+              </select>
+              <label for="category">Category</label>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-floating">
+              <select id="gender" name="gender" class="form-select">
+                <option value="">Select Gender</option>
+                <option value="Men">Men</option>
+                <option value="Women">Women</option>
+                <option value="Unisex">Unisex</option>
+                <option value="Kids">Kids</option>
+              </select>
+              <label for="gender">Gender</label>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-floating">
+              <input
+                type="text"
+                id="image_url"
+                name="image_url"
+                class="form-control"
+                placeholder="Image URL"
+              />
+              <label for="image_url">Image URL</label>
+            </div>
+          </div>
+
+          <div class="col-12">
+            <div class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="is_bestseller"
+                name="is_bestseller"
+              />
+              <label class="form-check-label" for="is_bestseller"
+                >Mark as Bestseller</label
+              >
+            </div>
+          </div>
+
+          <div class="col-12 text-end">
+            <button
+              type="button"
+              class="btn btn-outline-secondary me-2"
+              data-bs-toggle="collapse"
+              data-bs-target="#addProductForm"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save me-2"></i>Save Product
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
+  </div>
+
+  <!-- Product List -->
+  <div class="card border-0 shadow-sm">
+    <div class="card-header bg-white py-3">
+      <div class="row align-items-center">
+        <div class="col">
+          <h2 class="card-title h5 mb-0">
+            <i class="fas fa-list me-2"></i>Product List
+          </h2>
+        </div>
+        <div class="col-auto">
+          <div class="input-group">
+            <span class="input-group-text bg-transparent border-end-0">
+              <i class="fas fa-search"></i>
+            </span>
+            <input
+              type="text"
+              id="searchProduct"
+              class="form-control border-start-0"
+              placeholder="Search products..."
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="bg-light">
+            <tr>
+              <th class="ps-4">ID</th>
+              <th>Name</th>
+              <th>Brand</th>
+              <th>Category</th>
+              <th>Original</th>
+              <th>Sale Price</th>
+              <th>Quantity</th>
+              <th>Bestseller</th>
+              <th class="text-end pe-4">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for product in products %}
+            <tr class="product-row">
+              <td class="ps-4">{{ product.id }}</td>
+              <td class="fw-medium">{{ product.name }}</td>
+              <td>{{ product.brand }}</td>
+              <td>{{ product.category or '-' }}</td>
+              <td>${{ "%.2f"|format(product.original_price) }}</td>
+              <td>${{ "%.2f"|format(product.price) }}</td>
+              <td>
+                <span
+                  class="badge bg-{{ 'success' if product.quantity > 10 else 'warning' if product.quantity > 0 else 'danger' }}"
+                >
+                  {{ product.quantity }}
+                </span>
+              </td>
+              <td>
+                {% if product.is_bestseller %}
+                <span class="badge bg-warning"
+                  ><i class="fas fa-star me-1"></i>Bestseller</span
+                >
+                {% else %} - {% endif %}
+              </td>
+              <td class="text-end pe-4">
+                <button
+                  class="btn btn-sm btn-link text-primary edit-btn"
+                  data-id="{{ product.id }}"
+                >
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button
+                  class="btn btn-sm btn-link text-danger delete-btn"
+                  data-id="{{ product.id }}"
+                >
+                  <i class="fas fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- Edit Product Modal -->
 <div class="modal fade" id="editProductModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-gradient-primary text-white">
-                <h5 class="modal-title">Edit Product</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-gradient-primary text-white">
+        <h5 class="modal-title">Edit Product</h5>
+        <button
+          type="button"
+          class="btn-close btn-close-white"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form id="editProductForm" class="row g-3">
+          <input type="hidden" id="editProductId" name="id" />
+
+          <!-- Basic Info -->
+          <div class="col-md-6">
+            <div class="form-floating">
+              <input
+                type="text"
+                id="editName"
+                name="name"
+                class="form-control"
+                required
+              />
+              <label>Product Name</label>
             </div>
-            <div class="modal-body">
-                <form id="editProductForm" class="row g-3">
-                    <input type="hidden" id="editProductId">
-                    <div class="col-12">
-                        <div class="form-floating">
-                            <input type="text" id="editName" class="form-control" required>
-                            <label>Product Name</label>
-                        </div>
-                    </div>
-                    <div class="col-12">
-                        <div class="form-floating">
-                            <input type="text" id="editDescription" class="form-control">
-                            <label>Description</label>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-floating">
-                            <input type="number" id="editPrice" class="form-control" step="0.01" required>
-                            <label>Price ($)</label>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-floating">
-                            <input type="number" id="editQuantity" class="form-control" required>
-                            <label>Quantity</label>
-                        </div>
-                    </div>
-                </form>
+          </div>
+          <div class="col-md-6">
+            <div class="form-floating">
+              <input
+                type="text"
+                id="editBrand"
+                name="brand"
+                class="form-control"
+                required
+              />
+              <label>Brand</label>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="saveEditBtn">Save Changes</button>
+          </div>
+          <div class="col-12">
+            <div class="form-floating">
+              <input
+                type="text"
+                id="editDescription"
+                name="description"
+                class="form-control"
+              />
+              <label>Description</label>
             </div>
-        </div>
+          </div>
+
+          <!-- Pricing -->
+          <div class="col-md-4">
+            <div class="form-floating">
+              <input
+                type="number"
+                id="editOriginalPrice"
+                name="original_price"
+                class="form-control"
+                step="0.01"
+                required
+              />
+              <label>Original Price ($)</label>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-floating">
+              <input
+                type="number"
+                id="editPrice"
+                name="price"
+                class="form-control"
+                step="0.01"
+                required
+              />
+              <label>Sale Price ($)</label>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-floating">
+              <input
+                type="number"
+                id="editQuantity"
+                name="quantity"
+                class="form-control"
+                required
+              />
+              <label>Quantity</label>
+            </div>
+          </div>
+
+          <!-- Additional Info -->
+          <div class="col-md-4">
+            <div class="form-floating">
+              <select id="editCategory" name="category" class="form-select">
+                <option value="">Select Category</option>
+                <option value="Shirts">Shirts</option>
+                <option value="Pants">Pants</option>
+                <option value="Shoes">Shoes</option>
+                <option value="Accessories">Accessories</option>
+              </select>
+              <label>Category</label>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-floating">
+              <select id="editGender" name="gender" class="form-select">
+                <option value="">Select Gender</option>
+                <option value="Men">Men</option>
+                <option value="Women">Women</option>
+                <option value="Unisex">Unisex</option>
+                <option value="Kids">Kids</option>
+              </select>
+              <label>Gender</label>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-floating">
+              <input
+                type="text"
+                id="editImageUrl"
+                name="image_url"
+                class="form-control"
+              />
+              <label>Image URL</label>
+            </div>
+          </div>
+
+          <div class="col-12">
+            <div class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="editIsBestseller"
+                name="is_bestseller"
+              />
+              <label class="form-check-label" for="editIsBestseller"
+                >Mark as Bestseller</label
+              >
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-outline-secondary"
+          data-bs-dismiss="modal"
+        >
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary" id="saveEditBtn">
+          Save Changes
+        </button>
+      </div>
     </div>
+  </div>
 </div>
 
 <style>
-    .text-gradient {
-        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-    
-    .bg-gradient-primary {
-        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-    }
-    
-    .table > :not(caption) > * > * {
-        padding: 1rem 0.5rem;
-    }
-    
-    .product-row {
-        transition: all 0.3s ease;
-    }
-    
-    .product-row:hover {
-        background-color: rgba(99, 102, 241, 0.05);
-    }
-    
-    .form-floating > .form-control:focus ~ label,
-    .form-floating > .form-control:not(:placeholder-shown) ~ label {
-        color: #6366f1;
-    }
-    
-    .form-control:focus {
-        border-color: #8b5cf6;
-        box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.25);
-    }
+  .text-gradient {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  }
+
+  .table > :not(caption) > * > * {
+    padding: 1rem 0.5rem;
+  }
+
+  .product-row {
+    transition: all 0.3s ease;
+  }
+
+  .product-row:hover {
+    background-color: rgba(99, 102, 241, 0.05);
+  }
+
+  .form-floating > .form-control:focus ~ label,
+  .form-floating > .form-control:not(:placeholder-shown) ~ label {
+    color: #6366f1;
+  }
+
+  .form-control:focus,
+  .form-select:focus {
+    border-color: #8b5cf6;
+    box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.25);
+  }
 </style>
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
+  document.addEventListener("DOMContentLoaded", function () {
     // Search functionality
-    const searchInput = document.getElementById('searchProduct');
-    searchInput.addEventListener('input', function() {
-        const searchTerm = this.value.toLowerCase();
-        document.querySelectorAll('.product-row').forEach(row => {
-            const text = row.textContent.toLowerCase();
-            row.style.display = text.includes(searchTerm) ? '' : 'none';
-        });
+    const searchInput = document.getElementById("searchProduct");
+    searchInput.addEventListener("input", function () {
+      const searchTerm = this.value.toLowerCase();
+      document.querySelectorAll(".product-row").forEach((row) => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(searchTerm) ? "" : "none";
+      });
     });
 
     // Delete functionality
-    document.querySelectorAll(".delete-btn").forEach(button => {
-        button.addEventListener("click", function() {
-            const productId = this.getAttribute("data-id");
-            const row = this.closest("tr");
-            
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "This action cannot be undone.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#6366f1',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    fetch(`/products/${productId}`, {
-                        method: "DELETE",
-                        headers: { "Content-Type": "application/json" }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        row.style.height = row.offsetHeight + 'px';
-                        row.style.opacity = '0';
-                        setTimeout(() => row.remove(), 300);
-                        Swal.fire('Deleted!', data.message, 'success');
-                    })
-                    .catch(error => {
-                        console.error("Error:", error);
-                        Swal.fire('Error!', 'Failed to delete product', 'error');
-                    });
-                }
-            });
+    document.querySelectorAll(".delete-btn").forEach((button) => {
+      button.addEventListener("click", function () {
+        const productId = this.getAttribute("data-id");
+        const row = this.closest("tr");
+
+        Swal.fire({
+          title: "Are you sure?",
+          text: "This action cannot be undone.",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#6366f1",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Yes, delete it!",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            fetch(`/products/${productId}`, {
+              method: "DELETE",
+              headers: { "Content-Type": "application/json" },
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                row.style.height = row.offsetHeight + "px";
+                row.style.opacity = "0";
+                setTimeout(() => row.remove(), 300);
+                Swal.fire("Deleted!", data.message, "success");
+              })
+              .catch((error) => {
+                console.error("Error:", error);
+                Swal.fire("Error!", "Failed to delete product", "error");
+              });
+          }
         });
+      });
     });
 
     // Add Product Form Submission
-    document.getElementById('productForm').addEventListener('submit', function(e) {
+    document
+      .getElementById("productForm")
+      .addEventListener("submit", function (e) {
         e.preventDefault();
         const formData = new FormData(this);
-        const data = Object.fromEntries(formData.entries());
-        
-        fetch('/products', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        })
-        .then(response => response.json())
-        .then(data => {
-            Swal.fire('Success!', 'Product added successfully', 'success')
-            .then(() => location.reload());
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            Swal.fire('Error!', 'Failed to add product', 'error');
+        const data = {};
+
+        // Convert FormData to appropriate JSON structure
+        formData.forEach((value, key) => {
+          // Handle checkbox values
+          if (key === "is_bestseller") {
+            data[key] = value === "on";
+          }
+          // Handle numeric values
+          else if (["price", "quantity", "original_price"].includes(key)) {
+            data[key] = Number(value);
+          }
+          // Handle other values
+          else {
+            data[key] = value;
+          }
         });
+
+        // If is_bestseller checkbox is unchecked, it won't be in formData
+        if (!formData.has("is_bestseller")) {
+          data["is_bestseller"] = false;
+        }
+
+        fetch("/products", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            Swal.fire("Success!", "Product added successfully", "success").then(
+              () => location.reload()
+            );
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            Swal.fire("Error!", "Failed to add product", "error");
+          });
+      });
+
+    // Edit Product Functionality
+    document.querySelectorAll(".edit-btn").forEach((button) => {
+      button.addEventListener("click", function () {
+        const productId = this.getAttribute("data-id");
+
+        // Fetch product data
+        fetch(`/products/${productId}`)
+          .then((response) => response.json())
+          .then((product) => {
+            // Populate form fields
+            document.getElementById("editProductId").value = product.id;
+            document.getElementById("editName").value = product.name;
+            document.getElementById("editDescription").value =
+              product.description || "";
+            document.getElementById("editPrice").value = product.price;
+            document.getElementById("editQuantity").value = product.quantity;
+            document.getElementById("editBrand").value = product.brand;
+            document.getElementById("editOriginalPrice").value =
+              product.original_price;
+            document.getElementById("editCategory").value =
+              product.category || "";
+            document.getElementById("editGender").value = product.gender || "";
+            document.getElementById("editImageUrl").value =
+              product.image_url || "";
+            document.getElementById("editIsBestseller").checked =
+              product.is_bestseller;
+
+            // Show modal
+            const modal = new bootstrap.Modal(
+              document.getElementById("editProductModal")
+            );
+            modal.show();
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            Swal.fire("Error!", "Failed to fetch product data", "error");
+          });
+      });
     });
-});
+
+    // Save Edited Product
+    document
+      .getElementById("saveEditBtn")
+      .addEventListener("click", function () {
+        const form = document.getElementById("editProductForm");
+        const formData = new FormData(form);
+        const productId = document.getElementById("editProductId").value;
+        const data = {};
+
+        // Convert FormData to appropriate JSON structure
+        formData.forEach((value, key) => {
+          // Handle checkbox values
+          if (key === "is_bestseller") {
+            data[key] = value === "on";
+          }
+          // Handle numeric values
+          else if (["price", "quantity", "original_price"].includes(key)) {
+            data[key] = Number(value);
+          }
+          // Handle other values
+          else {
+            data[key] = value;
+          }
+        });
+
+        // If is_bestseller checkbox is unchecked, it won't be in formData
+        if (!formData.has("is_bestseller")) {
+          data["is_bestseller"] = false;
+        }
+
+        fetch(`/products/${productId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            const modal = bootstrap.Modal.getInstance(
+              document.getElementById("editProductModal")
+            );
+            modal.hide();
+            Swal.fire(
+              "Success!",
+              "Product updated successfully",
+              "success"
+            ).then(() => location.reload());
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            Swal.fire("Error!", "Failed to update product", "error");
+          });
+      });
+  });
 </script>
 
 <!-- Add SweetAlert2 CDN in your base template -->
 {% block extra_head %}
-<link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-borderless/borderless.css" rel="stylesheet">
+<link
+  href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-borderless/borderless.css"
+  rel="stylesheet"
+/>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-{% endblock %}
-{% endblock %}
+{% endblock %} {% endblock %}
