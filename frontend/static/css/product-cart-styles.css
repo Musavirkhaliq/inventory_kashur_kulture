@@ -1,0 +1,309 @@
+/* Enhanced Cart Page Styles */
+
+/* Main Container & Typography */
+
+.product-cart h2 {
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #f8f9fa;
+  padding-bottom: 10px;
+}
+
+/* Breadcrumb Styling */
+.product-cart .breadcrumb {
+  background-color: transparent;
+  padding: 0.5rem 0;
+  font-size: 0.9rem;
+}
+
+.product-cart .breadcrumb-item a {
+  color: #6c757d;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.product-cart .breadcrumb-item a:hover {
+  color: #007bff;
+  text-decoration: underline;
+}
+
+.product-cart .breadcrumb-item.active {
+  color: #343a40;
+  font-weight: 500;
+}
+
+/* Card Styling */
+.product-cart .card {
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-cart .card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  background-color: #fff;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+  padding: 1rem 1.5rem;
+}
+
+.product-cart .card-header h5 {
+  margin: 0;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.product-cart .card-body {
+  padding: 1.5rem;
+}
+
+.product-cart .card-footer {
+  background-color: #fff;
+  border-top: 1px solid rgba(0, 0, 0, 0.07);
+  padding: 1rem 1.5rem;
+}
+
+/* Cart Item Styling */
+.product-cart .cart-item {
+  transition: background-color 0.2s ease;
+  margin-bottom: 1.5rem !important;
+  padding-bottom: 1.5rem !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.07) !important;
+}
+
+.cart-item:last-child {
+  border-bottom: none !important;
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.cart-item:hover {
+  background-color: #f8fbff;
+}
+
+.cart-item img {
+  border-radius: 6px;
+  object-fit: cover;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.cart-item:hover img {
+  transform: scale(1.03);
+}
+
+.cart-item h5 {
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+}
+
+.cart-item .text-muted {
+  color: #6c757d !important;
+  font-size: 0.9rem;
+}
+
+.cart-item .fw-bold {
+  font-size: 1.1rem;
+  color: #2c3e50;
+}
+
+.cart-item .text-success {
+  color: #28a745 !important;
+  font-weight: 500;
+}
+
+/* Quantity Selector */
+.product-cart .quantity-selector {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.product-cart .quantity-selector button {
+  border: none;
+  background-color: #f8f9fa;
+  color: #495057;
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 0.3rem 0.7rem;
+  transition: all 0.2s ease;
+}
+
+.product-cart .quantity-selector button:hover {
+  background-color: #e9ecef;
+  color: #212529;
+}
+
+.product-cart .quantity-selector span {
+  background-color: #fff;
+  padding: 0.375rem 0.75rem;
+  min-width: 40px;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* Remove Link */
+a.text-danger {
+  color: #dc3545 !important;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  padding: 0.375rem 0.75rem;
+  border-radius: 4px;
+}
+
+.product-cart a.text-danger:hover {
+  background-color: rgba(220, 53, 69, 0.1);
+  text-decoration: underline;
+}
+
+/* Order Summary */
+.col-md-4 .card {
+  position: sticky;
+  top: 20px;
+}
+
+.col-md-4 .card-header {
+  background-color: #f8f9fa;
+}
+
+.col-md-4 .card-body {
+  padding: 1.5rem;
+}
+
+.col-md-4 .d-flex {
+  margin-bottom: 0.8rem;
+}
+
+.col-md-4 .fw-bold {
+  font-size: 1.1rem;
+}
+
+/* Checkout Button */
+.btn-primary {
+  background-color: #4361ee;
+  border-color: #4361ee;
+  box-shadow: 0 4px 6px rgba(67, 97, 238, 0.2);
+  font-weight: 600;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: #3a56d4;
+  border-color: #3a56d4;
+  box-shadow: 0 6px 10px rgba(67, 97, 238, 0.3);
+  transform: translateY(-2px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(67, 97, 238, 0.2);
+}
+
+/* Empty Cart */
+.text-center.py-5 {
+  margin: 3rem 0;
+  padding: 3rem !important;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.text-center.py-5 h4 {
+  margin-bottom: 1.5rem;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.btn-outline-primary {
+  border-color: #4361ee;
+  color: #4361ee;
+  font-weight: 500;
+  padding: 0.6rem 1.5rem;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.btn-outline-primary:hover {
+  background-color: #4361ee;
+  color: #fff;
+  box-shadow: 0 4px 8px rgba(67, 97, 238, 0.2);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 767px) {
+  .card-body {
+    padding: 1rem;
+  }
+
+  .cart-item {
+    padding-bottom: 1rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .cart-item .col-3 {
+    flex: 0 0 40%;
+    max-width: 40%;
+  }
+
+  .cart-item .col-9 {
+    flex: 0 0 60%;
+    max-width: 60%;
+  }
+
+  .col-md-4 .card {
+    margin-top: 1.5rem;
+  }
+
+  .quantity-selector button {
+    padding: 0.25rem 0.5rem;
+  }
+
+  .quantity-selector span {
+    min-width: 30px;
+    padding: 0.25rem 0.5rem;
+  }
+}
+
+/* Add elegant transitions and animations */
+.cart-item {
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Improve animations for image hover and card interactions */
+.cart-item:hover img {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Add subtle highlight effect to order summary rows */
+.col-md-4 .d-flex:hover {
+  background-color: #f8fbff;
+  border-radius: 4px;
+  padding-left: 4px;
+  padding-right: 4px;
+  margin-left: -4px;
+  margin-right: -4px;
+  transition: background-color 0.2s ease;
+}

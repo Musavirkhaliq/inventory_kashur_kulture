@@ -5,8 +5,11 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from ..users import services as user_services
 from ..config import settings
+import logging
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
+logger = logging.getLogger(__name__)
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
 
 async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     credentials_exception = HTTPException(

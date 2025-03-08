@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inventory Management - KashurKulture</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+    <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}" />
+    {% block extra_head %}{% endblock %}
+    <style>
+      :root {
+        --primary-color: #4361ee;
+        --secondary-color: #3f37c9;
+        --accent-color: #4cc9f0;
+        --light-color: #f8f9fa;
+        --dark-color: #212529;
+        --navbar-height: 80px;
+      }
+
+      body {
+        background-color: var(--light-color);
+        font-family: "Inter", "Segoe UI", sans-serif;
+        padding-top: var(--navbar-height);
+      }
+
+      /* Navbar Styles (E-commerce Focus) */
+      .navbar {
+        background: var(--primary-color);
+        height: var(--navbar-height);
+        padding: 0.5rem 1rem;
+        position: fixed;
+        top: 0;
+        right: 0;
+        left: 0;
+        z-index: 1030;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .navbar-brand {
+        font-weight: 700;
+        font-size: 1.8rem;
+        color: #fff !important;
+        position: relative;
+        padding: 0.5rem 1rem;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+      }
+
+      .navbar-brand:hover {
+        transform: translateY(-2px);
+      }
+
+      .navbar-brand i {
+        font-size: 1.5rem;
+        margin-right: 0.5rem;
+        color: var(--accent-color);
+      }
+
+      .navbar-nav {
+        gap: 0.75rem;
+      }
+
+      .nav-item {
+        position: relative;
+      }
+
+      .nav-link {
+        color: rgba(255, 255, 255, 0.9) !important;
+        font-weight: 600;
+        padding: 0.75rem 1.25rem !important;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+      }
+
+      .nav-link:hover {
+        color: #fff !important;
+        background: rgba(255, 255, 255, 0.15);
+        transform: translateY(-2px);
+      }
+
+      .nav-link.active {
+        background: rgba(255, 255, 255, 0.25);
+        color: #fff !important;
+      }
+
+      .navbar-toggler {
+        border: none;
+        padding: 0.5rem;
+        color: white;
+      }
+
+      .navbar-toggler:focus {
+        box-shadow: none;
+      }
+
+      /* Dropdown styles (E-commerce Style) */
+      .nav-item.dropdown:hover .dropdown-menu {
+        display: block;
+        opacity: 1;
+        transform: translateY(0);
+        animation: fadeInDown 0.3s ease-in-out;
+      }
+
+      .dropdown-menu {
+        background: var(--dark-color);
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+        padding: 0.75rem;
+        margin-top: 0.5rem;
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: all 0.3s ease;
+      }
+
+      .dropdown-item {
+        border-radius: 8px;
+        padding: 0.75rem 1.25rem;
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 500;
+        transition: all 0.3s ease;
+      }
+
+      .dropdown-item:hover,
+      .dropdown-item:focus {
+        background: var(--primary-color);
+        color: #fff;
+        transform: translateX(5px);
+      }
+
+      /* User Profile Section */
+      .nav-user {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #fff;
+        font-weight: 600;
+        padding: 0.75rem 1.25rem;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+      }
+
+      .nav-user:hover {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.15);
+        transform: translateY(-2px);
+      }
+
+      /* Auth Buttons */
+      .nav-auth-buttons {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .nav-auth-buttons .btn {
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+        color: #fff !important;
+        background-color: var(--accent-color);
+        border: none;
+      }
+
+      .nav-auth-buttons .btn:hover {
+        background-color: var(--secondary-color);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Main Content Area */
+      .main-content {
+        min-height: calc(100vh - var(--navbar-height) - 60px);
+        padding: 2rem 0;
+      }
+
+      /* Footer Styles (E-commerce Focus) */
+      footer {
+        background: var(--dark-color);
+        color: #fff;
+        padding: 2rem 0;
+        position: relative;
+      }
+
+      .footer-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+      }
+
+      .footer-links {
+        display: flex;
+        gap: 2rem;
+      }
+
+      .footer-link {
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+      }
+
+      .footer-link:hover {
+        color: var(--accent-color);
+        transform: translateY(-2px);
+      }
+
+      /* Scrollbar Styles */
+      ::-webkit-scrollbar {
+        width: 10px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: var(--light-color);
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: var(--primary-color);
+        border-radius: 5px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--secondary-color);
+      }
+
+      /* Loading Indicator */
+      .page-loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: var(--primary-color);
+        z-index: 9999;
+        animation: loadingProgress 2s ease-in-out infinite;
+      }
+
+      @keyframes loadingProgress {
+        0% {
+          width: 0%;
+        }
+        50% {
+          width: 70%;
+        }
+        100% {
+          width: 100%;
+        }
+      }
+
+      /* Animations */
+      @keyframes fadeInDown {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Loading State for User Details */
+      .nav-user.loading {
+        opacity: 0.5;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Loading Indicator -->
+    <div class="page-loader"></div>
+
+    <!-- Navbar (E-commerce Style) -->
+    <nav class="navbar navbar-expand-lg">
+      <div class="container">
+        <a class="navbar-brand animate__animated animate__fadeIn" href="/">
+          <i class="fas fa-store-alt me-2"></i>KashurKulture
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="/admin"
+                ><i class="fas fa-home me-1"></i>Admin</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#"
+                ><i class="fas fa-box-open me-1"></i>Shop</a
+              >
+            </li>
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+              >
+                <i class="fas fa-box me-1"></i>Inventory
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="#">Products</a></li>
+                <li><a class="dropdown-item" href="#">Restocks</a></li>
+                <li>
+                  <a class="dropdown-item" href="#">Inventory Value</a>
+                </li>
+              </ul>
+            </li>
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+              >
+                <i class="fas fa-users me-1"></i>Customers
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="#">View All</a></li>
+                <li>
+                  <a class="dropdown-item" href="#">Balances</a>
+                </li>
+              </ul>
+            </li>
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+              >
+                <i class="fas fa-chart-line me-1"></i>Sales
+              </a>
+              <ul class="dropdown-menu">
+                <li>
+                  <a class="dropdown-item" href="/users/profile"
+                    >Record Sales</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="#">Sales Report</a>
+                </li>
+                <li><a class="dropdown-item" href="#">Invoices</a></li>
+              </ul>
+            </li>
+            <li class="nav-item nav-cart">
+              <a class="nav-link" href="/cart"
+                ><i class="fas fa-shopping-cart me-1"></i>Cart
+                <span class="cart-count">0</span></a
+              >
+            </li>
+            <li class="nav-item dropdown nav-account">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+              >
+                <i class="fas fa-user me-1"></i>Account
+              </a>
+              <ul class="dropdown-menu">
+                <li>
+                  <a class="dropdown-item" href="/users/profile"
+                    ><i class="fas fa-user-circle"></i> Profile</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="#"
+                    ><i class="fas fa-box-archive"></i> Orders</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="#" onclick="logout()"
+                    ><i class="fas fa-sign-out-alt"></i> Logout</a
+                  >
+                </li>
+              </ul>
+            </li>
+
+            <li class="nav-item nav-auth-buttons">
+              <a href="/login" class="btn">Login</a>
+              <a href="/register" class="btn">Sign Up</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="container">{% block content %}{% endblock %}</div>
+    </main>
+
+    <!-- Footer (E-commerce Style) -->
+    <footer>
+      <div class="container">
+        <div class="footer-content">
+          <div class="copyright">
+            <p class="mb-0">© 2025 KashurKulture. All Rights Reserved.</p>
+          </div>
+          <div class="footer-links">
+            <a href="/about" class="footer-link">About Us</a>
+            <a href="/shop" class="footer-link">Shop</a>
+            <a href="/contact" class="footer-link">Contact</a>
+            <a href="/privacy" class="footer-link">Privacy Policy</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', path='js/main.js') }}"></script>
+    <script>
+      // Add active class to current nav item
+      document.addEventListener("DOMContentLoaded", function () {
+        const currentPath = window.location.pathname;
+        const navLinks = document.querySelectorAll(".nav-link");
+
+        navLinks.forEach((link) => {
+          if (link.getAttribute("href") === currentPath) {
+            link.classList.add("active");
+          }
+        });
+      });
+
+      // Update cart count and user details (example, replace with real data from backend)
+      const cartCount = document.querySelector(".cart-count");
+      const token = localStorage.getItem("access_token");
+      const userDisplay = document.getElementById("userDisplay");
+
+      if (token) {
+        // Fallback: Try decoding token for username if backend fetch fails
+        const navAuthButtons = document.querySelector(".nav-auth-buttons");
+        navAuthButtons.style.display = "none";
+      } else {
+        const cartLink = document.querySelector(".nav-cart");
+        const accountLink = document.querySelector(".nav-account");
+        const userLink = document.querySelector(".nav-user");
+        if (cartLink) cartLink.style.display = "none";
+        if (accountLink) accountLink.style.display = "none";
+        if (userLink) userLink.style.display = "none";
+      }
+
+      // Logout functionality
+      function logout() {
+        localStorage.removeItem("access_token");
+        window.location.href = "/kashur_kulture";
+      }
+
+      // Smooth scroll behavior
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          e.preventDefault();
+          document.querySelector(this.getAttribute("href")).scrollIntoView({
+            behavior: "smooth",
+          });
+        });
+      });
+
+      // function navigateToProfile(event) {
+      //   event.preventDefault();
+      //   const token = localStorage.getItem("access_token");
+      //   if (!token) {
+      //     alert("Please log in to view your profile.");
+      //     window.location.href = "/login";
+      //     return;
+      //   }
+
+      //   fetch("/users/profile", {
+      //     headers: { Authorization: `Bearer ${token}` },
+      //   })
+      //     .then((response) => {
+      //       if (!response.ok)
+      //         throw new Error("Unauthorized or profile not found");
+      //       return response.text(); // Handle HTML response
+      //     })
+      //     .then((html) => {
+      //       document.open();
+      //       document.write(html);
+      //       document.close();
+      //     })
+      //     .catch((error) => {
+      //       console.error("Error fetching profile:", error);
+      //       if (error.message.includes("Unauthorized")) {
+      //         alert("Please log in to view your profile.");
+      //         localStorage.removeItem("access_token");
+      //         window.location.href = "/login";
+      //       }
+      //     });
+      // }
+    </script>
+    {% block extra_scripts %}{% endblock %}
+  </body>
+</html>
+
+from fastapi import APIRouter, Depends, HTTPException, Request, Query from
+fastapi.responses import HTMLResponse from sqlalchemy.orm import Session from
+typing import List, Optional from app.database import get_db from
+app.products.schemas import Product, ProductCreate, ProductUpdate from
+app.products.services import ( get_all_products, get_product_by_id,
+create_product as create_product_service, update_product as
+update_product_service, delete_product as delete_product_service,
+get_filter_counts, ) from app.utils.utils import render_frontend_template router
+= APIRouter(prefix="/admin/products", tags=["products"]) # Route to display all
+products (HTML response) @router.get("/", response_class=HTMLResponse) def
+read_products( request: Request, gender: Optional[str] = Query(None), category:
+Optional[str] = Query(None), brand: Optional[str] = Query(None), min_price:
+Optional[float] = Query(None), max_price: Optional[float] = Query(None),
+sort_by: Optional[str] = Query("relevance"), db: Session = Depends(get_db) ):
+products = get_all_products(db) # Apply filters if provided if gender: products
+= [p for p in products if p.gender == gender] if category: products = [p for p
+in products if p.category == category] if brand: products = [p for p in products
+if p.brand == brand] if min_price is not None: products = [p for p in products
+if p.price >= min_price] if max_price is not None: products = [p for p in
+products if p.price <= max_price] # Apply sorting if sort_by == "price_low":
+products.sort(key=lambda p: p.price) elif sort_by == "price_high":
+products.sort(key=lambda p: p.price, reverse=True) elif sort_by == "discount":
+products.sort(key=lambda p: p.discount_percentage or 0, reverse=True) # Get
+filter counts for sidebar filter_counts = get_filter_counts(db) return
+render_frontend_template( "products.html", request, { "products": products,
+"gender_counts": filter_counts["gender_counts"], "category_counts":
+filter_counts["category_counts"], "brand_counts": filter_counts["brand_counts"],
+"selected_gender": gender, "selected_category": category, "selected_brand":
+brand, } ) # Route to create a new product (JSON response) @router.post("/",
+response_model=Product) def create_product_route(product: ProductCreate, db:
+Session = Depends(get_db)): return create_product_service(db, product) # Route
+to edit a product (HTML response) @router.get("/{product_id}/edit",
+response_class=HTMLResponse) def edit_product(request: Request, product_id: int,
+db: Session = Depends(get_db)): product = get_product_by_id(db, product_id) if
+not product: raise HTTPException(status_code=404, detail="Product not found")
+return render_template("edit_product.html", request, {"product": product}) #
+Route to view a product (HTML response) @router.get("/{product_id}",
+response_class=HTMLResponse) def view_product(request: Request, product_id: int,
+db: Session = Depends(get_db)): product = get_product_by_id(db, product_id) if
+not product: raise HTTPException(status_code=404, detail="Product not found") #
+Get recommended products (same category) recommended = db.query(Product).filter(
+Product.category == product.category, Product.id != product.id ).limit(4).all()
+return render_template( "product_detail.html", request, {"product": product,
+"recommended_products": recommended} ) # Route to update a product (JSON
+response) @router.put("/{product_id}", response_model=Product) def
+update_product_route(product_id: int, product: ProductUpdate, db: Session =
+Depends(get_db)): db_product = update_product_service(db, product_id, product)
+if not db_product: raise HTTPException(status_code=404, detail="Product not
+found") return db_product # Route to delete a product (JSON response)
+@router.delete("/{product_id}", response_model=Product) def
+delete_product_route(product_id: int, db: Session = Depends(get_db)): db_product
+= delete_product_service(db, product_id) if not db_product: raise
+HTTPException(status_code=404, detail="Product not found") return db_product #
+Route to calculate and display inventory value (HTML response)
+@router.get("/inventory/value", response_class=HTMLResponse) def
+inventory_value(request: Request, db: Session = Depends(get_db)): products =
+get_all_products(db) total_value = sum(product.price * product.quantity for
+product in products) return render_template("inventory_value.html", request,
+{"total_value": total_value})

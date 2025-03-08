@@ -1,0 +1,273 @@
+{% extends "base.html" %} {% block title %}{{ product.name }} | Fashion Store{%
+endblock %} {% block content %}
+<div class="container mt-4">
+  <div class="row">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Home</a></li>
+        <li class="breadcrumb-item"><a href="/products">Products</a></li>
+        <li class="breadcrumb-item">
+          <a href="/products?category={{ product.category }}"
+            >{{ product.category }}</a
+          >
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+          {{ product.name }}
+        </li>
+      </ol>
+    </nav>
+  </div>
+
+  <div class="row mt-3">
+    <!-- Product Images -->
+    <div class="col-md-6">
+      <div class="product-image-container">
+        <img
+          src="{{ product.image_url or '/static/images/placeholder.jpg' }}"
+          class="img-fluid product-detail-image"
+          alt="{{ product.name }}"
+        />
+
+        {% if product.is_bestseller %}
+        <div class="detail-bestseller-badge">BESTSELLER</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Product Details -->
+    <div class="col-md-6">
+      <div class="product-info">
+        <div class="brand-name">{{ product.brand }}</div>
+        <h1 class="product-title">{{ product.name }}</h1>
+
+        <!-- Ratings -->
+        <div class="product-rating mb-3">
+          <span
+            class="rating-badge {% if product.id % 3 == 1 %}green{% elif product.id % 3 == 2 %}orange{% else %}red{% endif %}"
+          >
+            {{ 3 + (product.id % 3) }}★ | {{ 5 + (product.id % 7) }}
+          </span>
+        </div>
+
+        <!-- Price Information -->
+        <div class="price-info mb-4">
+          <div class="current-price">₹{{ product.price }}</div>
+          <div class="detail-price-info">
+            <span class="original-price"
+              >MRP ₹{{ product.original_price }}</span
+            >
+            <span class="discount-percentage"
+              >({{ product.discount_percentage }}% off)</span
+            >
+          </div>
+          <div class="inclusive-tax">Inclusive of all taxes</div>
+        </div>
+
+        <!-- Size Selection -->
+        <div class="size-selection mb-4">
+          <h6>Select Size</h6>
+          <div class="size-options">
+            <span class="size-option">S</span>
+            <span class="size-option active">M</span>
+            <span class="size-option">L</span>
+            <span class="size-option">XL</span>
+            <span class="size-option">XXL</span>
+          </div>
+          <div class="size-guide">
+            <a href="#" data-bs-toggle="modal" data-bs-target="#sizeGuideModal"
+              >Size Guide</a
+            >
+          </div>
+        </div>
+
+        <!-- Delivery Options -->
+        <div class="delivery-options mb-4">
+          <h6>Check Delivery</h6>
+          <div class="input-group">
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Enter PIN code"
+            />
+            <button class="btn btn-outline-secondary" type="button">
+              Check
+            </button>
+          </div>
+          <ul class="delivery-info mt-2">
+            <li>Get it by <strong>Mar 10</strong></li>
+            <li>Pay on delivery available</li>
+            <li>Easy 30 days returns</li>
+          </ul>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+          <button class="btn btn-primary btn-lg w-100 mb-2">ADD TO BAG</button>
+          <button class="btn btn-outline-secondary btn-lg w-100">
+            SAVE TO WISHLIST
+          </button>
+        </div>
+
+        <!-- Product Description -->
+        <div class="product-description mt-4">
+          <h6>Product Details</h6>
+          <p>{{ product.description or 'No description available' }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Similar Products Section -->
+  <div class="similar-products mt-5">
+    <h3 class="section-title">Similar Products</h3>
+    <div class="row row-cols-1 row-cols-md-4 g-4">
+      {% for product in recommended_products %}
+      <div class="col product-card">
+        <!-- Wrap the entire card in a link to the product detail page -->
+        <a
+          href="/filter-products/{{ product.id }}"
+          class="text-decoration-none"
+        >
+          <div class="card h-100">
+            {% if product.is_bestseller %}
+            <div class="bestseller-badge">BESTSELLER</div>
+            {% endif %}
+            <div class="card-body text-center">
+              <div class="product-img-container">
+                <img
+                  src="{{ product.image_url }}"
+                  alt="{{ product.name }}"
+                  class="product-img"
+                  loading="lazy"
+                />
+              </div>
+              <div class="brand-name">{{ product.brand }}</div>
+              <h5 class="product-name">{{ product.name }}</h5>
+              <div class="product-rating">
+                <span
+                  class="rating-badge {% if loop.index % 3 == 1 %}green{% elif loop.index % 3 == 2 %}orange{% else %}red{% endif %}"
+                >
+                  {{ 3 + (loop.index % 3) }}★ | {{ 5 + (loop.index % 7) }}
+                </span>
+              </div>
+              <div class="price-info">
+                <span class="current-price">₹{{ product.price }}</span>
+                <span class="original-price"
+                  >₹{{ product.original_price }}</span
+                >
+                <span class="discount-percentage"
+                  >({{ product.discount_percentage }}% off)</span
+                >
+              </div>
+              <div class="sale-price-badge">
+                <i class="fas fa-star"></i> Sale Price ₹{{ product.price }}
+              </div>
+            </div>
+            <form action="/cart/add/{{ product.id }}" method="post">
+              <!-- Add size selection if dynamic -->
+              <input type="hidden" name="size" value="M" />
+              <!-- Default size; enhance later -->
+              <button type="submit" class="btn btn-primary btn-lg w-100 mb-2">
+                ADD TO BAG
+              </button>
+            </form>
+          </div>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- Size Guide Modal -->
+<div
+  class="modal fade"
+  id="sizeGuideModal"
+  tabindex="-1"
+  aria-labelledby="sizeGuideModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="sizeGuideModalLabel">Size Guide</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Size</th>
+                <th>Chest (in)</th>
+                <th>Waist (in)</th>
+                <th>Hip (in)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>S</td>
+                <td>36-38</td>
+                <td>30-32</td>
+                <td>36-38</td>
+              </tr>
+              <tr>
+                <td>M</td>
+                <td>38-40</td>
+                <td>32-34</td>
+                <td>38-40</td>
+              </tr>
+              <tr>
+                <td>L</td>
+                <td>40-42</td>
+                <td>34-36</td>
+                <td>40-42</td>
+              </tr>
+              <tr>
+                <td>XL</td>
+                <td>42-44</td>
+                <td>36-38</td>
+                <td>42-44</td>
+              </tr>
+              <tr>
+                <td>XXL</td>
+                <td>44-46</td>
+                <td>38-40</td>
+                <td>44-46</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Size options toggle
+    const sizeOptions = document.querySelectorAll(".size-option");
+
+    sizeOptions.forEach((option) => {
+      option.addEventListener("click", function () {
+        // Remove active class from all options
+        sizeOptions.forEach((opt) => opt.classList.remove("active"));
+
+        // Add active class to clicked option
+        this.classList.add("active");
+      });
+    });
+  });
+</script>
+{% endblock %}

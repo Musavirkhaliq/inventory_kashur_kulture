@@ -1,0 +1,494 @@
+{% extends "base.html" %} {% block title %}Products | Kashur Kulture{% endblock
+%} {% block content %}
+<div class="container mt-3">
+  <!-- Filters and Results Section -->
+  <div class="row">
+    <!-- Left Sidebar - Filters -->
+    <div class="col-md-3 filter-sidebar">
+      <!-- Existing filter code unchanged -->
+      <div class="filter-section">
+        <div
+          class="filter-header"
+          data-bs-toggle="collapse"
+          data-bs-target="#genderFilter"
+        >
+          <h5><i class="fas fa-chevron-down"></i> Refine By</h5>
+        </div>
+
+        <!-- Gender Filter -->
+        <div class="filter-group">
+          <div
+            class="filter-header"
+            data-bs-toggle="collapse"
+            data-bs-target="#genderFilter"
+          >
+            <h6><i class="fas fa-chevron-down"></i> Gender</h6>
+          </div>
+          <div id="genderFilter" class="collapse show">
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                value="Men"
+                id="menCheck"
+                data-filter="gender"
+                data-value="Men"
+              />
+              <label class="form-check-label" for="menCheck"
+                >Men ({{ gender_counts.get('Men', 0) }})</label
+              >
+            </div>
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                value="Women"
+                id="womenCheck"
+                data-filter="gender"
+                data-value="Women"
+              />
+              <label class="form-check-label" for="womenCheck"
+                >Women ({{ gender_counts.get('Women', 0) }})</label
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- Category Filter -->
+        <div class="filter-group">
+          <div
+            class="filter-header"
+            data-bs-toggle="collapse"
+            data-bs-target="#categoryFilter"
+          >
+            <h6><i class="fas fa-chevron-down"></i> Category</h6>
+          </div>
+          <div id="categoryFilter" class="collapse show">
+            {% for category, count in category_counts.items() %}
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                value="{{ category }}"
+                id="{{ category }}Check"
+                data-filter="category"
+                data-value="{{ category }}"
+              />
+              <label class="form-check-label" for="{{ category }}Check"
+                >{{ category }} ({{ count }})</label
+              >
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Price Filter -->
+        <div class="filter-group">
+          <div
+            class="filter-header"
+            data-bs-toggle="collapse"
+            data-bs-target="#priceFilter"
+          >
+            <h6><i class="fas fa-plus"></i> Price</h6>
+          </div>
+          <div id="priceFilter" class="collapse">
+            <div class="price-slider">
+              <input
+                type="range"
+                class="form-range"
+                min="0"
+                max="10000"
+                step="500"
+                id="priceRange"
+              />
+              <div class="price-range-values">
+                <span id="priceMin">₹0</span> -
+                <span id="priceMax">₹10000</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Brands Filter -->
+        <div class="filter-group">
+          <div
+            class="filter-header"
+            data-bs-toggle="collapse"
+            data-bs-target="#brandsFilter"
+          >
+            <h6><i class="fas fa-plus"></i> Brands</h6>
+          </div>
+          <div id="brandsFilter" class="collapse">
+            {% for brand, count in brand_counts.items() %}
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                value="{{ brand }}"
+                id="{{ brand }}Check"
+                data-filter="brand"
+                data-value="{{ brand }}"
+              />
+              <label class="form-check-label" for="{{ brand }}Check"
+                >{{ brand }} ({{ count }})</label
+              >
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Content - Products -->
+    <div class="col-md-9">
+      <!-- Products Header -->
+      <div
+        class="products-header d-flex justify-content-between align-items-center mb-3"
+      >
+        <div class="results-count">
+          <span>{{ products|length }} Items Found</span>
+        </div>
+        <form class="d-flex search-form">
+          <input
+            class="form-control"
+            type="search"
+            placeholder="Search for products, brands"
+          />
+          <button class="btn" type="submit">
+            <i class="fas fa-search"></i>
+          </button>
+        </form>
+        <div class="sort-options">
+          <span>SORT BY:</span>
+          <select class="form-select form-select-sm">
+            <option>Relevance</option>
+            <option>Price: Low to High</option>
+            <option>Price: High to Low</option>
+            <option>Discount</option>
+            <option>What's New</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Products Grid -->
+      <div class="row row-cols-1 row-cols-md-3 row-cols-lg-3 g-4 products-grid">
+        {% for product in products %}
+        <div class="col product-card">
+          <!-- Wrap the entire card in a link to the product detail page -->
+          <a
+            href="/filter-products/{{ product.id }}"
+            class="text-decoration-none"
+          >
+            <div class="card h-100">
+              {% if product.is_bestseller %}
+              <div class="bestseller-badge">BESTSELLER</div>
+              {% endif %}
+              <div class="card-body text-center">
+                <div class="product-img-container">
+                  <img
+                    src="{{ product.image_url }}"
+                    alt="{{ product.name }}"
+                    class="product-img"
+                    loading="lazy"
+                  />
+                </div>
+                <div class="brand-name">{{ product.brand }}</div>
+                <h5 class="product-name">{{ product.name }}</h5>
+                <div class="product-rating">
+                  <span
+                    class="rating-badge {% if loop.index % 3 == 1 %}green{% elif loop.index % 3 == 2 %}orange{% else %}red{% endif %}"
+                  >
+                    {{ 3 + (loop.index % 3) }}★ | {{ 5 + (loop.index % 7) }}
+                  </span>
+                </div>
+                <div class="price-info">
+                  <span class="current-price">₹{{ product.price }}</span>
+                  <span class="original-price"
+                    >₹{{ product.original_price }}</span
+                  >
+                  <span class="discount-percentage"
+                    >({{ product.discount_percentage }}% off)</span
+                  >
+                </div>
+                <div class="sale-price-badge">
+                  <i class="fas fa-star"></i> Sale Price ₹{{ product.price }}
+                </div>
+              </div>
+              <form action="/cart/add/{{ product.id }}" method="post">
+                <!-- Add size selection if dynamic -->
+                <input type="hidden" name="size" value="M" />
+                <!-- Default size; enhance later -->
+                <button type="submit" class="btn btn-primary btn-lg w-100 mb-2">
+                  ADD TO BAG
+                </button>
+              </form>
+            </div>
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<!-- Existing script unchanged -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    let activeFilters = {
+      gender: [],
+      category: [],
+      brand: [],
+      minPrice: 0,
+      maxPrice: 10000,
+      search: "",
+    };
+
+    const filterHeaders = document.querySelectorAll(".filter-header");
+    filterHeaders.forEach((header) => {
+      header.addEventListener("click", function () {
+        const icon = this.querySelector("i");
+        if (icon.classList.contains("fa-plus")) {
+          icon.classList.replace("fa-plus", "fa-minus");
+        } else if (icon.classList.contains("fa-minus")) {
+          icon.classList.replace("fa-minus", "fa-plus");
+        } else if (icon.classList.contains("fa-chevron-down")) {
+          icon.classList.replace("fa-chevron-down", "fa-chevron-up");
+        } else if (icon.classList.contains("fa-chevron-up")) {
+          icon.classList.replace("fa-chevron-up", "fa-chevron-down");
+        }
+      });
+    });
+
+    const filterSidebar = document.querySelector(".filter-sidebar");
+    if (filterSidebar) {
+      const resetButton = document.createElement("div");
+      resetButton.className = "reset-filters-btn mt-3 mb-3";
+      resetButton.innerHTML =
+        '<button class="btn btn-outline-secondary w-100">Reset All Filters</button>';
+      filterSidebar.prepend(resetButton);
+      resetButton
+        .querySelector("button")
+        .addEventListener("click", function () {
+          resetAllFilters();
+        });
+    }
+
+    function resetAllFilters() {
+      activeFilters = {
+        gender: [],
+        category: [],
+        brand: [],
+        minPrice: 0,
+        maxPrice: 10000,
+        search: "",
+      };
+      document
+        .querySelectorAll("[data-filter]")
+        .forEach((checkbox) => (checkbox.checked = false));
+      const priceRange = document.getElementById("priceRange");
+      if (priceRange) {
+        priceRange.value = 10000;
+        document.getElementById("priceMax").textContent = "₹10000";
+      }
+      const sortSelect = document.querySelector(".sort-options select");
+      if (sortSelect) sortSelect.selectedIndex = 0;
+      applyFilters();
+    }
+
+    const priceRange = document.getElementById("priceRange");
+    const priceMin = document.getElementById("priceMin");
+    const priceMax = document.getElementById("priceMax");
+    if (priceRange) {
+      priceRange.addEventListener("input", function () {
+        activeFilters.maxPrice = this.value;
+        priceMax.textContent = "₹" + this.value;
+        applyFilters();
+      });
+    }
+
+    const sortSelect = document.querySelector(".sort-options select");
+    if (sortSelect) {
+      sortSelect.addEventListener("change", function () {
+        applyFilters();
+      });
+    }
+
+    const filterCheckboxes = document.querySelectorAll("[data-filter]");
+    filterCheckboxes.forEach((checkbox) => {
+      checkbox.addEventListener("change", function () {
+        const filterType = this.dataset.filter;
+        const filterValue = this.dataset.value;
+        if (this.checked) {
+          if (!activeFilters[filterType].includes(filterValue)) {
+            activeFilters[filterType].push(filterValue);
+          }
+        } else {
+          activeFilters[filterType] = activeFilters[filterType].filter(
+            (v) => v !== filterValue
+          );
+        }
+        applyFilters();
+      });
+    });
+
+    function applyFilters() {
+      const queryParams = new URLSearchParams();
+      if (activeFilters.gender.length > 0) {
+        activeFilters.gender.forEach((gender) =>
+          queryParams.append("gender", gender)
+        );
+      }
+      if (activeFilters.category.length > 0) {
+        activeFilters.category.forEach((category) =>
+          queryParams.append("category", category)
+        );
+      }
+      if (activeFilters.brand.length > 0) {
+        activeFilters.brand.forEach((brand) =>
+          queryParams.append("brand", brand)
+        );
+      }
+      if (activeFilters.minPrice > 0) {
+        queryParams.append("min_price", activeFilters.minPrice);
+      }
+      if (activeFilters.maxPrice < 10000) {
+        queryParams.append("max_price", activeFilters.maxPrice);
+      }
+      if (activeFilters.search && activeFilters.search.trim() !== "") {
+        queryParams.append("search", activeFilters.search);
+      }
+      if (sortSelect) {
+        const sortValue = sortSelect.value;
+        let sortParam = "relevance";
+        if (sortValue === "Price: Low to High") sortParam = "price_low";
+        else if (sortValue === "Price: High to Low") sortParam = "price_high";
+        else if (sortValue === "Discount") sortParam = "discount";
+        else if (sortValue === "What's New") sortParam = "new";
+        queryParams.append("sort_by", sortParam);
+      }
+      const baseUrl = window.location.pathname;
+      const newUrl = baseUrl + "?" + queryParams.toString();
+      fetchFilteredProducts(queryParams);
+      window.history.pushState({}, "", newUrl);
+    }
+
+    function fetchFilteredProducts(queryParams) {
+      const url = "/filter-products/?" + queryParams.toString();
+      fetch(url)
+        .then((response) => response.text())
+        .then((html) => {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, "text/html");
+          const newProductsGrid = doc.querySelector(".products-grid");
+          const resultsCount = doc.querySelector(".results-count span");
+          if (newProductsGrid) {
+            document.querySelector(".products-grid").innerHTML =
+              newProductsGrid.innerHTML;
+          }
+          if (resultsCount) {
+            document.querySelector(".results-count span").innerHTML =
+              resultsCount.innerHTML;
+          }
+        })
+        .catch((error) =>
+          console.error("Error fetching filtered products:", error)
+        );
+    }
+
+    function initializeFiltersFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      const genders = params.getAll("gender");
+      genders.forEach((gender) => {
+        const checkbox = document.querySelector(
+          `[data-filter="gender"][data-value="${gender}"]`
+        );
+        if (checkbox) {
+          checkbox.checked = true;
+          activeFilters.gender.push(gender);
+        }
+      });
+      const categories = params.getAll("category");
+      categories.forEach((category) => {
+        const checkbox = document.querySelector(
+          `[data-filter="category"][data-value="${category}"]`
+        );
+        if (checkbox) {
+          checkbox.checked = true;
+          activeFilters.category.push(category);
+        }
+      });
+      const brands = params.getAll("brand");
+      brands.forEach((brand) => {
+        const checkbox = document.querySelector(
+          `[data-filter="brand"][data-value="${brand}"]`
+        );
+        if (checkbox) {
+          checkbox.checked = true;
+          activeFilters.brand.push(brand);
+        }
+      });
+      const minPrice = params.get("min_price");
+      if (minPrice) {
+        activeFilters.minPrice = parseFloat(minPrice);
+        if (priceMin) priceMin.textContent = "₹" + minPrice;
+      }
+      const maxPrice = params.get("max_price");
+      if (maxPrice && priceRange) {
+        activeFilters.maxPrice = parseFloat(maxPrice);
+        priceRange.value = maxPrice;
+        if (priceMax) priceMax.textContent = "₹" + maxPrice;
+      }
+      const search = params.get("search");
+      if (search) activeFilters.search = search;
+      const sortBy = params.get("sort_by");
+      if (sortBy && sortSelect) {
+        let sortValue = "Relevance";
+        switch (sortBy) {
+          case "price_low":
+            sortValue = "Price: Low to High";
+            break;
+          case "price_high":
+            sortValue = "Price: High to Low";
+            break;
+          case "discount":
+            sortValue = "Discount";
+            break;
+          case "new":
+            sortValue = "What's New";
+            break;
+        }
+        for (let i = 0; i < sortSelect.options.length; i++) {
+          if (sortSelect.options[i].text === sortValue) {
+            sortSelect.selectedIndex = i;
+            break;
+          }
+        }
+      }
+    }
+
+    const navSearchForm = document.querySelector(".search-form");
+    const navSearchInput = navSearchForm
+      ? navSearchForm.querySelector("input")
+      : null;
+    if (navSearchForm && navSearchInput) {
+      const currentSearch = new URLSearchParams(window.location.search).get(
+        "search"
+      );
+      if (currentSearch) navSearchInput.value = currentSearch;
+      navSearchForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        const searchQuery = navSearchInput.value.trim();
+        activeFilters.search = searchQuery;
+        if (!window.location.pathname.includes("/filter-products")) {
+          window.location.href =
+            "/filter-products?search=" + encodeURIComponent(searchQuery);
+        } else {
+          applyFilters();
+        }
+      });
+    }
+
+    initializeFiltersFromUrl();
+  });
+</script>
+{% endblock %}

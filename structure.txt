@@ -1,11 +1,18 @@
 <!-- Structure -->
 
 app/
+├── api/public/
+│ ├── cart
+│     ├── router.py
+│ ├── products
+│     ├── router.py
 ├── auth/
 │ ├── router.py
 │ ├── oauth.py
 │ └── services.py
 │ ├── dependencies.py
+├── cart/
+│ └── services.py
 ├── _pycache_/
 ├── customers/
 │ ├── router.py
@@ -32,6 +39,7 @@ app/
 │ ├── schemas.py
 │ └── services.py
 ├── models/
+│ ├── cart_model.py
 │ ├── customer_models.py
 | ├── email_varification.py
 │ ├── invoice_models.py
@@ -56,9 +64,13 @@ app/
 ├── static/
 |--templates/
 | ├── callback.html
-| ├── login.py
-| ├── register.py
-| ├── varify_email.py
+| ├── login.html
+| ├── register.html
+| ├── varify_email.html
+| ├── products.html
+| ├── product_details.html
+| ├── product_cart.html
+
 ├── node_modules/
 ├── static/
 ├── templates/

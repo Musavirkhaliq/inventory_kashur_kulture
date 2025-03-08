@@ -7,7 +7,7 @@ from .invoices.router import router as invoices_router
 from .users.routers import router as users_router
 from .auth.router import router as auth_router
 
-# router = APIRouter(prefix="/api")
+router = APIRouter(prefix="/admin")
 router = APIRouter()  # No prefix
 
 router.include_router(customers_router)

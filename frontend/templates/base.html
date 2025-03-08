@@ -3,21 +3,35 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Inventory Management - KashurKulture</title>
+    <title>{% block title %}Fashion Store{% endblock %}</title>
+
+    <!-- External CSS -->
     <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
     />
     <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
     />
-    <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}" />
-    {% block extra_head %}{% endblock %}
+
+    <!-- Custom CSS -->
+    <link
+      rel="stylesheet"
+      href="/frontend/static/css/product-cart-styles.css"
+    />
+    <link rel="stylesheet" href="/frontend/static/css/product-styles.css" />
+    <link
+      rel="stylesheet"
+      href="/frontend/static/css/product-detail-styles.css"
+    />
+
+    {% block styles %}{% endblock %}
+
     <style>
       :root {
         --primary-color: #4361ee;
@@ -29,84 +43,54 @@
       }
 
       body {
-        background-color: var(--light-color);
-        font-family: "Inter", "Segoe UI", sans-serif;
-        padding-top: var(--navbar-height);
+        font-family: "Montserrat", sans-serif;
       }
 
-      /* Navbar Styles (E-commerce Focus) */
+      /* Navbar Styles */
       .navbar {
-        background: var(--primary-color);
-        height: var(--navbar-height);
-        padding: 0.5rem 1rem;
-        position: fixed;
+        background-color: white;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        padding: 15px 0;
+        position: sticky;
         top: 0;
-        right: 0;
-        left: 0;
-        z-index: 1030;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
       }
 
       .navbar-brand {
         font-weight: 700;
         font-size: 1.8rem;
-        color: #fff !important;
-        position: relative;
+        letter-spacing: 1px;
+      }
+
+      .nav-link {
+        font-weight: 500;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+        color: var(--dark-color);
         padding: 0.5rem 1rem;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-      }
-
-      .navbar-brand:hover {
-        transform: translateY(-2px);
-      }
-
-      .navbar-brand i {
-        font-size: 1.5rem;
-        margin-right: 0.5rem;
-        color: var(--accent-color);
-      }
-
-      .navbar-nav {
-        gap: 0.75rem;
       }
 
       .nav-item {
         position: relative;
       }
 
-      .nav-link {
-        color: rgba(255, 255, 255, 0.9) !important;
-        font-weight: 600;
-        padding: 0.75rem 1.25rem !important;
-        border-radius: 10px;
-        transition: all 0.3s ease;
-        font-size: 1rem;
+      .nav-item::after {
+        content: "";
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: 0;
+        left: 50%;
+        background-color: var(--dark-color);
+        transition: all 0.3s;
       }
 
-      .nav-link:hover {
-        color: #fff !important;
-        background: rgba(255, 255, 255, 0.15);
-        transform: translateY(-2px);
+      .nav-item:hover::after {
+        width: 80%;
+        left: 10%;
       }
 
-      .nav-link.active {
-        background: rgba(255, 255, 255, 0.25);
-        color: #fff !important;
-      }
-
-      .navbar-toggler {
-        border: none;
-        padding: 0.5rem;
-        color: white;
-      }
-
-      .navbar-toggler:focus {
-        box-shadow: none;
-      }
-
-      /* Dropdown styles (E-commerce Style) */
+      /* Dropdown Menu */
       .nav-item.dropdown:hover .dropdown-menu {
         display: block;
         opacity: 1;
@@ -141,7 +125,24 @@
         transform: translateX(5px);
       }
 
-      /* User Profile Section */
+      /* Search Form */
+      .search-form {
+        width: 30%;
+      }
+
+      .search-form .form-control {
+        border-radius: 0;
+        border-right: none;
+      }
+
+      .search-form .btn {
+        border-radius: 0;
+        background-color: white;
+        border-left: none;
+        color: var(--dark-color);
+      }
+
+      /* User Elements */
       .nav-user {
         display: flex;
         align-items: center;
@@ -159,7 +160,6 @@
         transform: translateY(-2px);
       }
 
-      /* Auth Buttons */
       .nav-auth-buttons {
         display: flex;
         gap: 0.5rem;
@@ -182,337 +182,250 @@
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       }
 
-      /* Main Content Area */
-      .main-content {
-        min-height: calc(100vh - var(--navbar-height) - 60px);
-        padding: 2rem 0;
+      /* Footer Styles */
+      .footer {
+        background-color: var(--light-color);
+        padding: 50px 0 20px;
+        margin-top: 50px;
       }
 
-      /* Footer Styles (E-commerce Focus) */
-      footer {
-        background: var(--dark-color);
-        color: #fff;
-        padding: 2rem 0;
-        position: relative;
-      }
-
-      .footer-content {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 1.5rem;
+      .footer h5 {
+        font-weight: 600;
+        font-size: 1rem;
+        margin-bottom: 20px;
       }
 
       .footer-links {
-        display: flex;
-        gap: 2rem;
+        list-style: none;
+        padding-left: 0;
       }
 
-      .footer-link {
-        color: rgba(255, 255, 255, 0.8);
+      .footer-links li {
+        margin-bottom: 10px;
+      }
+
+      .footer-links a {
+        color: #6c757d;
+        font-size: 0.9rem;
         text-decoration: none;
-        font-weight: 500;
-        transition: all 0.3s ease;
       }
 
-      .footer-link:hover {
-        color: var(--accent-color);
-        transform: translateY(-2px);
+      .footer-links a:hover {
+        color: var(--dark-color);
       }
 
-      /* Scrollbar Styles */
-      ::-webkit-scrollbar {
-        width: 10px;
+      .social-icons {
+        display: flex;
+        gap: 15px;
+        margin-top: 15px;
       }
 
-      ::-webkit-scrollbar-track {
-        background: var(--light-color);
+      .social-icon {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background-color: var(--dark-color);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
       }
 
-      ::-webkit-scrollbar-thumb {
-        background: var(--primary-color);
-        border-radius: 5px;
-      }
-
-      ::-webkit-scrollbar-thumb:hover {
-        background: var(--secondary-color);
-      }
-
-      /* Loading Indicator */
-      .page-loader {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 2px;
-        background: var(--primary-color);
-        z-index: 9999;
-        animation: loadingProgress 2s ease-in-out infinite;
-      }
-
-      @keyframes loadingProgress {
-        0% {
-          width: 0%;
-        }
-        50% {
-          width: 70%;
-        }
-        100% {
-          width: 100%;
-        }
-      }
-
-      /* Animations */
-      @keyframes fadeInDown {
-        from {
-          opacity: 0;
-          transform: translateY(-10px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      /* Loading State for User Details */
-      .nav-user.loading {
-        opacity: 0.5;
-        pointer-events: none;
+      .copyright {
+        font-size: 0.85rem;
+        color: #6c757d;
+        border-top: 1px solid #dee2e6;
+        padding-top: 20px;
+        margin-top: 30px;
       }
     </style>
   </head>
   <body>
-    <!-- Loading Indicator -->
-    <div class="page-loader"></div>
-
-    <!-- Navbar (E-commerce Style) -->
-    <nav class="navbar navbar-expand-lg">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light">
       <div class="container">
-        <a class="navbar-brand animate__animated animate__fadeIn" href="/">
-          <i class="fas fa-store-alt me-2"></i>KashurKulture
-        </a>
+        <a class="navbar-brand" href="/">KASHUR KULTURE</a>
         <button
           class="navbar-toggler"
           type="button"
           data-bs-toggle="collapse"
           data-bs-target="#navbarNav"
         >
-          <i class="fas fa-bars"></i>
+          <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto">
-            <li class="nav-item">
-              <a class="nav-link" href="/admin"
-                ><i class="fas fa-home me-1"></i>Admin</a
-              >
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#"
-                ><i class="fas fa-box-open me-1"></i>Shop</a
-              >
-            </li>
-            <li class="nav-item dropdown">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-              >
-                <i class="fas fa-box me-1"></i>Inventory
-              </a>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">Products</a></li>
-                <li><a class="dropdown-item" href="#">Restocks</a></li>
-                <li>
-                  <a class="dropdown-item" href="#">Inventory Value</a>
-                </li>
-              </ul>
-            </li>
-            <li class="nav-item dropdown">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-              >
-                <i class="fas fa-users me-1"></i>Customers
-              </a>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">View All</a></li>
-                <li>
-                  <a class="dropdown-item" href="#">Balances</a>
-                </li>
-              </ul>
-            </li>
-            <li class="nav-item dropdown">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-              >
-                <i class="fas fa-chart-line me-1"></i>Sales
-              </a>
-              <ul class="dropdown-menu">
-                <li>
-                  <a class="dropdown-item" href="/users/profile"
-                    >Record Sales</a
-                  >
-                </li>
-                <li>
-                  <a class="dropdown-item" href="#">Sales Report</a>
-                </li>
-                <li><a class="dropdown-item" href="#">Invoices</a></li>
-              </ul>
-            </li>
-            <li class="nav-item nav-cart">
-              <a class="nav-link" href="/cart"
-                ><i class="fas fa-shopping-cart me-1"></i>Cart
-                <span class="cart-count">0</span></a
-              >
-            </li>
-            <li class="nav-item dropdown nav-account">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-              >
-                <i class="fas fa-user me-1"></i>Account
-              </a>
-              <ul class="dropdown-menu">
-                <li>
-                  <a class="dropdown-item" href="/users/profile"
-                    ><i class="fas fa-user-circle"></i> Profile</a
-                  >
-                </li>
-                <li>
-                  <a class="dropdown-item" href="#"
-                    ><i class="fas fa-box-archive"></i> Orders</a
-                  >
-                </li>
-                <li>
-                  <a class="dropdown-item" href="#" onclick="logout()"
-                    ><i class="fas fa-sign-out-alt"></i> Logout</a
-                  >
-                </li>
-              </ul>
-            </li>
 
-            <li class="nav-item nav-auth-buttons">
-              <a href="/login" class="btn">Login</a>
-              <a href="/register" class="btn">Sign Up</a>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="/">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/filter-products?gender=Men">Men</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/filter-products?gender=Women">Women</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/filter-products?discount_percentage=60"
+                >Sale</a
+              >
             </li>
           </ul>
+
+          <!-- Search Form -->
+
+          <!-- User Navigation -->
+          <div class="d-flex align-items-center">
+            <ul class="navbar-nav d-flex align-items-center">
+              <li class="nav-item nav-cart">
+                <a class="nav-link" href="/cart">
+                  <i class="fas fa-shopping-cart me-1"></i>Cart
+                  <span class="cart-count">{{ cart_count }}</span>
+                </a>
+              </li>
+              <li class="nav-item dropdown nav-account">
+                <a
+                  class="nav-link dropdown-toggle"
+                  href="#"
+                  role="button"
+                  data-bs-toggle="dropdown"
+                >
+                  <i class="fas fa-user me-1"></i>Account
+                </a>
+                <ul class="dropdown-menu">
+                  <li>
+                    <a class="dropdown-item" href="/users/profile">
+                      <i class="fas fa-user-circle"></i> Profile
+                    </a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="#">
+                      <i class="fas fa-box-archive"></i> Orders
+                    </a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="#" onclick="logout()">
+                      <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                  </li>
+                </ul>
+              </li>
+              <li class="nav-item nav-auth-buttons">
+                <a href="/login" class="btn">Login</a>
+                <a href="/register" class="btn">Sign Up</a>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </nav>
 
     <!-- Main Content -->
-    <main class="main-content">
-      <div class="container">{% block content %}{% endblock %}</div>
-    </main>
+    <main>{% block content %}{% endblock %}</main>
 
-    <!-- Footer (E-commerce Style) -->
-    <footer>
+    <!-- Footer -->
+    <footer class="footer">
       <div class="container">
-        <div class="footer-content">
-          <div class="copyright">
-            <p class="mb-0">© 2025 KashurKulture. All Rights Reserved.</p>
+        <div class="row">
+          <div class="col-md-3">
+            <h5>Customer Service</h5>
+            <ul class="footer-links">
+              <li><a href="#">Help & FAQs</a></li>
+              <li><a href="#">Order Tracking</a></li>
+              <li><a href="#">Shipping & Delivery</a></li>
+              <li><a href="#">Return Policy</a></li>
+              <li><a href="#">Contact Us</a></li>
+            </ul>
           </div>
-          <div class="footer-links">
-            <a href="/about" class="footer-link">About Us</a>
-            <a href="/shop" class="footer-link">Shop</a>
-            <a href="/contact" class="footer-link">Contact</a>
-            <a href="/privacy" class="footer-link">Privacy Policy</a>
+
+          <div class="col-md-3">
+            <h5>Information</h5>
+            <ul class="footer-links">
+              <li><a href="#">About Us</a></li>
+              <li><a href="#">Careers</a></li>
+              <li><a href="#">Terms & Conditions</a></li>
+              <li><a href="#">Privacy Policy</a></li>
+              <li><a href="#">Site Map</a></li>
+            </ul>
           </div>
+
+          <div class="col-md-3">
+            <h5>My Account</h5>
+            <ul class="footer-links">
+              <li><a href="#">Sign In</a></li>
+              <li><a href="#">View Cart</a></li>
+              <li><a href="#">My Wishlist</a></li>
+              <li><a href="#">Track My Order</a></li>
+              <li><a href="#">Help</a></li>
+            </ul>
+          </div>
+
+          <div class="col-md-3">
+            <h5>Stay Connected</h5>
+            <p class="mb-3">
+              Subscribe to our newsletter for updates on new arrivals, sales and
+              more.
+            </p>
+            <form>
+              <div class="input-group mb-3">
+                <input
+                  type="email"
+                  class="form-control"
+                  placeholder="Your Email Address"
+                />
+                <button class="btn btn-dark" type="button">Subscribe</button>
+              </div>
+            </form>
+
+            <div class="social-icons">
+              <a href="#" class="social-icon"
+                ><i class="fab fa-facebook-f"></i
+              ></a>
+              <a href="#" class="social-icon"
+                ><i class="fab fa-instagram"></i
+              ></a>
+              <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+              <a href="#" class="social-icon"
+                ><i class="fab fa-pinterest"></i
+              ></a>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-center copyright">
+          <p>&copy; 2025 KASHUR KULTURE. All Rights Reserved.</p>
         </div>
       </div>
     </footer>
 
     <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ url_for('static', path='js/main.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-      // Add active class to current nav item
-      document.addEventListener("DOMContentLoaded", function () {
-        const currentPath = window.location.pathname;
-        const navLinks = document.querySelectorAll(".nav-link");
-
-        navLinks.forEach((link) => {
-          if (link.getAttribute("href") === currentPath) {
-            link.classList.add("active");
-          }
-        });
-      });
-
-      // Update cart count and user details (example, replace with real data from backend)
+      // Authentication and user display logic
       const cartCount = document.querySelector(".cart-count");
       const token = localStorage.getItem("access_token");
-      const userDisplay = document.getElementById("userDisplay");
 
+      // Handle authentication state
       if (token) {
-        // Fallback: Try decoding token for username if backend fetch fails
+        // User is logged in - hide auth buttons
         const navAuthButtons = document.querySelector(".nav-auth-buttons");
-        navAuthButtons.style.display = "none";
+        if (navAuthButtons) navAuthButtons.style.display = "none";
       } else {
+        // User is not logged in - hide user-specific elements
         const cartLink = document.querySelector(".nav-cart");
         const accountLink = document.querySelector(".nav-account");
-        const userLink = document.querySelector(".nav-user");
         if (cartLink) cartLink.style.display = "none";
         if (accountLink) accountLink.style.display = "none";
-        if (userLink) userLink.style.display = "none";
       }
 
       // Logout functionality
       function logout() {
         localStorage.removeItem("access_token");
-        window.location.href = "/kashur_kulture";
+        window.location.href = "/";
       }
-
-      // Smooth scroll behavior
-      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-        anchor.addEventListener("click", function (e) {
-          e.preventDefault();
-          document.querySelector(this.getAttribute("href")).scrollIntoView({
-            behavior: "smooth",
-          });
-        });
-      });
-
-      // function navigateToProfile(event) {
-      //   event.preventDefault();
-      //   const token = localStorage.getItem("access_token");
-      //   if (!token) {
-      //     alert("Please log in to view your profile.");
-      //     window.location.href = "/login";
-      //     return;
-      //   }
-
-      //   fetch("/users/profile", {
-      //     headers: { Authorization: `Bearer ${token}` },
-      //   })
-      //     .then((response) => {
-      //       if (!response.ok)
-      //         throw new Error("Unauthorized or profile not found");
-      //       return response.text(); // Handle HTML response
-      //     })
-      //     .then((html) => {
-      //       document.open();
-      //       document.write(html);
-      //       document.close();
-      //     })
-      //     .catch((error) => {
-      //       console.error("Error fetching profile:", error);
-      //       if (error.message.includes("Unauthorized")) {
-      //         alert("Please log in to view your profile.");
-      //         localStorage.removeItem("access_token");
-      //         window.location.href = "/login";
-      //       }
-      //     });
-      // }
     </script>
-    {% block extra_scripts %}{% endblock %}
+
+    {% block scripts %}{% endblock %}
   </body>
 </html>
