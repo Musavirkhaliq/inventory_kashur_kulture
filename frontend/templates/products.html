@@ -175,14 +175,14 @@
         {% for product in products %}
         <div class="col product-card">
           <!-- Wrap the entire card in a link to the product detail page -->
-          <a
-            href="/filter-products/{{ product.id }}"
-            class="text-decoration-none"
-          >
-            <div class="card h-100">
-              {% if product.is_bestseller %}
-              <div class="bestseller-badge">BESTSELLER</div>
-              {% endif %}
+          <div class="card h-100">
+            {% if product.is_bestseller %}
+            <div class="bestseller-badge">BESTSELLER</div>
+            {% endif %}
+            <a
+              href="/filter-products/{{ product.id }}"
+              class="text-decoration-none"
+            >
               <div class="card-body text-center">
                 <div class="product-img-container">
                   <img
@@ -210,20 +210,14 @@
                     >({{ product.discount_percentage }}% off)</span
                   >
                 </div>
-                <div class="sale-price-badge">
-                  <i class="fas fa-star"></i> Sale Price ₹{{ product.price }}
-                </div>
+              </a>
+                  <form action="/cart/add/{{ product.id }}" method="post" >
+                    <button type="submit" class="sale-price-badge">
+                      <i class="fas fa-cart-plus"></i>Add to cart
+                    </button>
+                  </form>
               </div>
-              <form action="/cart/add/{{ product.id }}" method="post">
-                <!-- Add size selection if dynamic -->
-                <input type="hidden" name="size" value="M" />
-                <!-- Default size; enhance later -->
-                <button type="submit" class="btn btn-primary btn-lg w-100 mb-2">
-                  ADD TO BAG
-                </button>
-              </form>
             </div>
-          </a>
         </div>
         {% endfor %}
       </div>
